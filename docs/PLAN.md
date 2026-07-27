@@ -32,16 +32,16 @@
 
 ## Fasering
 
-### Fase 1 — Fundament
-- [ ] Monorepo-structuur (`apps/mobile`, `supabase/`, `docs/`)
-- [ ] Expo-app (laatste SDK, TypeScript strict, expo-router)
-- [ ] ESLint + Prettier + absolute imports (`@/…`)
-- [ ] Jest + eerste test draait
-- [ ] EAS-config (development / preview / production) gekoppeld aan bestaand EAS-project
-- [ ] `.env` via `app.config.ts` + `expo-constants`; `.env.example` in git
-- [ ] Supabase-project gekoppeld (`supabase link`), `supabase/` init + eerste lege migratie
-- [ ] CI (GitHub Actions): lint + typecheck + test
-- [ ] `CLAUDE.md` in de repo-root
+### Fase 1 — Fundament ✅ (2026-07-27)
+- [x] Monorepo-structuur (`apps/mobile`, `supabase/`, `docs/`)
+- [x] Expo-app (SDK 57, TypeScript strict, expo-router, src-layout)
+- [x] ESLint (eslint-config-expo + prettier) + Prettier + absolute imports (`@/…`)
+- [x] Jest (jest-expo) + eerste test draait (datumhelpers rooster)
+- [x] EAS-config (development / preview / production) gekoppeld aan EAS-project `fe37e87d`
+- [x] `.env` (EXPO_PUBLIC_SUPABASE_URL/ANON_KEY); `.env.example` in git
+- [x] Supabase-project aangemaakt én gekoppeld (`supabase link`, ref `pfvxgzosntzzhydzzkaj`); migraties volgen in Fase 3
+- [x] CI (GitHub Actions): lint + typecheck + test
+- [x] `CLAUDE.md` in de repo-root
 
 ### Fase 2 — Designsysteem
 - [ ] `theme.ts` met exact de tokens uit de handoff (kleuren, radii, schaduwen, typografie, spacing)
