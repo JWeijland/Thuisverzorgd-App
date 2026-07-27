@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Node / Expo (voor later)
+node_modules/
+.expo/
+dist/
+web-build/
+*.log
+
+# Env
+.env
+.env.*
+!.env.example
+
+# EAS / native builds
+ios/
+android/
+*.ipa
+*.apk
+
+# Xcode (legacy docs bevatten een .xcodeproj, die willen we wél in git;
+# alleen user-specifieke bestanden negeren)
+xcuserdata/
+DerivedData/
+
+# Supabase lokaal
+supabase/.temp/

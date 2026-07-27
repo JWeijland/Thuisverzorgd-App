@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Comic+Neue:ital,wght@0,400;0,700;1,400&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+  body { margin:0; background:#F5F8FC; }
+  a { color:#2A6CB0; } a:hover { color:#1A4878; }
+  input, button { font-family:inherit; }
+  input::placeholder { color:#8F9AAA; }
+  .leaflet-container { font-family:'Comic Neue',sans-serif; background:#EEF2F8; }
+  .leaflet-div-icon { background:transparent; border:none; }
+  @keyframes tvzBounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-7px); } }
+  @keyframes tvzIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes tvzPulse { 0% { box-shadow:0 0 0 0 rgba(141,201,63,0.55); } 70% { box-shadow:0 0 0 16px rgba(141,201,63,0); } 100% { box-shadow:0 0 0 0 rgba(141,201,63,0); } }
+  ::-webkit-scrollbar { width:0; height:0; }
+</style>
+</helmet>
+<div style="min-height:100vh; background:#F5F8FC; display:flex; align-items:flex-start; justify-content:center; gap:44px; padding:44px 32px; font-family:'Comic Neue',sans-serif; color:#112640; box-sizing:border-box; flex-wrap:wrap;">
+  <sc-if value="{{ showPanel }}" hint-placeholder-val="{{ true }}">
+  <div style="width:250px; flex:0 0 auto; position:sticky; top:44px; display:flex; flex-direction:column; gap:20px;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <div style="display:flex; gap:2px;"><div style="width:15px; height:10px; border-radius:5px; background:#2A6CB0;"></div><div style="width:15px; height:10px; border-radius:5px; background:#8DC93F;"></div></div>
+        <div style="width:10px; height:22px; border-radius:5px; background:#1A4878; margin-top:2px;"></div>
+      </div>
+      <div>
+        <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; color:#1A4878;">thuisverzorgd</div>
+        <div style="font-size:12px; color:#5A687A;">Pilot-prototype · Amsterdam · v3 getekend</div>
+      </div>
+    </div>
+    <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:12px; padding:20px; display:flex; flex-direction:column; gap:16px; box-shadow:0 8px 24px rgba(17,47,80,0.06);">
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:#8F9AAA;">Onboarding</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <button onClick="{{ jWelcome }}" style="{{ chipWelcome }}">Welkom</button>
+        <button onClick="{{ jSignup }}" style="{{ chipSignup }}">Account</button>
+        <button onClick="{{ jVerify }}" style="{{ chipVerify }}">E-mail</button>
+        <button onClick="{{ jRole }}" style="{{ chipRole }}">Rolkeuze</button>
+      </div>
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:#8F9AAA;">Beheerder</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <button onClick="{{ jMzVandaag }}" style="{{ chipMzVandaag }}">Rooster</button>
+        <button onClick="{{ jMzWeekplan }}" style="{{ chipMzWeekplan }}">Weekplanning</button>
+        <button onClick="{{ jMzKaart }}" style="{{ chipMzKaart }}">Buurt</button>
+        <button onClick="{{ jMzSpont }}" style="{{ chipOff }}">Directe hulp</button>
+        <button onClick="{{ jMzKring }}" style="{{ chipMzKring }}">Hulpkring</button>
+        <button onClick="{{ jMzChat }}" style="{{ chipMzChat }}">Berichten</button>
+        <button onClick="{{ jMzAbo }}" style="{{ chipMzAbo }}">Abonnement</button>
+        <button onClick="{{ jMzProfiel }}" style="{{ chipMzProfiel }}">Profiel</button>
+        <button onClick="{{ jMzForum }}" style="{{ chipMzForum }}">Forum</button>
+        <button onClick="{{ jMzMakelaar }}" style="{{ chipMzMakelaar }}">Hulpmakelaar</button>
+        <button onClick="{{ jMzInbox }}" style="{{ chipOff }}">Inbox</button>
+        <button onClick="{{ jMzBeoordeling }}" style="{{ chipOff }}">Beoordeling</button>
+      </div>
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:#8F9AAA;">Vrijwilliger (buddy)</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <button onClick="{{ jVKaart }}" style="{{ chipVKaart }}">Buurt</button>
+        <button onClick="{{ jVSpont }}" style="{{ chipOff }}">Directe hulp</button>
+        <button onClick="{{ jVUitnodiging }}" style="{{ chipVUitnodiging }}">Uitnodiging</button>
+        <button onClick="{{ jVId }}" style="{{ chipVId }}">ID-check</button>
+        <button onClick="{{ jVTaken }}" style="{{ chipVTaken }}">Taken</button>
+        <button onClick="{{ jVProfiel }}" style="{{ chipVProfiel }}">Profiel</button>
+        <button onClick="{{ jVInbox }}" style="{{ chipOff }}">Inbox</button>
+        <button onClick="{{ jVCancelChip }}" style="{{ chipOff }}">Annulering</button>
+        <button onClick="{{ jVCallChip }}" style="{{ chipOff }}">Videocall</button>
+      </div>
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:#8F9AAA;">Hulpvrager</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <button onClick="{{ jZvVandaag }}" style="{{ chipZvVandaag }}">Vandaag</button>
+      </div>
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:#8F9AAA;">Admin</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <button onClick="{{ jAdOverzicht }}" style="{{ chipAdOverzicht }}">Inzichten</button>
+      </div>
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:#8F9AAA;">Rondleiding</div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <button onClick="{{ wtMzChip }}" style="{{ chipOff }}">Beheerder</button>
+        <button onClick="{{ wtVChip }}" style="{{ chipOff }}">Vrijwilliger</button>
+        <button onClick="{{ wtZvChip }}" style="{{ chipOff }}">Hulpvrager</button>
+      </div>
+      <button onClick="{{ resetAll }}" style="margin-top:4px; padding:10px 16px; border-radius:999px; border:1.5px solid #E3E8F1; background:#FFFFFF; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; cursor:pointer;" style-hover="border-color:#1A4878; color:#1A4878;">Prototype resetten</button>
+    </div>
+    <div style="font-family:Caveat,cursive; font-size:18px; line-height:1.45; color:#1A4878; padding:0 6px; transform:rotate(-1deg);">Alles in de telefoon is klikbaar: doorloop de flow van welkom tot abonnement, of spring hiernaast direct naar een stap.</div>
+  </div>
+  </sc-if>
+  <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ darkChrome }}" hint-size="430px,880px">
+  <div style="height:100%; display:flex; flex-direction:column; background:#F5F8FC; position:relative; font-family:'Comic Neue',sans-serif; color:#112640; overflow:hidden;">
+
+    <sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:1; display:flex; flex-direction:column; background:linear-gradient(115deg,#112F50,#2A6CB0); padding:32px 28px 40px; box-sizing:border-box;">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div style="display:flex; gap:3px;">
+            <div style="width:34px; height:22px; border-radius:11px; background:#2A6CB0; animation:tvzBounce 2.6s ease-in-out infinite;"></div>
+            <div style="width:34px; height:22px; border-radius:11px; background:#8DC93F; animation:tvzBounce 2.6s ease-in-out 0.25s infinite;"></div>
+          </div>
+          <div style="width:22px; height:52px; border-radius:11px; background:#FFFFFF; margin-top:5px;"></div>
+        </div>
+        <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:30px; color:#FFFFFF;">thuisverzorgd</div>
+        <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; line-height:1.5; color:#FFFFFF; opacity:0.9; text-align:center; max-width:250px;">Hulp dichtbij, geregeld door de buurt<span style="color:#8DC93F;">.</span></div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <button onClick="{{ toSignup }}" style="height:64px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; cursor:pointer; box-shadow:0 8px 20px rgba(17,47,80,0.35);" style-hover="background:#9AD44E;">Account aanmaken</button>
+        <button onClick="{{ toSignup }}" style="height:56px; border-radius:999px; border:1.5px solid rgba(255,255,255,0.55); background:transparent; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; cursor:pointer;" style-hover="border-color:#FFFFFF; background:rgba(255,255,255,0.08);">Inloggen</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isSignup }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1; display:flex; flex-direction:column; padding:58px 24px 28px; box-sizing:border-box; overflow-y:auto;">
+      <button onClick="{{ toWelcome }}" style="width:44px; height:44px; border-radius:50%; border:none; background:#EEF2F8; color:#1A4878; font-size:19px; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#E3E8F1;">←</button>
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:27px; margin-top:18px; color:#112640;">Maak je account</div>
+      <div style="font-size:16px; color:#5A687A; line-height:1.55; margin-top:8px;">Alleen je naam en e-mailadres. Geen wachtwoord — je logt in via een link in je mail.</div>
+      <div style="display:flex; flex-direction:column; gap:14px; margin-top:26px;">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:#112640;">Je naam</label>
+          <input onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Bijv. Jelle Weijland" style="height:56px; border-radius:8px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 18px; font-size:17px; color:#112640; outline:none;">
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <label style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:#112640;">E-mailadres</label>
+          <input onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="naam@voorbeeld.nl" style="height:56px; border-radius:8px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 18px; font-size:17px; color:#112640; outline:none;">
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+      <div style="font-size:13px; color:#8F9AAA; line-height:1.55; margin:18px 2px 12px;">Door verder te gaan ga je akkoord met de voorwaarden. Je gegevens blijven van jou.</div>
+      <button onClick="{{ toVerify }}" style="height:64px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; cursor:pointer;" style-hover="background:#112F50;">Stuur mij een inloglink</button>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isVerify }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 30px; box-sizing:border-box; text-align:center; gap:8px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+        <div style="width:40px; height:26px; border-radius:13px; background:#2A6CB0; animation:tvzBounce 2.2s ease-in-out infinite;"></div>
+        <div style="width:40px; height:26px; border-radius:13px; background:#8DC93F; animation:tvzBounce 2.2s ease-in-out 0.3s infinite;"></div>
+      </div>
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:25px; color:#112640;">Kijk in je mail</div>
+      <div style="font-size:16.5px; color:#5A687A; line-height:1.6; max-width:280px;">We hebben je een inloglink gestuurd. Eén tik en je bent binnen — geen wachtwoord nodig.</div>
+      <button onClick="{{ toRole }}" style="margin-top:26px; height:64px; width:100%; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; cursor:pointer;" style-hover="background:#112F50;">Ik heb op de link getikt</button>
+      <button style="margin-top:6px; border:none; background:none; color:#2A6CB0; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; cursor:pointer; padding:12px;" style-hover="color:#1A4878;">Link opnieuw sturen</button>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isRole }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1; display:flex; flex-direction:column; padding:30px 24px 36px; box-sizing:border-box;">
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:27px; color:#112640;">Wat wil je doen<span style="color:#8DC93F;">?</span></div>
+      <div style="font-size:16px; color:#5A687A; line-height:1.55; margin-top:8px;">Je kunt dit later altijd aanpassen.</div>
+      <div style="display:flex; flex-direction:column; gap:16px; margin-top:28px;">
+        <button onClick="{{ pickMantelzorger }}" style="text-align:left; border:1.5px solid #E3E8F1; background:#FFFFFF; border-radius:12px; padding:22px; cursor:pointer; display:flex; flex-direction:column; gap:8px; box-shadow:0 6px 18px rgba(17,47,80,0.05);" style-hover="border-color:#1A4878;">
+          <div style="width:46px; height:30px; border-radius:15px; background:#2A6CB0;"></div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; color:#112640;">Ik regel hulp voor iemand</div>
+          <div style="font-size:15px; color:#5A687A; line-height:1.5;">Maak een hulpkring rondom je naaste en nodig vrijwilligers uit.</div>
+        </button>
+        <button onClick="{{ pickVrijwilliger }}" style="text-align:left; border:1.5px solid #E3E8F1; background:#FFFFFF; border-radius:12px; padding:22px; cursor:pointer; display:flex; flex-direction:column; gap:8px; box-shadow:0 6px 18px rgba(17,47,80,0.05);" style-hover="border-color:#73B02B;">
+          <div style="width:46px; height:30px; border-radius:15px; background:#8DC93F;"></div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; color:#112640;">Ik wil helpen in de buurt</div>
+          <div style="font-size:15px; color:#5A687A; line-height:1.5;">Word buddy en help af en toe iemand dichtbij. Jij bepaalt wanneer.</div>
+        </button>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isVid }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1; display:flex; flex-direction:column; padding:58px 24px 32px; box-sizing:border-box; overflow-y:auto;">
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:26px;">Nog twee foto's<span style="color:#8DC93F;">.</span></div>
+      <div style="font-size:16px; color:#5A687A; line-height:1.6; margin-top:8px;">Eén keer bij je registratie, daarna nooit meer. Zo weet elke kring zeker wie je bent.</div>
+      <div style="display:flex; gap:12px; margin-top:22px;">
+        <button onClick="{{ vidFotoId }}" style="{{ vidTileId }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1A4878" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"></rect><circle cx="9" cy="12" r="2.2"></circle><path d="M14 10h4M14 14h4"></path></svg>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:#112640;">Foto van je ID</div>
+          <div style="font-size:13px; color:#5A687A;">Paspoort, ID-kaart of rijbewijs</div>
+          <sc-if value="{{ vidIdDone }}" hint-placeholder-val="{{ false }}"><span style="height:26px; display:inline-flex; align-items:center; padding:0 11px; border-radius:999px; background:#F1F8E4; color:#4C7A16; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px;">Gelukt ✓</span></sc-if>
+        </button>
+        <button onClick="{{ vidFotoSelfie }}" style="{{ vidTileSelfie }}">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1A4878" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="3.4"></circle><path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path></svg>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:#112640;">Profielfoto</div>
+          <div style="font-size:13px; color:#5A687A;">Voor herkenning aan de deur</div>
+          <sc-if value="{{ vidSelfieDone }}" hint-placeholder-val="{{ false }}"><span style="height:26px; display:inline-flex; align-items:center; padding:0 11px; border-radius:999px; background:#F1F8E4; color:#4C7A16; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px;">Gelukt ✓</span></sc-if>
+        </button>
+      </div>
+      <div style="display:flex; align-items:flex-start; gap:10px; margin-top:16px; background:#EEF2F8; border-radius:10px; padding:14px 16px;">
+        <span style="width:18px; height:5px; border-radius:3px; background:#8DC93F; flex:0 0 auto; margin-top:7px;"></span>
+        <div style="font-size:13.5px; color:#5A687A; line-height:1.55;">We bewaren alleen de bevestiging van de check, niet je document. Je profielfoto zien alleen kringen waar je bij hoort.</div>
+      </div>
+      <div style="flex:1;"></div>
+      <button onClick="{{ vidKlaar }}" style="{{ vidKlaarStyle }}">De app in →</button>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1; display:flex; flex-direction:column; background:#F5F8FC; overflow:hidden;">
+      <div style="background:linear-gradient(115deg,#112F50,#2A6CB0); padding:58px 20px 18px; color:#FFFFFF;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="display:flex; gap:2px;"><div style="width:14px; height:9px; border-radius:5px; background:#8DC93F;"></div><div style="width:14px; height:9px; border-radius:5px; background:#FFFFFF;"></div></div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:19px; flex:1;">Thuisverzorgd Admin</div>
+          <span style="height:26px; display:inline-flex; align-items:center; padding:0 11px; border-radius:999px; background:rgba(255,255,255,0.16); font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11.5px;">Pilot</span>
+        </div>
+        <div style="font-size:13.5px; opacity:0.85; margin-top:6px;">Geaccumuleerde data · Amsterdam · geen persoonsgegevens</div>
+      </div>
+      <div style="flex:1; overflow-y:auto; padding:18px 20px 30px; box-sizing:border-box;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div style="background:#FFFFFF; border-radius:12px; padding:16px; box-shadow:0 6px 18px rgba(17,47,80,0.06);">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:28px; color:#1A4878;">42</div>
+            <div style="width:22px; height:4px; border-radius:2px; background:#8DC93F; margin:4px 0 6px;"></div>
+            <div style="font-size:13px; color:#5A687A;">Actieve hulpkringen</div>
+          </div>
+          <div style="background:#FFFFFF; border-radius:12px; padding:16px; box-shadow:0 6px 18px rgba(17,47,80,0.06);">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:28px; color:#1A4878;">128</div>
+            <div style="width:22px; height:4px; border-radius:2px; background:#8DC93F; margin:4px 0 6px;"></div>
+            <div style="font-size:13px; color:#5A687A;">Buddy's in Amsterdam</div>
+          </div>
+          <div style="background:#FFFFFF; border-radius:12px; padding:16px; box-shadow:0 6px 18px rgba(17,47,80,0.06);">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:28px; color:#1A4878;">92%</div>
+            <div style="width:22px; height:4px; border-radius:2px; background:#8DC93F; margin:4px 0 6px;"></div>
+            <div style="font-size:13px; color:#5A687A;">Taken vervuld</div>
+          </div>
+          <div style="background:#FFFFFF; border-radius:12px; padding:16px; box-shadow:0 6px 18px rgba(17,47,80,0.06);">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:28px; color:#1A4878;">12</div>
+            <div style="width:22px; height:4px; border-radius:2px; background:#8DC93F; margin:4px 0 6px;"></div>
+            <div style="font-size:13px; color:#5A687A;">Taken vandaag</div>
+          </div>
+        </div>
+        <div style="background:#FFFFFF; border-radius:12px; padding:18px 20px; box-shadow:0 6px 18px rgba(17,47,80,0.06); margin-top:14px;">
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;">Groei hulpkringen</div>
+          <div style="font-size:13px; color:#5A687A; margin-top:2px;">Actieve kringen per maand</div>
+          <div style="display:flex; align-items:flex-end; gap:10px; height:110px; margin-top:14px;">
+            <sc-for list="{{ adGroeiRows }}" as="g" hint-placeholder-count="6">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; height:100%; justify-content:flex-end;">
+                <div style="font-size:11.5px; color:#5A687A; font-weight:600;">{{ g.n }}</div>
+                <div style="{{ g.bar }}"></div>
+                <div style="font-size:11px; color:#8F9AAA;">{{ g.mnd }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#FFFFFF; border-radius:12px; padding:18px 20px; box-shadow:0 6px 18px rgba(17,47,80,0.06); margin-top:12px;">
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;">Taken per type</div>
+          <div style="font-size:13px; color:#5A687A; margin-top:2px;">Afgeronde taken, afgelopen 30 dagen</div>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+            <sc-for list="{{ adTypeRows }}" as="t" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:96px; font-size:13px; font-weight:600;">{{ t.naam }}</div>
+                <div style="flex:1; height:10px; border-radius:5px; background:#EEF2F8; overflow:hidden;"><div style="{{ t.bar }}"></div></div>
+                <div style="width:38px; font-size:12.5px; color:#5A687A; text-align:right;">{{ t.pct }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#FFFFFF; border-radius:12px; padding:18px 20px; box-shadow:0 6px 18px rgba(17,47,80,0.06); margin-top:12px; display:flex; align-items:center; gap:16px;">
+          <div style="width:48px; height:48px; border-radius:15px; background:#EEF2F8; display:flex; align-items:center; justify-content:center; flex:0 0 auto;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A4878" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
+          </div>
+          <div>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:21px;">2,1 uur</div>
+            <div style="font-size:13px; color:#5A687A;">Gemiddelde tijd tot een open taak is vervuld</div>
+          </div>
+        </div>
+        <div style="font-size:12.5px; color:#8F9AAA; text-align:center; line-height:1.5; margin-top:14px; padding:0 10px;">Alle cijfers zijn geanonimiseerd en geaccumuleerd op wijkniveau.</div>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isMain }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1; display:flex; flex-direction:column; position:relative; overflow:hidden;">
+
+      <sc-if value="{{ isKaart }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute; inset:0;">
+        <div ref="{{ mapRef }}" style="position:absolute; inset:0;"></div>
+        <div style="position:absolute; top:60px; left:16px; right:16px; display:flex; flex-direction:column; gap:10px; z-index:600;">
+          <div style="height:52px; background:#FFFFFF; border-radius:999px; box-shadow:0 8px 24px rgba(17,47,80,0.14); display:flex; align-items:center; gap:12px; padding:0 20px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A4878" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.2-3.2"></path></svg>
+            <input value="{{ zoek }}" onChange="{{ onZoek }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Zoek hulpkringen" style="flex:1; min-width:0; border:none; outline:none; background:none; font-size:16px; font-family:inherit; color:#112640;">
+            <sc-if value="{{ zoekActief }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ zoekClear }}" style="width:30px; height:30px; border-radius:50%; border:none; background:#EEF2F8; color:#5A687A; cursor:pointer; font-size:13px; flex:0 0 auto;" style-hover="background:#E3E8F1;">✕</button>
+            </sc-if>
+          </div>
+          <sc-if value="{{ zoekActief }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FFFFFF; border-radius:12px; box-shadow:0 12px 32px rgba(17,47,80,0.18); overflow:hidden; margin-top:-2px;">
+            <sc-for list="{{ zoekRows }}" as="z" hint-placeholder-count="2">
+              <button onClick="{{ z.kies }}" style="display:flex; align-items:center; gap:12px; width:100%; padding:13px 16px; border:none; background:#FFFFFF; cursor:pointer; text-align:left; border-bottom:1px solid #EEF2F8;" style-hover="background:#F5F8FC;">
+                <div style="width:34px; height:34px; border-radius:50%; background:#EEF2F8; display:flex; align-items:center; justify-content:center; gap:2px; flex:0 0 auto;">
+                  <span style="width:10px; height:7px; border-radius:4px; background:#2A6CB0;"></span><span style="width:10px; height:7px; border-radius:4px; background:#8DC93F;"></span>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:14.5px; font-weight:600; color:#112640;">{{ z.naam }}</div>
+                  <div style="font-size:12.5px; color:#5A687A;">{{ z.sub }}</div>
+                </div>
+              </button>
+            </sc-for>
+            <sc-if value="{{ zoekLeeg }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:14px 16px; font-size:14px; color:#8F9AAA;">Geen hulpkring gevonden met die naam.</div>
+            </sc-if>
+          </div>
+          </sc-if>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <sc-if value="{{ isMz }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ filterKringen }}" style="{{ chipFilterKringen }}">Hulpkringen</button>
+            <button onClick="{{ filterBuddys }}" style="{{ chipFilterBuddys }}">Buddy's</button>
+            </sc-if>
+            <sc-if value="{{ isV }}" hint-placeholder-val="{{ false }}">
+            <div style="height:36px; display:inline-flex; align-items:center; gap:8px; background:#112F50; color:#FFFFFF; border-radius:999px; padding:0 15px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; box-shadow:0 4px 14px rgba(17,47,80,0.2);">
+              <span style="width:8px; height:8px; border-radius:50%; background:#8DC93F;"></span>
+              {{ mapCountLabel }}
+            </div>
+            </sc-if>
+          </div>
+        </div>
+        <sc-if value="{{ hasSelectedKring }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; left:16px; right:16px; bottom:106px; background:#FFFFFF; border-radius:12px; box-shadow:0 16px 40px rgba(17,47,80,0.22); padding:20px; z-index:650; animation:tvzIn 0.25s ease;">
+          <div style="display:flex; align-items:flex-start; gap:14px;">
+            <div style="width:48px; height:48px; border-radius:50%; background:#EEF2F8; display:flex; align-items:center; justify-content:center; gap:2px; flex:0 0 auto;">
+              <div style="width:13px; height:9px; border-radius:5px; background:#2A6CB0;"></div><div style="width:13px; height:9px; border-radius:5px; background:#8DC93F;"></div>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; color:#112640;">{{ selNaam }}</div>
+              <div style="font-size:14px; color:#5A687A; margin-top:2px;">{{ selWijk }} · {{ selBuddies }} buddy's</div>
+            </div>
+            <button onClick="{{ closeKring }}" style="width:34px; height:34px; border-radius:50%; border:none; background:#EEF2F8; color:#5A687A; cursor:pointer; font-size:15px;" style-hover="background:#E3E8F1;">✕</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:14px;">
+            <span style="{{ selPlekPill }}">{{ selPlekLabel }}</span>
+            <span style="height:30px; display:inline-flex; align-items:center; padding:0 13px; border-radius:999px; background:#EEF2F8; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px;">Wijkniveau</span>
+          </div>
+          <sc-if value="{{ isV }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ meldAan }}" style="margin-top:16px; width:100%; height:56px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer;" style-hover="background:#9AD44E;">Meld je aan bij deze kring</button>
+          </sc-if>
+          <sc-if value="{{ isMz }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px; font-size:13.5px; color:#8F9AAA; line-height:1.5;">Namen en details zijn alleen zichtbaar voor leden van deze kring.</div>
+          </sc-if>
+        </div>
+        </sc-if>
+        <sc-if value="{{ spontMzCta }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ spontStart }}" style="position:absolute; left:16px; right:16px; bottom:106px; height:60px; border-radius:999px; border:none; background:#112F50; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; z-index:640; box-shadow:0 14px 34px rgba(17,47,80,0.35);" style-hover="background:#1A4878;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#8DC93F" stroke="none"><path d="M13 2L4.5 13.5H11L9.5 22 19 10h-6.5L13 2z"></path></svg>
+          Directe hulp vragen
+        </button>
+        </sc-if>
+        <sc-if value="{{ spontMzCard }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; left:16px; right:16px; bottom:106px; background:#FFFFFF; border-radius:12px; box-shadow:0 16px 40px rgba(17,47,80,0.22); padding:20px; z-index:650; animation:tvzIn 0.25s ease;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:42px; height:42px; border-radius:50%; background:#112F50; display:flex; align-items:center; justify-content:center; flex:0 0 auto;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#8DC93F" stroke="none"><path d="M13 2L4.5 13.5H11L9.5 22 19 10h-6.5L13 2z"></path></svg>
+            </div>
+            <div style="flex:1; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px;">Directe hulp</div>
+            <button onClick="{{ spontMzClose }}" style="width:34px; height:34px; border-radius:50%; border:none; background:#EEF2F8; color:#5A687A; cursor:pointer; font-size:15px;" style-hover="background:#E3E8F1;">✕</button>
+          </div>
+          <sc-if value="{{ spontMzCompose }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:14.5px; color:#5A687A; line-height:1.55; margin-top:10px;">Nu even hulp nodig, buiten het rooster om? Buddy's in de buurt krijgen direct een melding.</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;">
+            <sc-for list="{{ spontTaakRows }}" as="c" hint-placeholder-count="4">
+              <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <button onClick="{{ spontPlaats }}" style="margin-top:14px; width:100%; height:56px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer;" style-hover="background:#9AD44E;">Zet op de kaart</button>
+          <div style="font-size:12.5px; color:#8F9AAA; margin-top:8px; text-align:center;">Je adres blijft verborgen tot jij iemand toestaat.</div>
+          </sc-if>
+          <sc-if value="{{ spontMzOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; gap:12px; margin-top:14px;">
+            <span style="width:14px; height:14px; border-radius:50%; background:#8DC93F; animation:tvzPulse 1.8s ease-out infinite; flex:0 0 auto;"></span>
+            <div style="font-size:14.5px; line-height:1.55; color:#112640;"><strong>{{ spontMzTaak }}</strong> staat op de kaart. Buddy's in de buurt zien je aanvraag nu.</div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ spontMzOffer }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; gap:12px; margin-top:14px;">
+            <div style="width:46px; height:46px; border-radius:50%; background:#2A6CB0; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px;">T</div>
+            <div style="flex:1;">
+              <div style="font-size:15.5px; font-weight:600;">Tim Bakker wil helpen</div>
+              <div style="font-size:13px; color:#5A687A;">400 m · helpt al in 2 kringen</div>
+            </div>
+          </div>
+          <div style="margin-top:10px; background:#EAF5D8; border-radius:12px 12px 12px 6px; padding:11px 15px; font-size:14.5px; line-height:1.5;">"Ik kan er over 20 minuten zijn, ik neem de fiets!"</div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button onClick="{{ spontToestaan }}" style="flex:1; height:54px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px; cursor:pointer;" style-hover="background:#9AD44E;">Toestaan</button>
+            <button onClick="{{ spontAfwijzen }}" style="height:54px; padding:0 20px; border-radius:999px; border:1.5px solid #E3E8F1; background:#FFFFFF; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; cursor:pointer;" style-hover="border-color:#D9413A; color:#D9413A;">Afwijzen</button>
+          </div>
+          </sc-if>
+          <sc-if value="{{ spontMzActive }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; gap:12px; margin-top:14px;">
+            <span style="width:14px; height:14px; border-radius:50%; background:#8DC93F; animation:tvzPulse 1.8s ease-out infinite; flex:0 0 auto;"></span>
+            <div style="font-size:14.5px; line-height:1.55;"><strong>Tim is onderweg</strong> voor {{ spontMzTaakLc }}.</div>
+          </div>
+          <a href="tel:0687654321" style="margin-top:12px; height:52px; border-radius:999px; background:#EAF1F9; color:#1A4878; display:flex; align-items:center; justify-content:center; gap:9px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-decoration:none;" style-hover="background:#DEE8F4;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1A4878" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l4 4-2.5 2.5a13 13 0 0 0 7 7L17 14l4 4-2 3c-8 0-16-8-16-16l3-2z"></path></svg>
+            Bel Tim · 06 87 65 43 21
+          </a>
+          <button onClick="{{ spontKlaarMz }}" style="margin-top:8px; width:100%; height:54px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px; cursor:pointer;" style-hover="background:#112F50;">Markeer als afgerond</button>
+          </sc-if>
+          <sc-if value="{{ spontMzDone }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px; height:56px; border-radius:999px; background:#F1F8E4; color:#4C7A16; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px;">Afgerond ✓ bedankt, Tim!</div>
+          </sc-if>
+        </div>
+        </sc-if>
+        <sc-if value="{{ vSpontCard }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; left:16px; right:16px; bottom:106px; background:#FFFFFF; border-radius:12px; box-shadow:0 16px 40px rgba(17,47,80,0.22); padding:20px; z-index:650; animation:tvzIn 0.25s ease;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:42px; height:42px; border-radius:50%; background:#112F50; display:flex; align-items:center; justify-content:center; flex:0 0 auto;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#8DC93F" stroke="none"><path d="M13 2L4.5 13.5H11L9.5 22 19 10h-6.5L13 2z"></path></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px;">Directe hulp gevraagd</div>
+              <div style="font-size:13px; color:#5A687A;">Nu · De Pijp · 650 m van jou</div>
+            </div>
+            <button onClick="{{ spontVClose }}" style="width:34px; height:34px; border-radius:50%; border:none; background:#EEF2F8; color:#5A687A; cursor:pointer; font-size:15px;" style-hover="background:#E3E8F1;">✕</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:12px; font-size:15px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#8DC93F;"></span> Vervoer naar de apotheek · meneer De Boer
+          </div>
+          <sc-if value="{{ vSpontAsk }}" hint-placeholder-val="{{ true }}">
+          <textarea value="{{ spontVMsg }}" onChange="{{ onSpontVMsg }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Klein berichtje erbij, bijv. 'Ik kan er over 15 minuten zijn!'" rows="2" style="margin-top:12px; width:100%; box-sizing:border-box; border-radius:8px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:11px 14px; font-size:15px; font-family:inherit; color:#112640; outline:none; resize:none; line-height:1.5;"></textarea>
+          <button onClick="{{ spontVSend }}" style="margin-top:10px; width:100%; height:56px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer; box-shadow:0 8px 20px rgba(115,176,43,0.3);" style-hover="background:#9AD44E;">Ik kan helpen</button>
+          <div style="font-size:12.5px; color:#8F9AAA; margin-top:8px; text-align:center;">Het precieze adres zie je pas na akkoord.</div>
+          </sc-if>
+          <sc-if value="{{ vSpontSent }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; gap:12px; margin-top:14px;">
+            <span style="width:14px; height:14px; border-radius:50%; background:#8DC93F; animation:tvzPulse 1.8s ease-out infinite; flex:0 0 auto;"></span>
+            <div style="font-size:14.5px; line-height:1.55;">Je aanbod is verstuurd. Even wachten op akkoord van de aanvrager…</div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ vSpontApproved }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px; background:#F1F8E4; border-radius:10px; padding:12px 15px; font-size:14.5px; line-height:1.5; color:#4C7A16;"><strong>Akkoord!</strong> Adres: Ceintuurbaan 112. Jelle weet dat je eraan komt.</div>
+          <button onClick="{{ spontVDone }}" style="margin-top:12px; width:100%; height:56px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer;" style-hover="background:#112F50;">Hulp afronden ✓</button>
+          <button onClick="{{ spontVCancel }}" style="margin-top:6px; width:100%; height:44px; border:none; background:none; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; cursor:pointer;" style-hover="color:#D9413A;">Toch annuleren (met berichtje)</button>
+          </sc-if>
+          <sc-if value="{{ vSpontDone }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px; height:56px; border-radius:999px; background:#F1F8E4; color:#4C7A16; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px;">Afgerond ✓ dank je wel!</div>
+          </sc-if>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showTaskBanner }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; top:54px; left:14px; right:14px; z-index:730; background:#112F50; border-radius:999px; box-shadow:0 10px 26px rgba(17,47,80,0.3); padding:7px 7px 7px 16px; display:flex; align-items:center; gap:10px; color:#FFFFFF; animation:tvzIn 0.3s ease;">
+        <span style="width:9px; height:9px; border-radius:50%; background:#8DC93F; flex:0 0 auto;"></span>
+        <button onClick="{{ bannerNaarVandaag }}" style="flex:1; min-width:0; border:none; background:none; color:#FFFFFF; text-align:left; cursor:pointer; font-family:'Comic Neue',sans-serif; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0;"><strong>Do 09:15</strong> · Vervoer naar huisarts · jij gaat</button>
+        <button onClick="{{ bannerWeg }}" style="width:30px; height:30px; border-radius:50%; border:none; background:rgba(255,255,255,0.15); color:#FFFFFF; cursor:pointer; font-size:13px; flex:0 0 auto;" style-hover="background:rgba(255,255,255,0.3);">✕</button>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isVandaag }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; overflow-y:auto; padding:62px 20px 120px; box-sizing:border-box;">
+        <button onClick="{{ openInbox }}" style="position:absolute; top:56px; right:20px; width:46px; height:46px; border-radius:50%; border:none; background:#FFFFFF; box-shadow:0 6px 18px rgba(17,47,80,0.14); cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#EEF2F8;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A4878" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"></path><path d="M10 19a2.2 2.2 0 0 0 4 0"></path></svg>
+          <span style="position:absolute; top:9px; right:10px; width:10px; height:10px; border-radius:50%; background:#8DC93F; border:2px solid #FFFFFF;"></span>
+        </button>
+        <sc-if value="{{ isZv }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:29px;">Goedemiddag, Riet</div>
+          <div style="font-size:17px; color:#5A687A; margin-top:4px;">Donderdag 23 juli</div>
+          <div style="margin-top:18px; background:#FFFFFF; border-radius:12px; padding:22px; box-shadow:0 8px 24px rgba(17,47,80,0.08); border:1.5px solid #8DC93F;">
+            <div style="display:flex; align-items:center; gap:16px;">
+              <div style="width:66px; height:66px; border-radius:50%; background:#2A6CB0; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:27px; flex:0 0 auto;">A</div>
+              <div style="flex:1;">
+                <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px;">Anna is nu bij je</div>
+                <div style="font-size:16px; color:#5A687A; margin-top:2px;">Boodschappen doen</div>
+              </div>
+              <span style="width:14px; height:14px; border-radius:50%; background:#8DC93F; animation:tvzPulse 1.8s ease-out infinite; flex:0 0 auto;"></span>
+            </div>
+            <a href="tel:0623456789" style="margin-top:16px; height:62px; border-radius:999px; background:#1A4878; color:#FFFFFF; display:flex; align-items:center; justify-content:center; gap:10px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; text-decoration:none;" style-hover="background:#112F50;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l4 4-2.5 2.5a13 13 0 0 0 7 7L17 14l4 4-2 3c-8 0-16-8-16-16l3-2z"></path></svg>
+              Bel Anna
+            </a>
+          </div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:19px; margin:26px 0 12px;">Straks</div>
+          <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:12px; padding:18px 20px; display:flex; align-items:center; gap:16px;">
+            <div style="width:56px; height:56px; border-radius:50%; background:#1A4878; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:23px; flex:0 0 auto;">T</div>
+            <div style="flex:1;">
+              <div style="font-size:17px; font-weight:700;">Tim komt om 16:00</div>
+              <div style="font-size:15px; color:#5A687A; margin-top:2px;">Vervoer naar de apotheek</div>
+            </div>
+          </div>
+          <div style="font-size:14.5px; color:#8F9AAA; line-height:1.55; margin-top:12px; padding:0 4px;">Je herkent Tim aan zijn profielfoto. Klopt er iets niet? Bel dan eerst Jelle.</div>
+        </sc-if>
+        <sc-if value="{{ isMz }}" hint-placeholder-val="{{ true }}">
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:25px; color:#112640;">Goedemorgen, Jelle</div>
+          <div style="font-size:15px; color:#5A687A; margin-top:4px;">Donderdag 23 juli</div>
+          <sc-if value="{{ roosterMatch }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px; background:#F1F8E4; border:1.5px solid #8DC93F; border-radius:10px; padding:14px 16px; display:flex; gap:12px; align-items:center; animation:tvzIn 0.3s ease;">
+            <div style="width:34px; height:22px; border-radius:11px; background:#8DC93F; flex:0 0 auto;"></div>
+            <div style="font-size:14.5px; line-height:1.5; color:#112640;"><strong>Match uit de buddy-pool!</strong> Tim neemt de taak van donderdag over.</div>
+          </div>
+          </sc-if>
+          <div style="margin-top:16px; background:#FFFFFF; border-radius:12px; padding:20px; box-shadow:0 8px 24px rgba(17,47,80,0.07); display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="width:52px; height:52px; border-radius:50%; background:#2A6CB0; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px;">A</div>
+              <div style="flex:1;">
+                <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px;">Anna de Wit</div>
+                <div style="font-size:14px; color:#5A687A;">Buddy · komt vandaag om 14:00</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:15px; color:#112640;">
+              <span style="width:8px; height:8px; border-radius:50%; background:#8DC93F;"></span> Boodschappen doen · ± 1 uur
+            </div>
+            <a href="tel:0612345678" style="height:56px; border-radius:999px; background:#EAF1F9; color:#1A4878; display:flex; align-items:center; justify-content:center; gap:10px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; text-decoration:none;" style-hover="background:#DEE8F4;">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#1A4878" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l4 4-2.5 2.5a13 13 0 0 0 7 7L17 14l4 4-2 3c-8 0-16-8-16-16l3-2z"></path></svg>
+              Bel Anna · 06 12 34 56 78
+            </a>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin:26px 0 12px;">
+            <div style="width:26px; height:5px; border-radius:3px; background:#8DC93F;"></div>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; flex:1; white-space:nowrap;">Rooster · week 31</div>
+          </div>
+          <button onClick="{{ togNc }}" style="width:100%; height:60px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px; cursor:pointer; box-shadow:0 8px 20px rgba(115,176,43,0.3);" style-hover="background:#9AD44E;">{{ ncKnop }}</button>
+          <sc-if value="{{ ncOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FFFFFF; border-radius:12px; padding:18px; box-shadow:0 8px 24px rgba(17,47,80,0.08); display:flex; flex-direction:column; gap:12px; margin-top:10px; animation:tvzIn 0.25s ease;">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Wat is er nodig?</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <sc-for list="{{ ncTaakRows }}" as="c" hint-placeholder-count="5">
+                <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ ncAnders }}" hint-placeholder-val="{{ false }}">
+            <input value="{{ ncCustom }}" onChange="{{ onNcCustom }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Typ zelf wat er nodig is, bijv. 'Plantjes water geven'" style="height:50px; border-radius:8px; border:1.5px solid #2A6CB0; background:#FFFFFF; padding:0 16px; font-size:15px; font-family:inherit; color:#112640; outline:none;">
+            </sc-if>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Welke dag?</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <sc-for list="{{ ncDagRows }}" as="c" hint-placeholder-count="7">
+                <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Hoe laat?</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+              <sc-for list="{{ ncTijdRows }}" as="c" hint-placeholder-count="4">
+                <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+              </sc-for>
+              <input type="time" value="{{ ncTijd }}" onChange="{{ onNcTijd }}" style="height:40px; border-radius:999px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 12px; font-size:14px; font-family:inherit; color:#1A4878; font-weight:600; outline:none;">
+            </div>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Herhalen?</div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <sc-for list="{{ ncHerhaalRows }}" as="c" hint-placeholder-count="2">
+                <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+            <button onClick="{{ addTaak }}" style="height:56px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer;" style-hover="background:#112F50;">Zet in het rooster</button>
+            <button onClick="{{ openWeekplan }}" style="height:48px; border-radius:999px; border:1.5px solid #1A4878; background:#FFFFFF; color:#1A4878; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; cursor:pointer;" style-hover="background:#EAF1F9;">Hele week plannen →</button>
+            <div style="font-size:13px; color:#8F9AAA; text-align:center; line-height:1.5;">Vrijwilligers in de kring zien de taak direct en kunnen hem aannemen.</div>
+          </div>
+          </sc-if>
+          <div style="display:flex; gap:6px; margin-top:14px;">
+            <sc-for list="{{ weekStrip }}" as="d" hint-placeholder-count="7">
+              <div style="{{ d.style }}">
+                <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px;">{{ d.label }}</div>
+                <div style="font-size:10.5px; color:#8F9AAA;">{{ d.datum }}</div>
+                <div style="display:flex; gap:3px; height:6px; margin-top:3px;">
+                  <sc-for list="{{ d.dots }}" as="p" hint-placeholder-count="0"><span style="{{ p.s }}"></span></sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+            <sc-for list="{{ roosterRows }}" as="r" hint-placeholder-count="4">
+              <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
+                <div style="width:44px; text-align:center;">
+                  <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:#1A4878;">{{ r.dag }}</div>
+                  <div style="font-size:11.5px; color:#8F9AAA;">{{ r.datum }}</div>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:15px; font-weight:600;">{{ r.taak }}</div>
+                  <div style="font-size:13px; color:#5A687A;">{{ r.sub }}</div>
+                </div>
+                <sc-if value="{{ r.kanZoeken }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ r.zoek }}" style="height:38px; padding:0 14px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; cursor:pointer;" style-hover="background:#112F50;">Buddy-pool</button>
+                </sc-if>
+                <sc-if value="{{ r.toonPill }}" hint-placeholder-val="{{ true }}">
+                <span style="{{ r.pill }}">{{ r.status }}</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin:26px 0 12px;">
+            <div style="width:26px; height:5px; border-radius:3px; background:#8DC93F;"></div>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px;">Uit de kring</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <sc-for list="{{ uitKringRows }}" as="u" hint-placeholder-count="2">
+              <div style="background:#FFFFFF; border-radius:12px; padding:16px; box-shadow:0 6px 18px rgba(17,47,80,0.06);">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:36px; height:36px; border-radius:50%; background:#2A6CB0; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;">{{ u.initial }}</div>
+                  <div style="flex:1; font-size:14.5px; font-weight:600;">{{ u.van }}</div>
+                  <div style="font-size:12.5px; color:#8F9AAA;">{{ u.tijd }}</div>
+                </div>
+                <div style="font-size:14.5px; line-height:1.55; color:#112640; margin-top:8px;">{{ u.tekst }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ isV }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:25px; color:#112640;">Hoi Tim<span style="color:#8DC93F;">.</span></div>
+          <div style="margin-top:14px; background:linear-gradient(115deg,#112F50,#2A6CB0); border-radius:12px; padding:20px; color:#FFFFFF;">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:30px;">3 <span style="font-size:16px; font-weight:600;">mensen geholpen</span></div>
+            <div style="width:56px; height:5px; border-radius:3px; background:#8DC93F; margin:8px 0;"></div>
+            <div style="font-size:14.5px; opacity:0.9;">Goed bezig! Dit was jouw juli tot nu toe.</div>
+          </div>
+          <sc-if value="{{ vInvited }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px; background:#FFFFFF; border-radius:12px; padding:20px; box-shadow:0 8px 24px rgba(17,47,80,0.07); animation:tvzIn 0.3s ease;">
+            <span style="height:28px; display:inline-flex; align-items:center; padding:0 12px; border-radius:999px; background:#EAF1F9; color:#1A4878; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px;">Uitnodiging</span>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; margin-top:10px;">Jelle nodigt je uit voor de kring van mevrouw Jansen</div>
+            <div style="font-size:14.5px; color:#5A687A; line-height:1.55; margin-top:6px;">Oud-Oost · 3 buddy's · vooral boodschappen en gezelschap.</div>
+            <button onClick="{{ acceptUitnodiging }}" style="margin-top:14px; width:100%; height:56px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer;" style-hover="background:#9AD44E;">Uitnodiging accepteren</button>
+            <button onClick="{{ laterMisschien }}" style="margin-top:6px; width:100%; height:44px; border-radius:999px; border:none; background:none; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; cursor:pointer;" style-hover="color:#112640;">Later misschien</button>
+          </div>
+          </sc-if>
+          <sc-if value="{{ vWachtKennismaking }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px; background:#FFFFFF; border-radius:12px; padding:20px; box-shadow:0 8px 24px rgba(17,47,80,0.07);">
+            <span style="height:28px; display:inline-flex; align-items:center; padding:0 12px; border-radius:999px; background:#FBF3E0; color:#9A6E0B; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px;">In behandeling</span>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; margin-top:10px;">Nog één stap: kennismaken met Jelle</div>
+            <div style="font-size:14.5px; color:#5A687A; line-height:1.55; margin-top:6px;">Je ID is goedgekeurd. Na een kort gesprek word je toegelaten tot de kring.</div>
+            <sc-if value="{{ vIntroSent }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:12px; background:#EEF2F8; border-radius:10px; padding:12px 14px; display:flex; gap:10px; align-items:flex-start;">
+              <span style="width:18px; height:5px; border-radius:3px; background:#8DC93F; flex:0 0 auto; margin-top:7px;"></span>
+              <div style="font-size:14px; color:#112640; line-height:1.5;"><em>"{{ vIntro }}"</em><br><span style="font-size:12.5px; color:#8F9AAA;">Je voorstelbericht is bij Jelle bezorgd</span></div>
+            </div>
+            </sc-if>
+            <button onClick="{{ startCallV }}" style="margin-top:14px; width:100%; height:56px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer;" style-hover="background:#112F50;">Start videokennismaking · di 15:00</button>
+          </div>
+          </sc-if>
+          <sc-if value="{{ vLid }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; align-items:center; gap:10px; margin:24px 0 12px;">
+            <div style="width:26px; height:5px; border-radius:3px; background:#8DC93F;"></div>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; white-space:nowrap;">Rooster · week 31</div>
+          </div>
+          <div style="display:flex; gap:6px; margin-bottom:12px;">
+            <sc-for list="{{ weekStrip }}" as="d" hint-placeholder-count="7">
+              <div style="{{ d.style }}">
+                <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px;">{{ d.label }}</div>
+                <div style="font-size:10.5px; color:#8F9AAA;">{{ d.datum }}</div>
+                <div style="display:flex; gap:3px; height:6px; margin-top:3px;">
+                  <sc-for list="{{ d.dots }}" as="p" hint-placeholder-count="0"><span style="{{ p.s }}"></span></sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <sc-for list="{{ vRoosterRows }}" as="r" hint-placeholder-count="4">
+              <div style="{{ r.card }}">
+                <div style="width:44px; text-align:center;">
+                  <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:#1A4878;">{{ r.dag }}</div>
+                  <div style="font-size:11.5px; color:#8F9AAA;">{{ r.datum }}</div>
+                </div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:15px; font-weight:600;">{{ r.taak }}</div>
+                  <div style="font-size:13px; color:#5A687A;">{{ r.sub }}</div>
+                </div>
+                <sc-if value="{{ r.kanClaim }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ r.claim }}" style="height:44px; padding:0 18px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; cursor:pointer;" style-hover="background:#9AD44E;">Aannemen</button>
+                </sc-if>
+                <sc-if value="{{ r.kanAfronden }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ r.rondAf }}" style="height:44px; padding:0 16px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; cursor:pointer;" style-hover="background:#112F50;">Rond af</button>
+                </sc-if>
+                <sc-if value="{{ r.toonPill }}" hint-placeholder-val="{{ true }}">
+                <span style="{{ r.pill }}">{{ r.status }}</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ logOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px; background:#FFFFFF; border-radius:12px; padding:18px; box-shadow:0 8px 24px rgba(17,47,80,0.1); animation:tvzIn 0.25s ease;">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px;">Logboekje · {{ logTaak }}</div>
+            <div style="font-size:13.5px; color:#5A687A; margin-top:2px;">Korte notitie voor de kring — zo blijft iedereen op de hoogte.</div>
+            <textarea value="{{ logMsg }}" onChange="{{ onLogMsg }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Bijv. 'Alles gehaald, Riet was in een goed humeur!'" rows="3" style="margin-top:10px; width:100%; box-sizing:border-box; border-radius:8px; border:1.5px solid #E3E8F1; padding:11px 14px; font-size:15px; font-family:inherit; color:#112640; outline:none; resize:none; line-height:1.5;"></textarea>
+            <button onClick="{{ logKlaar }}" style="margin-top:10px; width:100%; height:54px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px; cursor:pointer;" style-hover="background:#9AD44E;">Afronden &amp; delen ✓</button>
+            <button onClick="{{ logSluit }}" style="margin-top:4px; width:100%; height:42px; border:none; background:none; color:#8F9AAA; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; cursor:pointer;" style-hover="color:#112640;">Annuleren</button>
+          </div>
+          </sc-if>
+          <div style="font-size:13px; color:#8F9AAA; text-align:center; line-height:1.5; padding:8px 16px 0;">Open taken kun je aannemen. Ruilen of overdragen kan altijd onderling.</div>
+          </sc-if>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isWeekplan }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; overflow-y:auto; padding:56px 20px 120px; box-sizing:border-box;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button onClick="{{ weekplanTerug }}" style="width:44px; height:44px; border-radius:50%; border:none; background:#EEF2F8; color:#1A4878; font-size:19px; cursor:pointer; flex:0 0 auto;" style-hover="background:#E3E8F1;">←</button>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:21px; white-space:nowrap;">Planning maken</div>
+        </div>
+        <div style="font-size:14px; color:#5A687A; line-height:1.5; margin-top:8px;">Puzzel de planning eerst rustig in concept — voor een week, twee weken of een paar maanden. Publiceer daarna alles in één keer naar de kring.</div>
+        <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; margin-top:16px;">Voor welke periode?</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
+          <sc-for list="{{ planPeriodeRows }}" as="c" hint-placeholder-count="4">
+            <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ planMeerWeken }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
+          <sc-for list="{{ planWeekRows }}" as="c" hint-placeholder-count="4">
+            <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+          </sc-for>
+        </div>
+        </sc-if>
+        <div style="background:#FFFFFF; border-radius:12px; padding:18px; box-shadow:0 8px 24px rgba(17,47,80,0.08); display:flex; flex-direction:column; gap:12px; margin-top:14px;">
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Dag</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <sc-for list="{{ ncDagRows }}" as="c" hint-placeholder-count="7">
+              <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Taak</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <sc-for list="{{ ncTaakRows }}" as="c" hint-placeholder-count="5">
+              <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ ncAnders }}" hint-placeholder-val="{{ false }}">
+          <input value="{{ ncCustom }}" onChange="{{ onNcCustom }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Typ zelf wat er nodig is" style="height:50px; border-radius:8px; border:1.5px solid #2A6CB0; background:#FFFFFF; padding:0 16px; font-size:15px; font-family:inherit; color:#112640; outline:none;">
+          </sc-if>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Tijd &amp; herhaling</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+            <input type="time" value="{{ ncTijd }}" onChange="{{ onNcTijd }}" style="height:40px; border-radius:999px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 12px; font-size:14px; font-family:inherit; color:#1A4878; font-weight:600; outline:none;">
+            <sc-for list="{{ ncHerhaalRows }}" as="c" hint-placeholder-count="2">
+              <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+          <button onClick="{{ addTaakWeek }}" style="height:54px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px; cursor:pointer;" style-hover="background:#9AD44E;">{{ weekAddLabel }}</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; margin:20px 0 10px;">
+          <div style="width:26px; height:5px; border-radius:3px; background:#8DC93F;"></div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; flex:1;">Concept · {{ draftCount }}</div>
+        </div>
+        <sc-if value="{{ draftLeeg }}" hint-placeholder-val="{{ true }}">
+        <div style="border:1.5px dashed #C6CFDC; border-radius:12px; padding:18px; font-size:14px; color:#8F9AAA; text-align:center; line-height:1.55;">Nog leeg. Voeg hierboven taken toe — de kring ziet nog niets tot je publiceert.</div>
+        </sc-if>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <sc-for list="{{ draftRows }}" as="d" hint-placeholder-count="0">
+            <div style="background:#FFFFFF; border:1.5px dashed #2A6CB0; border-radius:10px; padding:12px 14px; display:flex; align-items:center; gap:12px;">
+              <div style="width:52px; text-align:center;">
+                <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:#1A4878;">{{ d.dag }}</div>
+                <div style="font-size:11px; color:#8F9AAA;">{{ d.week }}</div>
+              </div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:14.5px; font-weight:600;">{{ d.taak }}</div>
+                <div style="font-size:12.5px; color:#5A687A;">{{ d.sub }}</div>
+              </div>
+              <button onClick="{{ d.weg }}" style="width:32px; height:32px; border-radius:50%; border:none; background:#EEF2F8; color:#5A687A; cursor:pointer; font-size:13px; flex:0 0 auto;" style-hover="background:#FDEDEC; color:#D9413A;">✕</button>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ heeftDraft }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ publiceer }}" style="margin-top:12px; width:100%; height:60px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer; box-shadow:0 10px 26px rgba(17,47,80,0.28);" style-hover="background:#112F50;">{{ pubLabel }}</button>
+        <div style="font-size:13px; color:#8F9AAA; text-align:center; line-height:1.5; margin-top:8px;">Pas na publiceren zien de vrijwilligers de taken en kunnen ze aannemen.</div>
+        </sc-if>
+        <sc-if value="{{ pubOk }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:12px; height:54px; border-radius:999px; background:#F1F8E4; color:#4C7A16; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;">Gepubliceerd ✓ de kring kan nu aannemen</div>
+        </sc-if>
+        <div style="display:flex; align-items:center; gap:10px; margin:22px 0 2px;">
+          <div style="width:26px; height:5px; border-radius:3px; background:#8DC93F;"></div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;">Al gepubliceerd · week 31</div>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:12px;">
+          <sc-for list="{{ weekStrip }}" as="d" hint-placeholder-count="7">
+            <div style="{{ d.style }}">
+              <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px;">{{ d.label }}</div>
+              <div style="font-size:10.5px; color:#8F9AAA;">{{ d.datum }}</div>
+              <div style="display:flex; gap:3px; height:6px; margin-top:3px;">
+                <sc-for list="{{ d.dots }}" as="p" hint-placeholder-count="0"><span style="{{ p.s }}"></span></sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+          <sc-for list="{{ roosterRows }}" as="r" hint-placeholder-count="4">
+            <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
+              <div style="width:44px; text-align:center;">
+                <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:#1A4878;">{{ r.dag }}</div>
+                <div style="font-size:11.5px; color:#8F9AAA;">{{ r.datum }}</div>
+              </div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:15px; font-weight:600;">{{ r.taak }}</div>
+                <div style="font-size:13px; color:#5A687A;">{{ r.sub }}</div>
+              </div>
+              <span style="{{ r.pill }}">{{ r.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isKringTab }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; overflow-y:auto; padding-bottom:120px; box-sizing:border-box;">
+
+        <sc-if value="{{ showKringEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:70%; padding:70px 32px 40px; text-align:center; gap:10px;">
+          <div style="display:flex; gap:26px; margin-bottom:10px;">
+            <div style="width:38px; height:24px; border-radius:12px; background:#2A6CB0; animation:tvzBounce 3s ease-in-out infinite;"></div>
+            <div style="width:38px; height:24px; border-radius:12px; background:#8DC93F; animation:tvzBounce 3s ease-in-out 0.4s infinite;"></div>
+          </div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px; color:#112640;">Nog geen hulpkring</div>
+          <div style="font-size:16px; color:#5A687A; line-height:1.6; max-width:270px;">Maak een kring rondom je naaste. Jij wordt de beheerder en nodigt vrijwilligers uit.</div>
+          <button onClick="{{ startKringCreate }}" style="margin-top:18px; width:100%; height:64px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; cursor:pointer;" style-hover="background:#9AD44E;">Hulpkring aanmaken</button>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ showKringCreate }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:62px 24px 18px; display:flex; flex-direction:column; gap:16px;">
+          <button onClick="{{ backToKringEmpty }}" style="width:44px; height:44px; border-radius:50%; border:none; background:#EEF2F8; color:#1A4878; font-size:19px; cursor:pointer;" style-hover="background:#E3E8F1;">←</button>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:25px;">Nieuwe hulpkring</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <label style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Naam van de kring</label>
+            <input value="{{ kringNaam }}" onChange="{{ onKringNaam }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" style="height:56px; border-radius:8px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 18px; font-size:17px; color:#112640; outline:none;">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <label style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Voor wie is de kring?</label>
+            <input placeholder="Bijv. mijn moeder, Riet Jansen" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" style="height:56px; border-radius:8px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 18px; font-size:17px; color:#112640; outline:none;">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <label style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Waar kan de buurt bij helpen?</label>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <button onClick="{{ togBoodschappen }}" style="{{ chipBoodschappen }}">Boodschappen</button>
+              <button onClick="{{ togWandelen }}" style="{{ chipWandelen }}">Wandelen</button>
+              <button onClick="{{ togVervoer }}" style="{{ chipVervoer }}">Vervoer</button>
+              <button onClick="{{ togGezelschap }}" style="{{ chipGezelschap }}">Gezelschap</button>
+            </div>
+          </div>
+          <button onClick="{{ createKring }}" style="margin-top:8px; height:64px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; cursor:pointer;" style-hover="background:#112F50;">Kring aanmaken</button>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ showKringCode }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; align-items:center; padding:70px 30px 44px; text-align:center; gap:10px;">
+          <span style="height:30px; display:inline-flex; align-items:center; padding:0 14px; border-radius:999px; background:#F1F8E4; color:#4C7A16; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px;">Kring aangemaakt ✓</span>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:23px; margin-top:8px;">Koppel de hulpvrager</div>
+          <div style="font-size:16px; color:#5A687A; line-height:1.6; max-width:280px;">Geef deze code aan Riet (of wie haar helpt met de telefoon). Daarmee kijkt ze mee in de kring.</div>
+          <div style="margin-top:16px; background:#FFFFFF; border:2px dashed #2A6CB0; border-radius:12px; padding:20px 34px;">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:32px; letter-spacing:5px; color:#1A4878;">TVZ-4Q7B</div>
+          </div>
+          <button onClick="{{ kringCodeKlaar }}" style="margin-top:22px; width:100%; height:64px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; cursor:pointer;" style-hover="background:#112F50;">Naar mijn kring</button>
+          <button onClick="{{ kringCodeKlaar }}" style="border:none; background:none; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; cursor:pointer; padding:10px;" style-hover="color:#112640;">Code later delen</button>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ showKringHome }}" hint-placeholder-val="{{ false }}">
+        <div style="background:linear-gradient(115deg,#112F50,#2A6CB0); border-radius:0 0 12px 12px; padding:64px 24px 24px; color:#FFFFFF;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px;">{{ kringNaam }}</div>
+            <sc-if value="{{ subscribed }}" hint-placeholder-val="{{ false }}">
+            <span style="height:28px; display:inline-flex; align-items:center; padding:0 12px; border-radius:999px; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px;">Abonnement</span>
+            </sc-if>
+          </div>
+          <div style="font-size:14.5px; opacity:0.85; margin-top:4px;">Oud-Oost · jij bent beheerder</div>
+          <div style="display:flex; gap:8px; margin-top:16px;">
+            <button onClick="{{ kvLeden }}" style="{{ subLeden }}">Leden</button>
+            <button onClick="{{ kvChat }}" style="{{ subChat }}">Berichten</button>
+          </div>
+        </div>
+
+        <sc-if value="{{ showLeden }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:20px 20px 0; display:flex; flex-direction:column; gap:10px;">
+          <sc-for list="{{ ledenRows }}" as="m" hint-placeholder-count="3">
+            <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
+              <div style="{{ m.avStyle }}">{{ m.initial }}</div>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:15.5px; font-weight:600;">{{ m.naam }}</div>
+                <div style="font-size:13px; color:#5A687A;">{{ m.sub }}</div>
+              </div>
+              <sc-if value="{{ m.kanAccepteren }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ m.accepteer }}" style="height:38px; padding:0 14px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; cursor:pointer;" style-hover="background:#112F50;">Beoordelen</button>
+              </sc-if>
+              <sc-if value="{{ m.toonPill }}" hint-placeholder-val="{{ true }}">
+              <span style="{{ m.pill }}">{{ m.status }}</span>
+              </sc-if>
+            </div>
+          </sc-for>
+          <div style="background:#FFFFFF; border-radius:12px; padding:18px 20px; box-shadow:0 8px 24px rgba(17,47,80,0.07); margin-top:6px;">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;">Wie doet wat deze maand?</div>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+              <sc-for list="{{ belastingRows }}" as="b" hint-placeholder-count="3">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:52px; font-size:13.5px; font-weight:600;">{{ b.naam }}</div>
+                  <div style="flex:1; height:10px; border-radius:5px; background:#EEF2F8; overflow:hidden;"><div style="{{ b.bar }}"></div></div>
+                  <div style="width:58px; font-size:12.5px; color:#5A687A; text-align:right;">{{ b.count }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:13px; color:#8F9AAA; line-height:1.5; margin-top:10px;">Anna doet nu het meest. Verdeel gerust: zet een open taak uit bij een ander, of vraag de buddy-pool.</div>
+          </div>
+          <button onClick="{{ startInvite }}" style="margin-top:6px; height:56px; border-radius:999px; border:1.5px solid #1A4878; background:#FFFFFF; color:#1A4878; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px; cursor:pointer;" style-hover="background:#EAF1F9;">+ Vrijwilliger uitnodigen</button>
+          <sc-if value="{{ freeLimitNote }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:13px; color:#8F9AAA; text-align:center; line-height:1.5; padding:0 12px;">Gratis tot 2 vrijwilligers. Meer buddy's en extra functies met een abonnement.</div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ showInvite }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:20px 20px 0; display:flex; flex-direction:column; gap:14px;">
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:19px;">Vrijwilliger uitnodigen</div>
+          <div style="display:flex; gap:8px;">
+            <input value="{{ inviteInput }}" onChange="{{ onInviteInput }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="E-mail of TVZ-ID" style="flex:1; height:54px; border-radius:8px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 16px; font-size:16px; color:#112640; outline:none; min-width:0;">
+            <button onClick="{{ inviteByInput }}" style="height:54px; padding:0 20px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; cursor:pointer;" style-hover="background:#112F50;">Nodig uit</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-top:6px;">
+            <div style="width:26px; height:5px; border-radius:3px; background:#8DC93F;"></div>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:#112640;">Best matches in de buurt</div>
+          </div>
+          <div style="font-size:13.5px; color:#5A687A; line-height:1.5; margin-top:-6px;">Op basis van afstand en voorkeuren. Zij doorlopen eerst een ID-check en een kennismaking.</div>
+          <sc-for list="{{ suggestieRows }}" as="s" hint-placeholder-count="3">
+            <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
+              <div style="width:44px; height:44px; border-radius:50%; background:#EEF2F8; color:#1A4878; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px;">{{ s.initial }}</div>
+              <div style="flex:1;">
+                <div style="font-size:15.5px; font-weight:600;">{{ s.naam }}</div>
+                <div style="font-size:13px; color:#5A687A;">{{ s.sub }}</div>
+              </div>
+              <sc-if value="{{ s.open }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ s.nodigUit }}" style="height:38px; padding:0 16px; border-radius:999px; border:1.5px solid #1A4878; background:#FFFFFF; color:#1A4878; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; cursor:pointer;" style-hover="background:#EAF1F9;">Uitnodigen</button>
+              </sc-if>
+              <sc-if value="{{ s.gedaan }}" hint-placeholder-val="{{ false }}">
+              <span style="height:30px; display:inline-flex; align-items:center; padding:0 13px; border-radius:999px; background:#FBF3E0; color:#9A6E0B; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px;">Uitgenodigd</span>
+              </sc-if>
+            </div>
+          </sc-for>
+          <button onClick="{{ kvLeden }}" style="height:48px; border-radius:999px; border:none; background:none; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; cursor:pointer;" style-hover="color:#112640;">Terug naar leden</button>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ showChat }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:20px 20px 0; display:flex; flex-direction:column; gap:12px;">
+          <sc-for list="{{ chatRows }}" as="c" hint-placeholder-count="2">
+            <div style="{{ c.row }}">
+              <div style="{{ c.bubble }}">
+                <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; opacity:0.75; margin-bottom:3px;">{{ c.van }}</div>
+                <div style="font-size:15.5px; line-height:1.5;">{{ c.tekst }}</div>
+              </div>
+            </div>
+          </sc-for>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <input value="{{ chatDraft }}" onChange="{{ onChatDraft }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Schrijf een bericht aan de kring" style="flex:1; height:54px; border-radius:999px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 20px; font-size:16px; color:#112640; outline:none; min-width:0;">
+            <button onClick="{{ sendChat }}" style="width:54px; height:54px; border-radius:50%; border:none; background:#1A4878; color:#FFFFFF; cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:#112F50;">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-7-5 16-3.5-6L4 12z"></path></svg>
+            </button>
+          </div>
+        </div>
+        </sc-if>
+
+        </sc-if>
+
+        <sc-if value="{{ showVKring }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ vLid }}" hint-placeholder-val="{{ false }}">
+          <div style="background:linear-gradient(115deg,#112F50,#2A6CB0); border-radius:0 0 12px 12px; padding:64px 24px 24px; color:#FFFFFF;">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px;">Kring van mevrouw Jansen</div>
+            <div style="font-size:14.5px; opacity:0.85; margin-top:4px;">Oud-Oost · jij bent buddy</div>
+          </div>
+          <div style="padding:20px; display:flex; flex-direction:column; gap:10px;">
+            <div style="background:#FFFFFF; border-radius:12px; padding:20px; box-shadow:0 8px 24px rgba(17,47,80,0.07); display:flex; align-items:center; gap:16px;">
+              <div style="display:flex; gap:3px;">
+                <span style="width:12px; height:12px; border-radius:50%; background:#8DC93F;"></span><span style="width:12px; height:12px; border-radius:50%; background:#8DC93F;"></span><span style="width:12px; height:12px; border-radius:50%; background:#8DC93F;"></span><span style="width:12px; height:12px; border-radius:50%; background:#8DC93F;"></span><span style="width:12px; height:12px; border-radius:50%; background:#E3E8F1;"></span>
+              </div>
+              <div>
+                <div style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px;">4,0</div>
+                <div style="font-size:13px; color:#5A687A;">Samen 12 taken gedaan</div>
+              </div>
+            </div>
+            <sc-for list="{{ vKringLeden }}" as="m" hint-placeholder-count="3">
+              <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
+                <div style="{{ m.avStyle }}">{{ m.initial }}</div>
+                <div style="flex:1;">
+                  <div style="font-size:15.5px; font-weight:600;">{{ m.naam }}</div>
+                  <div style="font-size:13px; color:#5A687A;">{{ m.sub }}</div>
+                </div>
+                <span style="{{ m.pill }}">{{ m.status }}</span>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+          <sc-if value="{{ vGeenKring }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:70%; padding:70px 32px 40px; text-align:center; gap:10px;">
+            <div style="display:flex; gap:26px; margin-bottom:10px;">
+              <div style="width:38px; height:24px; border-radius:12px; background:#2A6CB0; animation:tvzBounce 3s ease-in-out infinite;"></div>
+              <div style="width:38px; height:24px; border-radius:12px; background:#8DC93F; animation:tvzBounce 3s ease-in-out 0.4s infinite;"></div>
+            </div>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px;">Nog geen kring</div>
+            <div style="font-size:16px; color:#5A687A; line-height:1.6; max-width:270px;">Kijk op de kaart welke hulpkringen hulp kunnen gebruiken, of wacht op een uitnodiging.</div>
+            <button onClick="{{ jVKaartBtn }}" style="margin-top:18px; width:100%; height:56px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer;" style-hover="background:#112F50;">Bekijk de kaart</button>
+          </div>
+          </sc-if>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isSteun }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; display:flex; flex-direction:column; overflow:hidden;">
+        <div style="background:linear-gradient(115deg,#112F50,#2A6CB0); padding:56px 20px 18px; color:#FFFFFF; flex:0 0 auto;">
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px;">Steun &amp; advies</div>
+          <div style="font-size:14px; opacity:0.86; margin-top:3px;">Je staat er niet alleen voor.</div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button onClick="{{ svForum }}" style="{{ subForum }}">Forum</button>
+            <button onClick="{{ svMakelaar }}" style="{{ subMakelaar }}">Hulpmakelaar</button>
+          </div>
+        </div>
+
+        <sc-if value="{{ showForumList }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; overflow-y:auto; padding:18px 20px 120px; box-sizing:border-box;">
+          <button onClick="{{ forumNieuw }}" style="width:100%; height:56px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; cursor:pointer; box-shadow:0 8px 20px rgba(115,176,43,0.28);" style-hover="background:#9AD44E;">Stel een vraag aan de community</button>
+          <sc-if value="{{ forumCompose }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FFFFFF; border-radius:12px; padding:18px; box-shadow:0 8px 24px rgba(17,47,80,0.1); margin-top:12px; animation:tvzIn 0.25s ease;">
+            <textarea value="{{ forumDraft }}" onChange="{{ onForumDraft }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Waar loop je tegenaan? Bijv. 'Hoe combineren jullie werk met de zorg voor een ouder?'" rows="3" style="width:100%; box-sizing:border-box; border-radius:8px; border:1.5px solid #E3E8F1; padding:12px 14px; font-size:15px; font-family:inherit; color:#112640; outline:none; resize:none; line-height:1.5;"></textarea>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <button onClick="{{ forumPlaats }}" style="flex:1; height:52px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; cursor:pointer;" style-hover="background:#112F50;">Plaatsen</button>
+              <button onClick="{{ forumAnnuleer }}" style="height:52px; padding:0 18px; border-radius:999px; border:1.5px solid #E3E8F1; background:#FFFFFF; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; cursor:pointer;" style-hover="color:#112640;">Annuleren</button>
+            </div>
+          </div>
+          </sc-if>
+          <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap;">
+            <sc-for list="{{ forumTagRows }}" as="t" hint-placeholder-count="4">
+              <button onClick="{{ t.pick }}" style="{{ t.style }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+            <sc-for list="{{ forumRows }}" as="p" hint-placeholder-count="4">
+              <button onClick="{{ p.open }}" style="text-align:left; background:#FFFFFF; border:1px solid #E3E8F1; border-radius:12px; padding:16px; cursor:pointer; display:flex; flex-direction:column; gap:8px; font-family:inherit;" style-hover="border-color:#2A6CB0;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:34px; height:34px; border-radius:50%; background:#EEF2F8; color:#1A4878; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; flex:0 0 auto;">{{ p.initial }}</div>
+                  <div style="flex:1; min-width:0; font-size:13px; color:#5A687A;">{{ p.meta }}</div>
+                  <span style="{{ p.tagPill }}">{{ p.tag }}</span>
+                </div>
+                <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; color:#112640; line-height:1.35;">{{ p.titel }}</div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8F9AAA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15a2 2 0 0 1-2 2H8l-4 3V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9z"></path></svg>
+                  <div style="font-size:13px; color:#8F9AAA;">{{ p.antwoorden }}</div>
+                </div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ showForumThread }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1; overflow-y:auto; padding:18px 20px 120px; box-sizing:border-box;">
+          <button onClick="{{ forumTerug }}" style="width:44px; height:44px; border-radius:50%; border:none; background:#EEF2F8; color:#1A4878; font-size:19px; cursor:pointer;" style-hover="background:#E3E8F1;">←</button>
+          <div style="background:#FFFFFF; border-radius:12px; padding:18px; box-shadow:0 8px 24px rgba(17,47,80,0.07); margin-top:14px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:38px; height:38px; border-radius:50%; background:#EEF2F8; color:#1A4878; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;">{{ threadInitial }}</div>
+              <div style="flex:1; font-size:13px; color:#5A687A;">{{ threadMeta }}</div>
+            </div>
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:19px; margin-top:10px; line-height:1.35;">{{ threadTitel }}</div>
+            <div style="font-size:15px; color:#112640; line-height:1.6; margin-top:8px;">{{ threadTekst }}</div>
+          </div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin:20px 0 10px;">{{ threadAntwoordenKop }}</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <sc-for list="{{ threadReplies }}" as="r" hint-placeholder-count="2">
+              <div style="{{ r.card }}">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="{{ r.av }}">{{ r.initial }}</div>
+                  <div style="flex:1; min-width:0; font-size:14px; font-weight:600;">{{ r.van }}</div>
+                  <sc-if value="{{ r.expert }}" hint-placeholder-val="{{ false }}">
+                  <span style="height:26px; display:inline-flex; align-items:center; padding:0 11px; border-radius:999px; background:#112F50; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11.5px;">Hulpmakelaar</span>
+                  </sc-if>
+                </div>
+                <div style="font-size:14.5px; color:#112640; line-height:1.6; margin-top:8px;">{{ r.tekst }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <input value="{{ replyDraft }}" onChange="{{ onReplyDraft }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Deel je ervaring" style="flex:1; min-width:0; height:54px; border-radius:999px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 20px; font-size:15.5px; font-family:inherit; color:#112640; outline:none;">
+            <button onClick="{{ sendReply }}" style="width:54px; height:54px; border-radius:50%; border:none; background:#1A4878; color:#FFFFFF; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:0 0 auto;" style-hover="background:#112F50;">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-7-5 16-3.5-6L4 12z"></path></svg>
+            </button>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ showMakelaar }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+          <div style="flex:0 0 auto; background:#FFFFFF; border-bottom:1px solid #E3E8F1; padding:14px 20px; display:flex; align-items:center; gap:12px;">
+            <div style="display:flex;">
+              <div style="width:36px; height:36px; border-radius:50%; background:#1A4878; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:2px solid #FFFFFF;">M</div>
+              <div style="width:36px; height:36px; border-radius:50%; background:#2A6CB0; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:2px solid #FFFFFF; margin-left:-11px;">S</div>
+              <div style="width:36px; height:36px; border-radius:50%; background:#8DC93F; color:#112F50; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:2px solid #FFFFFF; margin-left:-11px;">J</div>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px;">3 hulpmakelaars online</div>
+              <div style="font-size:12.5px; color:#5A687A;">Meestal antwoord binnen 2 minuten</div>
+            </div>
+            <span style="width:10px; height:10px; border-radius:50%; background:#8DC93F; animation:tvzPulse 1.8s ease-out infinite; flex:0 0 auto;"></span>
+          </div>
+          <div style="flex:1; overflow-y:auto; padding:16px 20px 8px; box-sizing:border-box; display:flex; flex-direction:column; gap:10px;">
+            <div style="background:#EEF2F8; border-radius:10px; padding:13px 16px; font-size:13.5px; color:#5A687A; line-height:1.55; text-align:center;">Gratis en vertrouwelijk. Hulpmakelaars kennen de regelingen en verwijzen je door naar de juiste persoon of instantie.</div>
+            <sc-for list="{{ mkRows }}" as="m" hint-placeholder-count="2">
+              <div style="{{ m.row }}">
+                <div style="{{ m.bubble }}">
+                  <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; opacity:0.75; margin-bottom:3px;">{{ m.van }}</div>
+                  <div style="font-size:15.5px; line-height:1.55;">{{ m.tekst }}</div>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ mkTyping }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;">
+              <div style="background:#EAF5D8; border-radius:18px 18px 18px 6px; padding:14px 18px; display:flex; gap:5px; align-items:center;">
+                <span style="width:7px; height:7px; border-radius:50%; background:#73B02B; animation:tvzBounce 1.1s ease-in-out infinite;"></span>
+                <span style="width:7px; height:7px; border-radius:50%; background:#73B02B; animation:tvzBounce 1.1s ease-in-out 0.15s infinite;"></span>
+                <span style="width:7px; height:7px; border-radius:50%; background:#73B02B; animation:tvzBounce 1.1s ease-in-out 0.3s infinite;"></span>
+              </div>
+            </div>
+            </sc-if>
+          </div>
+          <div style="flex:0 0 auto; padding:0 20px 96px;">
+            <sc-if value="{{ mkShowChips }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; gap:8px; overflow-x:auto; padding:4px 0 10px;">
+              <sc-for list="{{ mkChipRows }}" as="c" hint-placeholder-count="3">
+                <button onClick="{{ c.pick }}" style="{{ c.style }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+            </sc-if>
+            <div style="display:flex; gap:8px;">
+              <input value="{{ mkDraft }}" onChange="{{ onMkDraft }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Stel je vraag" style="flex:1; min-width:0; height:54px; border-radius:999px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:0 20px; font-size:15.5px; font-family:inherit; color:#112640; outline:none;">
+              <button onClick="{{ sendMk }}" style="width:54px; height:54px; border-radius:50%; border:none; background:#1A4878; color:#FFFFFF; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:0 0 auto;" style-hover="background:#112F50;">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-7-5 16-3.5-6L4 12z"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isProfiel }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; overflow-y:auto; padding:62px 20px 120px; box-sizing:border-box;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:14px 0 6px;">
+          <div style="{{ profielAvatar }}">{{ profielInitial }}</div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:21px;">{{ profielNaam }}</div>
+          <div style="display:flex; gap:8px;">
+            <span style="{{ profielRolPill }}">{{ profielRol }}</span>
+          </div>
+        </div>
+        <sc-if value="{{ isV }}" hint-placeholder-val="{{ false }}">
+        <div style="background:linear-gradient(115deg,#112F50,#2A6CB0); border-radius:12px; padding:20px; margin-top:14px; color:#FFFFFF;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="flex:1; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px;">Ook helpen buiten je kring?</div>
+            <button onClick="{{ togPool }}" style="{{ poolTrack }}"><span style="{{ poolKnob }}"></span></button>
+          </div>
+          <div style="font-size:14px; line-height:1.55; opacity:0.92; margin-top:8px;">Zet jezelf aan voor de buddy-pool: kringen in de buurt kunnen je vragen voor één losse taak — of je sluit je juist ergens aan als vast gezicht. Jij kiest per kring.</div>
+          <sc-if value="{{ poolOn }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:12px; display:inline-flex; align-items:center; height:32px; padding:0 14px; border-radius:999px; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px;">Zichtbaar voor 3 kringen in de buurt ✓</div>
+          </sc-if>
+        </div>
+        <div style="background:#FFFFFF; border-radius:12px; padding:18px 20px; box-shadow:0 8px 24px rgba(17,47,80,0.07); margin-top:14px;">
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;">Mijn beschikbaarheid</div>
+          <div style="font-size:13.5px; color:#5A687A; margin-top:2px;">Het rooster stelt je alleen taken voor op deze dagen.</div>
+          <div style="display:flex; gap:6px; margin-top:12px;">
+            <sc-for list="{{ beschikRows }}" as="b" hint-placeholder-count="7">
+              <button onClick="{{ b.tog }}" style="{{ b.style }}">{{ b.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; margin-top:14px; padding-top:14px; border-top:1px solid #EEF2F8;">
+            <div style="flex:1;">
+              <div style="font-size:14.5px; font-weight:600;">Even afwezig</div>
+              <div style="font-size:12.5px; color:#8F9AAA;">Vakantie of druk? Het rooster slaat je over.</div>
+            </div>
+            <button onClick="{{ togVakantie }}" style="{{ vakTrack }}"><span style="{{ vakKnob }}"></span></button>
+          </div>
+          <sc-if value="{{ vakantieAan }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:10px; display:inline-flex; align-items:center; height:30px; padding:0 13px; border-radius:999px; background:#FBF3E0; color:#9A6E0B; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px;">Op pauze t/m 10 aug — geen nieuwe taken</div>
+          </sc-if>
+        </div>
+        </sc-if>
+        <sc-if value="{{ isMz }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF; border-radius:12px; padding:18px 20px; box-shadow:0 8px 24px rgba(17,47,80,0.07); margin-top:14px; display:flex; align-items:center; gap:14px;">
+          <div style="flex:1;">
+            <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;">Abonnement</div>
+            <div style="font-size:14px; color:#5A687A; margin-top:2px;">{{ aboStatusTekst }}</div>
+          </div>
+          <button onClick="{{ openAbo }}" style="height:40px; padding:0 16px; border-radius:999px; border:1.5px solid #1A4878; background:#FFFFFF; color:#1A4878; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; cursor:pointer;" style-hover="background:#EAF1F9;">{{ aboKnopTekst }}</button>
+        </div>
+        </sc-if>
+        <div style="background:#FFFFFF; border-radius:12px; margin-top:14px; box-shadow:0 8px 24px rgba(17,47,80,0.07); overflow:hidden;">
+          <div style="display:flex; align-items:center; gap:14px; padding:17px 20px; border-bottom:1px solid #EEF2F8;">
+            <div style="flex:1;">
+              <div style="font-size:16px; font-weight:600;">Grotere letters</div>
+              <div style="font-size:13px; color:#5A687A;">Ouderen-modus, alles 1,3× groter</div>
+            </div>
+            <button onClick="{{ togElderly }}" style="{{ toggleTrack }}"><span style="{{ toggleKnob }}"></span></button>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; padding:17px 20px; border-bottom:1px solid #EEF2F8;">
+            <div style="flex:1;">
+              <div style="font-size:16px; font-weight:600;">Agenda-koppeling</div>
+              <div style="font-size:13px; color:#5A687A;">Taken automatisch in je eigen agenda</div>
+            </div>
+            <button onClick="{{ togCal }}" style="{{ calTrack }}"><span style="{{ calKnob }}"></span></button>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; padding:17px 20px; border-bottom:1px solid #EEF2F8;">
+            <div style="flex:1; font-size:16px; font-weight:600;">Meldingen</div>
+            <span style="color:#8F9AAA;">›</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; padding:17px 20px; border-bottom:1px solid #EEF2F8;">
+            <div style="flex:1; font-size:16px; font-weight:600;">Mijn TVZ-ID <span style="font-weight:400; color:#5A687A;">· TVZ-8813</span></div>
+            <span style="color:#8F9AAA;">›</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px; padding:17px 20px;">
+            <div style="flex:1; font-size:16px; font-weight:600; color:#D9413A;">Uitloggen</div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isAbo }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; overflow-y:auto; padding:62px 24px 120px; box-sizing:border-box; background:#F5F8FC;">
+        <button onClick="{{ closeAbo }}" style="width:44px; height:44px; border-radius:50%; border:none; background:#EEF2F8; color:#1A4878; font-size:19px; cursor:pointer;" style-hover="background:#E3E8F1;">←</button>
+        <sc-if value="{{ nietSubscribed }}" hint-placeholder-val="{{ true }}">
+        <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:26px; margin-top:16px;">Alle logistiek geregeld<span style="color:#8DC93F;">.</span></div>
+        <div style="font-size:16px; color:#5A687A; line-height:1.6; margin-top:8px;">Eén abonnement voor de hele kring. Iedereen profiteert, jij betaalt als beheerder.</div>
+        <div style="margin-top:20px; background:linear-gradient(115deg,#112F50,#2A6CB0); border-radius:12px; padding:24px; color:#FFFFFF;">
+          <div style="display:flex; align-items:baseline; gap:6px;">
+            <span style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:38px;">€4,99</span>
+            <span style="font-size:16px; opacity:0.85;">per maand</span>
+          </div>
+          <div style="width:56px; height:5px; border-radius:3px; background:#8DC93F; margin:10px 0 14px;"></div>
+          <div style="display:flex; flex-direction:column; gap:11px; font-size:15.5px;">
+            <div style="display:flex; gap:10px; align-items:center;"><span style="width:18px; height:5px; border-radius:3px; background:#8DC93F; flex:0 0 auto;"></span>Onbeperkt vrijwilligers in de kring</div>
+            <div style="display:flex; gap:10px; align-items:center;"><span style="width:18px; height:5px; border-radius:3px; background:#8DC93F; flex:0 0 auto;"></span>Inzetrooster: zelf inplannen en ruilen</div>
+            <div style="display:flex; gap:10px; align-items:center;"><span style="width:18px; height:5px; border-radius:3px; background:#8DC93F; flex:0 0 auto;"></span>Berichten aan de hele kring</div>
+            <div style="display:flex; gap:10px; align-items:center;"><span style="width:18px; height:5px; border-radius:3px; background:#8DC93F; flex:0 0 auto;"></span>Buddy-pool vult open diensten</div>
+          </div>
+        </div>
+        <button onClick="{{ subscribe }}" style="margin-top:18px; width:100%; height:64px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; cursor:pointer; box-shadow:0 8px 20px rgba(115,176,43,0.35);" style-hover="background:#9AD44E;">Start abonnement</button>
+        <div style="font-size:13px; color:#8F9AAA; text-align:center; line-height:1.55; margin-top:12px;">Je geeft een incassomachtiging af. Maandelijks opzegbaar, geen kleine lettertjes.</div>
+        <button onClick="{{ closeAbo }}" style="width:100%; height:48px; border:none; background:none; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; cursor:pointer;" style-hover="color:#112640;">Later misschien</button>
+        </sc-if>
+        <sc-if value="{{ subscribed }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; padding-top:60px;">
+          <div style="display:flex; align-items:flex-end; gap:3px; margin-bottom:8px;">
+            <div style="width:36px; height:23px; border-radius:12px; background:#2A6CB0;"></div>
+            <div style="width:36px; height:23px; border-radius:12px; background:#8DC93F; animation:tvzBounce 1.6s ease-in-out infinite;"></div>
+          </div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:24px;">Abonnement actief</div>
+          <div style="font-size:16px; color:#5A687A; line-height:1.6; max-width:270px;">Alle extra functies staan aan voor de hele kring: rooster, berichten en de buddy-pool.</div>
+          <button onClick="{{ naarRooster }}" style="margin-top:16px; width:100%; height:60px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px; cursor:pointer;" style-hover="background:#112F50;">Open het rooster</button>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isIdUpload }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; overflow-y:auto; padding:62px 24px 120px; box-sizing:border-box;">
+        <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:25px; margin-top:8px;">Stel jezelf voor</div>
+        <div style="font-size:16px; color:#5A687A; line-height:1.6; margin-top:8px;">De beheerder van de kring leest dit bij je aanmelding. Je ID is al gecheckt bij je registratie, dus dit is genoeg.</div>
+        <div style="display:flex; flex-direction:column; gap:6px; margin-top:20px;">
+          <label style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;">Je berichtje</label>
+          <textarea value="{{ vIntro }}" onChange="{{ onVIntro }}" onFocus="{{ kbOn }}" onBlur="{{ kbOff }}" placeholder="Bijv. Hoi! Ik ben Tim, ik woon om de hoek en doe graag boodschappen of een wandeling. Tot snel?" rows="4" style="border-radius:8px; border:1.5px solid #E3E8F1; background:#FFFFFF; padding:12px 16px; font-size:16px; font-family:inherit; color:#112640; outline:none; resize:none; line-height:1.5;"></textarea>
+          <div style="font-size:13px; color:#8F9AAA; line-height:1.5;">Dit berichtje gaat naar de beheerder van de kring, zo maak je alvast half kennis.</div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:10px; margin-top:16px; background:#EEF2F8; border-radius:10px; padding:14px 16px;">
+          <span style="width:18px; height:5px; border-radius:3px; background:#8DC93F; flex:0 0 auto; margin-top:7px;"></span>
+          <div style="font-size:13.5px; color:#5A687A; line-height:1.55;">Na je aanmelding volgt nog een korte videokennismaking met de beheerder. Daarna ben je lid.</div>
+        </div>
+        <button onClick="{{ uploadId }}" style="margin-top:20px; width:100%; height:64px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; cursor:pointer;" style-hover="background:#112F50;">Verstuur aanmelding</button>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isInbox }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; overflow-y:auto; padding:56px 20px 120px; box-sizing:border-box;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+          <button onClick="{{ inboxBack }}" style="width:44px; height:44px; border-radius:50%; border:none; background:#EEF2F8; color:#1A4878; font-size:19px; cursor:pointer;" style-hover="background:#E3E8F1;">←</button>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:23px;">Inbox</div>
+        </div>
+        <sc-if value="{{ isMz }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="background:#FFFFFF; border:1.5px solid #2A6CB0; border-radius:12px; padding:16px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:#8DC93F; flex:0 0 auto;"></span>
+              <div style="flex:1; font-size:15px; font-weight:600;">Aanvraag voor je kring</div>
+              <div style="font-size:12.5px; color:#8F9AAA;">10:24</div>
+            </div>
+            <div style="font-size:14px; color:#5A687A; line-height:1.5; margin-top:6px;">Tim Bakker (onbekende vrijwilliger, 400 m) wil zich aansluiten. Hij stuurde een voorstelbericht mee.</div>
+            <button onClick="{{ openBeoordeling }}" style="margin-top:12px; height:44px; padding:0 18px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; cursor:pointer;" style-hover="background:#112F50;">Bekijk aanvraag</button>
+          </div>
+          <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:12px; padding:16px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="flex:1; font-size:15px; font-weight:600;">Dienst geruild</div>
+              <div style="font-size:12.5px; color:#8F9AAA;">Gisteren</div>
+            </div>
+            <div style="font-size:14px; color:#5A687A; line-height:1.5; margin-top:6px;">Sophie neemt de koffie van zaterdag over van Anna. Het rooster is bijgewerkt.</div>
+          </div>
+          <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:12px; padding:16px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="flex:1; font-size:15px; font-weight:600;">Herinnering</div>
+              <div style="font-size:12.5px; color:#8F9AAA;">Vandaag 08:00</div>
+            </div>
+            <div style="font-size:14px; color:#5A687A; line-height:1.5; margin-top:6px;">Anna komt vandaag om 14:00 langs voor de boodschappen.</div>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ isV }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="background:#FFFFFF; border:1.5px solid #2A6CB0; border-radius:12px; padding:16px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:#8DC93F; flex:0 0 auto;"></span>
+              <div style="flex:1; font-size:15px; font-weight:600;">Hulpvraag ingetrokken</div>
+              <div style="font-size:12.5px; color:#8F9AAA;">09:41</div>
+            </div>
+            <div style="font-size:14px; color:#5A687A; line-height:1.5; margin-top:6px;">De koffie-afspraak van meneer De Boer (buddy-pool) gaat niet door.</div>
+            <button onClick="{{ openCancel }}" style="margin-top:12px; height:44px; padding:0 18px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; cursor:pointer;" style-hover="background:#112F50;">Bekijk melding</button>
+          </div>
+          <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:12px; padding:16px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="flex:1; font-size:15px; font-weight:600;">Uitnodiging</div>
+              <div style="font-size:12.5px; color:#8F9AAA;">Gisteren</div>
+            </div>
+            <div style="font-size:14px; color:#5A687A; line-height:1.5; margin-top:6px;">Jelle nodigt je uit voor de kring van mevrouw Jansen.</div>
+          </div>
+          <div style="background:#FFFFFF; border:1px solid #E3E8F1; border-radius:12px; padding:16px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="flex:1; font-size:15px; font-weight:600;">Nieuwe taak in het rooster</div>
+              <div style="font-size:12.5px; color:#8F9AAA;">Ma</div>
+            </div>
+            <div style="font-size:14px; color:#5A687A; line-height:1.5; margin-top:6px;">Vervoer naar de huisarts, donderdag 09:15. Nog niemand heeft hem aangenomen.</div>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isBeoordeling }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; overflow-y:auto; padding:56px 24px 120px; box-sizing:border-box;">
+        <button onClick="{{ beoordelingTerug }}" style="width:44px; height:44px; border-radius:50%; border:none; background:#EEF2F8; color:#1A4878; font-size:19px; cursor:pointer;" style-hover="background:#E3E8F1;">←</button>
+        <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:24px; margin-top:14px;">Aanvraag voor de kring</div>
+        <div style="margin-top:16px; background:#FFFFFF; border-radius:12px; padding:20px; box-shadow:0 8px 24px rgba(17,47,80,0.07);">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <div style="width:56px; height:56px; border-radius:50%; background:#2A6CB0; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px;">{{ bInitial }}</div>
+            <div style="flex:1;">
+              <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px;">{{ bNaam }}</div>
+              <div style="font-size:14px; color:#5A687A;">Onbekende vrijwilliger · 400 m van Riet</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <span style="height:30px; display:inline-flex; align-items:center; padding:0 13px; border-radius:999px; background:#EAF1F9; color:#1A4878; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px;">Helpt al in 2 andere kringen</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid #EEF2F8;">
+            <div style="display:flex; gap:3px;">
+              <span style="width:11px; height:11px; border-radius:50%; background:#8DC93F;"></span><span style="width:11px; height:11px; border-radius:50%; background:#8DC93F;"></span><span style="width:11px; height:11px; border-radius:50%; background:#8DC93F;"></span><span style="width:11px; height:11px; border-radius:50%; background:#8DC93F;"></span><span style="width:11px; height:11px; border-radius:50%; background:#E3E8F1;"></span>
+            </div>
+            <div style="font-size:13.5px; color:#5A687A;"><strong style="color:#112640;">4,0</strong> · 12 taken in 2 andere kringen</div>
+          </div>
+        </div>
+        <div style="margin-top:12px; background:#EEF2F8; border-radius:12px; padding:16px 18px;">
+          <div style="font-size:15px; line-height:1.6; color:#112640;"><em>"{{ bIntro }}"</em></div>
+          <div style="font-size:13px; color:#8F9AAA; margin-top:6px;">Voorstelbericht van {{ bNaam }}</div>
+        </div>
+        <sc-if value="{{ mzCallNogNiet }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ startCallMz }}" style="margin-top:18px; width:100%; height:60px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px; cursor:pointer;" style-hover="background:#112F50;">Start videokennismaking</button>
+        <button onClick="{{ afwijsB }}" style="margin-top:8px; width:100%; height:52px; border-radius:999px; border:1.5px solid #E3E8F1; background:#FFFFFF; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; cursor:pointer;" style-hover="border-color:#D9413A; color:#D9413A;">Afwijzen</button>
+        </sc-if>
+        <sc-if value="{{ mzCallDone }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px; display:flex; align-items:center; gap:10px; background:#F1F8E4; border-radius:10px; padding:12px 16px;">
+          <span style="width:10px; height:10px; border-radius:50%; background:#73B02B;"></span>
+          <div style="font-size:14px; color:#4C7A16; font-weight:600;">Videokennismaking gedaan · {{ callTimer }}</div>
+        </div>
+        <button onClick="{{ accepteerB }}" style="margin-top:14px; width:100%; height:64px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; cursor:pointer; box-shadow:0 8px 20px rgba(115,176,43,0.35);" style-hover="background:#9AD44E;">Toelaten tot de kring</button>
+        <button onClick="{{ afwijsB }}" style="margin-top:6px; width:100%; height:48px; border:none; background:none; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; cursor:pointer;" style-hover="color:#D9413A;">Toch afwijzen</button>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isCall }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; background:linear-gradient(115deg,#112F50,#2A6CB0); z-index:760; display:flex; flex-direction:column; align-items:center; padding:70px 24px 40px; box-sizing:border-box; color:#FFFFFF;">
+        <div style="height:32px; display:inline-flex; align-items:center; padding:0 15px; border-radius:999px; background:rgba(255,255,255,0.14); font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px;">Videokennismaking</div>
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;">
+          <div style="width:124px; height:124px; border-radius:50%; background:#FFFFFF; color:#1A4878; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:48px; box-shadow:0 16px 44px rgba(17,47,80,0.4);">{{ callInitial }}</div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:24px;">{{ callNaam }}</div>
+          <div style="font-size:15px; opacity:0.85;">Kring van mevrouw Jansen</div>
+          <div style="font-family:'Baloo 2',sans-serif; font-weight:600; font-size:17px; margin-top:6px; letter-spacing:1px;">{{ callTimer }}</div>
+        </div>
+        <div style="position:absolute; top:70px; right:20px; width:88px; height:116px; border-radius:10px; background:#1A4878; border:1.5px solid rgba(255,255,255,0.35); display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:26px;">{{ callSelf }}</div>
+        <div style="display:flex; gap:14px; align-items:center;">
+          <button style="width:58px; height:58px; border-radius:50%; border:none; background:rgba(255,255,255,0.16); cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:rgba(255,255,255,0.28);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
+          </button>
+          <button onClick="{{ endCall }}" style="width:68px; height:68px; border-radius:50%; border:none; background:#D9413A; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 26px rgba(217,65,58,0.45);" style-hover="background:#C23730;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(135deg);"><path d="M6 3l4 4-2.5 2.5a13 13 0 0 0 7 7L17 14l4 4-2 3c-8 0-16-8-16-16l3-2z"></path></svg>
+          </button>
+          <button style="width:58px; height:58px; border-radius:50%; border:none; background:rgba(255,255,255,0.16); cursor:pointer; display:flex; align-items:center; justify-content:center;" style-hover="background:rgba(255,255,255,0.28);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="13" height="10" rx="3"></rect><path d="M16 11l5-3v8l-5-3"></path></svg>
+          </button>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isCancel }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; background:#F5F8FC; z-index:750; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 32px; box-sizing:border-box; text-align:center; gap:10px;">
+        <div style="width:64px; height:26px; border-radius:13px; background:#1A4878; margin-bottom:10px;"></div>
+        <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:23px;">Hulpvraag ingetrokken</div>
+        <div style="font-size:16px; color:#5A687A; line-height:1.6; max-width:280px;">Meneer De Boer heeft de koffie-afspraak van vandaag geannuleerd. Je hoeft niet meer langs te komen. Bedankt voor je inzet!</div>
+        <span style="height:32px; display:inline-flex; align-items:center; padding:0 15px; border-radius:999px; background:#EEF2F8; color:#5A687A; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px;">Geen zorgen, dit kan gebeuren</span>
+        <button onClick="{{ cancelBegrepen }}" style="margin-top:18px; width:100%; height:60px; border-radius:999px; border:none; background:#1A4878; color:#FFFFFF; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px; cursor:pointer;" style-hover="background:#112F50;">Begrepen</button>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ wtActive }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; inset:0; z-index:800; background:rgba(17,38,64,0.38);">
+        <div style="{{ wtPos }}">
+          <div style="{{ wtArrow }}"></div>
+          <div style="background:#FFFFFF; border-radius:12px; padding:16px 18px; box-shadow:0 16px 44px rgba(17,47,80,0.35);">
+            <div style="font-family:Caveat,cursive; font-weight:600; font-size:22px; color:#1A4878;">{{ wtTitle }}</div>
+            <div style="font-size:14px; color:#5A687A; line-height:1.55; margin-top:2px;">{{ wtText }}</div>
+            <div style="display:flex; align-items:center; gap:8px; margin-top:12px;">
+              <div style="display:flex; gap:5px; flex:1;">
+                <sc-for list="{{ wtDots }}" as="d" hint-placeholder-count="4">
+                  <span style="{{ d.style }}"></span>
+                </sc-for>
+              </div>
+              <button onClick="{{ wtSkip }}" style="height:38px; padding:0 12px; border:none; background:none; color:#8F9AAA; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; cursor:pointer;" style-hover="color:#112640;">Overslaan</button>
+              <button onClick="{{ wtNext }}" style="height:40px; padding:0 18px; border-radius:999px; border:none; background:#8DC93F; color:#112F50; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; cursor:pointer;" style-hover="background:#9AD44E;">{{ wtBtn }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ showTabBar }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute; left:50%; transform:translateX(-50%); bottom:16px; z-index:700; background:#FFFFFF; border-radius:999px; box-shadow:0 12px 32px rgba(17,47,80,0.18); padding:6px; display:flex; gap:2px;">
+        <button onClick="{{ tabVandaag }}" style="{{ tabStyleVandaag }}">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="4"></rect><path d="M8 3v4M16 3v4M4 10h16"></path></svg>
+          Rooster
+        </button>
+        <button onClick="{{ tabKaart }}" style="{{ tabStyleKaart }}">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.4-6.5-10.2a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21z"></path><circle cx="12" cy="10.5" r="2.3"></circle></svg>
+          Buurt
+        </button>
+        <button onClick="{{ tabKring }}" style="{{ tabStyleKring }}">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="4" r="1.6"></circle><circle cx="19" cy="8.5" r="1.6"></circle><circle cx="19" cy="15.5" r="1.6"></circle><circle cx="12" cy="20" r="1.6"></circle><circle cx="5" cy="15.5" r="1.6"></circle><circle cx="5" cy="8.5" r="1.6"></circle></svg>
+          Kring
+        </button>
+        <button onClick="{{ tabSteun }}" style="{{ tabStyleSteun }}">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14a2 2 0 0 1-2 2H9l-4 3V6a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v8z"></path><path d="M9 10h7M9 13h4"></path></svg>
+          Steun
+        </button>
+        <button onClick="{{ tabProfiel }}" style="{{ tabStyleProfiel }}">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg>
+          Profiel
+        </button>
+      </div>
+      </sc-if>
+    </div>
+    </sc-if>
+  </div>
+  </x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1200, &quot;height&quot;: 980}, &quot;showFlowPanel&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Prototype&quot;}, &quot;startRole&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;kies zelf&quot;, &quot;options&quot;: [&quot;kies zelf&quot;, &quot;mantelzorger&quot;, &quot;vrijwilliger&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Prototype&quot;}, &quot;startSubscribed&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Prototype&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: null, tab: 'kaart', role: null, kb: false,
+    hasKring: false, kringView: 'empty', kringNaam: 'Kring van mevrouw Jansen',
+    catSel: { Boodschappen: true, Wandelen: false, Vervoer: true, Gezelschap: true },
+    leden: [], suggesties: [
+      { naam: 'Tim Bakker', sub: '400 m · helpt al in 2 kringen', status: 'open' },
+      { naam: 'Sophie van Dijk', sub: '650 m · nieuw op Thuisverzorgd', status: 'open' },
+      { naam: 'Karim El Idrissi', sub: '900 m · helpt al in 1 kring', status: 'open' }
+    ],
+    ncOpen: false, ncTaak: 'Boodschappen', ncDag: 'Vr', ncTijd: '14:00', ncHerhaal: 'Eenmalig', ncCustom: '', bannerGone: false,
+    zoek: '', mapCountK: 4, mapCountS: 1,
+    planPeriode: '1 week', planWeek: 31, draft: [], pubOk: false,
+    steunView: 'forum', forumTag: 'Alles', forumOpen: null, forumCompose: false, forumDraft: '', replyDraft: '',
+    forumPosts: [
+      { van: 'Marieke', wijk: 'Utrecht', tijd: '2 u', tag: 'Wonen', titel: 'Kan ik mijn moeder zomaar bij ons in huis nemen?', tekst: 'Mijn moeder (79) woont nu alleen en dat gaat steeds moeilijker. We hebben ruimte, maar ik hoor van alles over huurtoeslag en de kostendelersnorm. Wat komt er echt op ons af?', replies: [
+        { van: 'Sanne (hulpmakelaar)', tekst: 'Het mag, maar het raakt drie dingen: haar AOW/toeslagen, jullie eigen uitkering of toeslagen, en soms de gemeentelijke bijdrage. Vraag bij je gemeente een gesprek aan over de Wmo — dan zetten ze het voor jullie situatie op papier. Ik kan je doorverwijzen.', expert: true },
+        { van: 'Peter', tekst: 'Wij hebben dit vorig jaar gedaan. Belangrijkste tip: leg vooraf vast wie welke kosten draagt, ook met broers en zussen. Voorkomt veel gedoe.' }
+      ] },
+      { van: 'Youssef', wijk: 'Rotterdam', tijd: '5 u', tag: 'Werk', titel: 'Hoe combineren jullie een baan met de zorg voor je vader?', tekst: 'Ik werk vier dagen en ren daarnaast heen en weer. Werkgever is welwillend maar ik weet niet wat mijn rechten zijn.', replies: [
+        { van: 'Nadia', tekst: 'Kijk naar kortdurend zorgverlof — vaak 70% doorbetaald. Ik heb het in blokjes van halve dagen opgenomen, dat werkte veel beter.' }
+      ] },
+      { van: 'Hannie', wijk: 'Zwolle', tijd: 'gisteren', tag: 'Dementie', titel: 'Vader vergeet de dagbesteding, hoe pak ik dat aan?', tekst: 'Elke keer opnieuw uitleggen werkt niet meer. Iemand ervaring met een vast ritueel of hulp uit de buurt?', replies: [] },
+      { van: 'Bram', wijk: 'Eindhoven', tijd: '2 dagen', tag: 'Financiën', titel: 'Welke vergoedingen bestaan er voor mantelzorgers?', tekst: 'Ik hoorde over het mantelzorgcompliment van de gemeente. Wie heeft dat aangevraagd en hoe ging dat?', replies: [
+        { van: 'Marc (hulpmakelaar)', tekst: 'Elke gemeente regelt het mantelzorgcompliment zelf: soms geld, soms een bon of cursus. Meld je ook aan bij het lokale mantelzorgsteunpunt — die regelen respijtzorg. Stuur me je gemeente in de chat, dan zoek ik het op.', expert: true }
+      ] }
+    ],
+    mkChat: [
+      { van: 'Sanne · hulpmakelaar', kant: 'mk', tekst: 'Hoi! Waar kan ik je mee helpen? Geen vraag is te klein.' }
+    ],
+    mkDraft: '', mkTyping: false,
+    beschikbaar: { Ma: true, Di: false, Wo: true, Do: true, Vr: false, Za: true, Zo: false },
+    inviteInput: '', subscribed: null, aboReturn: null,
+    chat: [
+      { van: 'Jelle (beheerder)', kant: 'vraag', tekst: 'Zou iemand donderdag de boodschappen kunnen doen?' },
+      { van: 'Anna de Wit', kant: 'buddy', tekst: 'Ik kom eraan! 😊' }
+    ],
+    chatDraft: '', chatReplied: true,
+    rooster: [
+      { dag: 'Ma', datum: '27 jul', taak: 'Boodschappen', tijd: '14:00', wie: 'Anna de Wit', status: 'ingepland' },
+      { dag: 'Wo', datum: '29 jul', taak: 'Wandeling', tijd: '10:30', wie: 'Tim Bakker', status: 'ingepland' },
+      { dag: 'Do', datum: '30 jul', taak: 'Vervoer naar huisarts', tijd: '09:15', wie: null, status: 'open' },
+      { dag: 'Za', datum: '1 aug', taak: 'Koffie & gezelschap', tijd: '15:00', wie: 'Sophie van Dijk', status: 'ingepland' }
+    ],
+    roosterMatch: false, afspraak: 'open',
+    mapFilter: 'kringen', selectedKring: null,
+    vStatus: 'invited', vTaak: 'open', elderly: false, vIntro: '',
+    beoordeelNaam: 'Tim Bakker', mzCallDone: false, callSec: 0, callRole: null,
+    poolOptIn: false, walkthrough: null,
+    spontMz: 'none', spontMzTaak: 'Vervoer', spontVStage: 'ask', spontVMsg: '', selectedSpont: false,
+    vidId: false, vidSelfie: false,
+    logFor: null, logMsg: '',
+    kringNotes: [
+      { van: 'Anna de Wit', tijd: 'Gisteren 15:12', tekst: 'Boodschappen gedaan. Riet was vrolijk vandaag, we hebben samen nog koffie gedronken.' },
+      { van: 'Tim Bakker', tijd: 'Maandag 11:02', tekst: 'Wandeling ging goed, wel wat moe aan het eind. Volgende keer een korter rondje doen.' }
+    ],
+    vakantie: false, calSync: false,
+    adminView: 'overzicht'
+  };
+  kringen = [
+    { id: 1, naam: 'Hulpkring Westerpark', wijk: 'Westerpark', buddies: 8, plekken: 0, lat: 52.3872, lng: 4.8760 },
+    { id: 2, naam: 'Kring van mevrouw Jansen', wijk: 'Oud-Oost', buddies: 3, plekken: 2, lat: 52.3625, lng: 4.9126 },
+    { id: 3, naam: 'Kring van meneer De Boer', wijk: 'De Pijp', buddies: 5, plekken: 1, lat: 52.3547, lng: 4.8925 },
+    { id: 4, naam: 'Hulpkring Jordaan', wijk: 'Jordaan', buddies: 12, plekken: 0, lat: 52.3752, lng: 4.8790 }
+  ];
+  buddies = [
+    { ini: 'T', lat: 52.3680, lng: 4.9040 }, { ini: 'S', lat: 52.3590, lng: 4.8830 },
+    { ini: 'K', lat: 52.3710, lng: 4.8680 }, { ini: 'M', lat: 52.3800, lng: 4.9000 },
+    { ini: 'E', lat: 52.3560, lng: 4.9060 }
+  ];
+  effRole() { const p = this.props.startRole; return this.state.role ?? ((p && p !== 'kies zelf') ? p : null); }
+  effScreen() { return this.state.screen ?? (this.effRole() ? 'main' : 'welcome'); }
+  effSub() { return this.state.subscribed ?? (this.props.startSubscribed ?? false); }
+  set(patch) { return () => this.setState(patch); }
+  jump(role, tab, extra) {
+    return () => {
+      this.setState(Object.assign({ screen: 'main', role, tab, selectedKring: null }, extra || {}));
+    };
+  }
+  ensureKring() {
+    if (this.state.hasKring) return {};
+    return { hasKring: true, kringView: 'leden', leden: this.defaultLeden() };
+  }
+  defaultLeden() {
+    return [
+      { naam: 'Riet Jansen', sub: 'Hulpvrager · gekoppeld via code', kind: 'zv', status: 'Kijkt mee' },
+      { naam: 'Anna de Wit', sub: 'Vrijwilliger · buurvrouw', kind: 'vw', status: 'Actief' }
+    ];
+  }
+  vwCount() { return this.state.leden.filter(m => m.kind === 'vw').length; }
+  chipStyle(active) {
+    return {
+      height: '36px', padding: '0 15px', borderRadius: '999px', cursor: 'pointer',
+      fontFamily: "'Baloo 2',sans-serif", fontWeight: 600, fontSize: '12.5px',
+      border: active ? 'none' : '1.5px solid #E3E8F1',
+      background: active ? '#1A4878' : '#FFFFFF', color: active ? '#FFFFFF' : '#5A687A'
+    };
+  }
+  vidTile(done) {
+    return { flex: 1, textAlign: 'left', border: done ? '1.5px solid #8DC93F' : '1.5px dashed #2A6CB0', background: done ? '#F7FBEF' : '#FFFFFF', borderRadius: '12px', padding: '18px 16px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start', fontFamily: 'inherit' };
+  }
+  pill(bg, color) {
+    return { height: '28px', display: 'inline-flex', alignItems: 'center', padding: '0 12px', borderRadius: '999px', background: bg, color, fontFamily: "'Baloo 2',sans-serif", fontWeight: 600, fontSize: '12px', flex: '0 0 auto' };
+  }
+  statusPill(s) {
+    if (s === 'Actief' || s === 'Ingepland' || s === 'Kijkt mee') return this.pill('#F1F8E4', '#4C7A16');
+    if (s === 'Uitgenodigd' || s === 'ID-check' || s === 'Nog open') return this.pill('#FBF3E0', '#9A6E0B');
+    return this.pill('#EEF2F8', '#5A687A');
+  }
+  mapRef = (el) => {
+    if (!el) { if (this._map) { this._map.remove(); this._map = null; } return; }
+    if (this._mapEl === el && this._map) return;
+    const init = () => {
+      if (!window.L) { setTimeout(init, 120); return; }
+      if (!el.isConnected) return;
+      if (this._map) { this._map.remove(); this._map = null; }
+      const m = window.L.map(el, { zoomControl: false, attributionControl: true }).setView([52.368, 4.892], 13);
+      window.L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(m);
+      const home = window.L.divIcon({ className: '', iconSize: [26, 26], iconAnchor: [13, 13], html: '<div style="width:22px;height:22px;border-radius:50%;background:#8DC93F;border:4px solid #fff;box-shadow:0 2px 10px rgba(17,47,80,.35)"></div>' });
+      window.L.marker([52.3625, 4.9126], { icon: home }).addTo(m);
+      this._layerBuddies = window.L.layerGroup();
+      this._kringMarkers = this.kringen.map(k => {
+        const ic = window.L.divIcon({ className: '', iconSize: [44, 54], iconAnchor: [22, 50], html:
+          '<div style="display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 5px 10px rgba(17,47,80,.35))">' +
+          '<div style="width:42px;height:42px;background:#fff;border:3px solid #1A4878;border-radius:50%;display:flex;align-items:center;justify-content:center;gap:2px">' +
+          '<div style="width:12px;height:8px;border-radius:4px;background:#2A6CB0"></div><div style="width:12px;height:8px;border-radius:4px;background:#8DC93F"></div></div>' +
+          '<div style="width:4px;height:9px;background:#1A4878;border-radius:2px"></div></div>' });
+        const mk = window.L.marker([k.lat, k.lng], { icon: ic }).on('click', () => this.setState({ selectedKring: k, selectedSpont: false }));
+        return { k, mk };
+      });
+      m.on('moveend', () => this.updateMapCount());
+      this.buddies.forEach(b => {
+        const ic = window.L.divIcon({ className: '', iconSize: [28, 28], iconAnchor: [14, 14], html:
+          '<div style="width:26px;height:26px;border-radius:50%;background:#2A6CB0;border:2.5px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font:700 12px Baloo 2,sans-serif;box-shadow:0 3px 8px rgba(17,47,80,.3)">' + b.ini + '</div>' });
+        window.L.marker([b.lat, b.lng], { icon: ic }).addTo(this._layerBuddies);
+      });
+      const spontIc = (size) => window.L.divIcon({ className: '', iconSize: [size, size], iconAnchor: [size / 2, size / 2], html:
+        '<div style="width:' + (size - 6) + 'px;height:' + (size - 6) + 'px;border-radius:50%;background:#112F50;border:3px solid #fff;display:flex;align-items:center;justify-content:center;animation:tvzPulse 1.8s ease-out infinite;">' +
+        '<svg width="' + (size / 2 - 4) + '" height="' + (size / 2 - 4) + '" viewBox="0 0 24 24" fill="#8DC93F"><path d="M13 2L4.5 13.5H11L9.5 22 19 10h-6.5L13 2z"></path></svg></div>' });
+      this._spontVMarker = window.L.marker([52.3547, 4.8990], { icon: spontIc(40), zIndexOffset: 900 }).on('click', () => this.setState({ selectedSpont: true, selectedKring: null }));
+      this._spontMzMarker = window.L.marker([52.3625, 4.9126], { icon: spontIc(44), zIndexOffset: 900 });
+      this.syncLayers(m);
+      this._map = m; this._mapEl = el;
+      setTimeout(() => m.invalidateSize(), 250);
+    };
+    init();
+  };
+  syncLayers(m) {
+    const map = m || this._map; if (!map) return;
+    const role = this.effRole(), f = this.state.mapFilter;
+    const zoek = (this.state.zoek || '').trim().toLowerCase();
+    const showKringen = role === 'vrijwilliger' ? true : f === 'kringen';
+    if (this._kringMarkers) this._kringMarkers.forEach(({ k, mk }) => {
+      const vis = showKringen && (!zoek || k.naam.toLowerCase().indexOf(zoek) >= 0);
+      if (vis) map.addLayer(mk); else map.removeLayer(mk);
+    });
+    if (this._layerBuddies) { if (role !== 'vrijwilliger' && f === 'buddys') map.addLayer(this._layerBuddies); else map.removeLayer(this._layerBuddies); }
+    if (this._spontVMarker) { if (role === 'vrijwilliger') map.addLayer(this._spontVMarker); else map.removeLayer(this._spontVMarker); }
+    if (this._spontMzMarker) { if (role === 'mantelzorger' && ['open', 'offer', 'active'].includes(this.state.spontMz)) map.addLayer(this._spontMzMarker); else map.removeLayer(this._spontMzMarker); }
+    this.updateMapCount();
+  }
+  updateMapCount() {
+    const map = this._map; if (!map) return;
+    const b = map.getBounds();
+    const zoek = (this.state.zoek || '').trim().toLowerCase();
+    const k = this.kringen.filter(x => (!zoek || x.naam.toLowerCase().indexOf(zoek) >= 0) && b.contains([x.lat, x.lng])).length;
+    const sp = b.contains([52.3547, 4.8990]) ? 1 : 0;
+    if (k !== this.state.mapCountK || sp !== this.state.mapCountS) this.setState({ mapCountK: k, mapCountS: sp });
+  }
+  componentDidUpdate() { this.syncLayers(); }
+  wtSteps = {
+    mantelzorger: [
+      { t: 'Plan hier taken in!', x: 'Met de groene knop zet je in drie tikken een taak in het rooster. Je kring ziet hem direct en neemt hem aan.', patch: { tab: 'vandaag' }, pos: { top: '160px', left: '20px', right: '20px' }, arrow: 'up-left' },
+      { t: 'Je inbox', x: 'Aanvragen van nieuwe buddy\u2019s en meldingen uit de kring vind je onder het belletje.', patch: { tab: 'vandaag' }, pos: { top: '112px', left: '60px', right: '14px' }, arrow: 'up-right' },
+      { t: 'De buurtkaart', x: 'Bekijk kringen en buddy\u2019s dichtbij. Plotseling iets nodig? Vraag hier directe hulp aan de buurt.', patch: { tab: 'kaart' }, pos: { bottom: '96px', left: '20px', right: '20px' }, arrow: 'down' },
+      { t: 'Jouw kring', x: 'Beheer de leden, nodig buddy\u2019s uit en stuur berichten aan iedereen tegelijk.', patch: { tab: 'kring' }, pos: { bottom: '96px', left: '20px', right: '20px' }, arrow: 'down' }
+    ],
+    vrijwilliger: [
+      { t: 'Neem taken aan', x: 'In het weekrooster zie je de open taken van je kring. E\u00e9n tik en hij staat op jouw naam.', patch: { tab: 'vandaag' }, pos: { top: '160px', left: '20px', right: '20px' }, arrow: 'up-left' },
+      { t: 'De buurtkaart', x: 'Pulserende stippen laten zien waar n\u00fa directe hulp nodig is. Tik erop om te helpen.', patch: { tab: 'kaart' }, pos: { bottom: '96px', left: '20px', right: '20px' }, arrow: 'down' },
+      { t: 'Meer doen in de buurt', x: 'Zet op je profiel de buddy-pool aan: help los bij andere kringen, of sluit je ergens vast aan.', patch: { tab: 'profiel' }, pos: { top: '330px', left: '20px', right: '20px' }, arrow: 'up' }
+    ],
+    hulpvrager: [
+      { t: 'Je kring staat om je heen', x: 'Je ziet wie er langskomt en wanneer. Zelf regelen hoeft niet \u2014 dat doet de beheerder van je kring.', patch: { tab: 'vandaag' }, pos: { top: '36%', left: '26px', right: '26px' }, arrow: 'none' },
+      { t: 'Alles op \u00e9\u00e9n plek', x: 'Bekijk de agenda, stuur een berichtje naar de groep en zie bekende gezichten op de kaart.', patch: { tab: 'vandaag' }, pos: { top: '36%', left: '26px', right: '26px' }, arrow: 'none' }
+    ]
+  };
+  dagVolgorde = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'];
+  startCall(role, extra) {
+    if (this._callInt) clearInterval(this._callInt);
+    this.setState(Object.assign({ tab: 'call', callRole: role, callSec: 0 }, extra || {}));
+    this._callInt = setInterval(() => this.setState(s => ({ callSec: s.callSec + 1 })), 1000);
+  }
+  componentWillUnmount() { if (this._callInt) clearInterval(this._callInt); if (this._mkT) clearTimeout(this._mkT); }
+  mkSend(vraag, antwoord) {
+    const reply = antwoord || 'Goede vraag. Ik zoek het even op voor jouw situatie — mag ik weten in welke gemeente je woont? Dan kan ik je gericht doorverwijzen.';
+    this.setState(st => ({ mkChat: st.mkChat.concat([{ van: 'Jij', kant: 'ik', tekst: vraag }]), mkDraft: '', mkTyping: true, kb: false }));
+    if (this._mkT) clearTimeout(this._mkT);
+    this._mkT = setTimeout(() => this.setState(st => ({ mkTyping: false, mkChat: st.mkChat.concat([{ van: 'Sanne · hulpmakelaar', kant: 'mk', tekst: reply }]) })), 1800);
+  }
+  renderVals() {
+    const s = this.state, role = this.effRole(), screen = this.effScreen(), sub = this.effSub();
+    const isMain = screen === 'main';
+    const isMz = role === 'mantelzorger', isV = role === 'vrijwilliger';
+    const tab = s.tab;
+    const tabStyle = (t) => {
+      const a = tab === t;
+      return { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', width: '64px', height: '58px', justifyContent: 'center', borderRadius: '999px', border: 'none', cursor: 'pointer', fontFamily: "'Baloo 2',sans-serif", fontWeight: 600, fontSize: '10.5px', background: a ? '#1A4878' : 'transparent', color: a ? '#FFFFFF' : '#5A687A' };
+    };
+    const chipNav = (active) => {
+      return { height: '32px', padding: '0 13px', borderRadius: '999px', cursor: 'pointer', fontFamily: "'Baloo 2',sans-serif", fontWeight: 600, fontSize: '12px', border: active ? 'none' : '1.5px solid #E3E8F1', background: active ? '#1A4878' : '#FFFFFF', color: active ? '#FFFFFF' : '#5A687A' };
+    };
+    const subChip = (active) => {
+      return { height: '36px', padding: '0 16px', borderRadius: '999px', cursor: 'pointer', fontFamily: "'Baloo 2',sans-serif", fontWeight: 600, fontSize: '13px', border: 'none', background: active ? '#FFFFFF' : 'rgba(255,255,255,0.16)', color: active ? '#1A4878' : '#FFFFFF' };
+    };
+    const at = (scr, r, t, kv) => isMain === (scr === 'main') && (scr !== 'main' ? screen === scr : (role === r && tab === t && (!kv || s.kringView === kv)));
+    const avStyle = (kind) => ({ width: '44px', height: '44px', borderRadius: '50%', flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Baloo 2',sans-serif", fontWeight: 700, fontSize: '17px', background: kind === 'zv' ? '#1A4878' : kind === 'vw' ? '#2A6CB0' : '#EEF2F8', color: kind === 'pend' ? '#1A4878' : '#FFFFFF' });
+    const ledenRows = s.leden.map((m, i) => ({
+      naam: m.naam, sub: m.sub, initial: m.naam[0], avStyle: avStyle(m.kind === 'zv' ? 'zv' : (m.status === 'Actief' || m.status === 'Kijkt mee') ? (m.kind === 'zv' ? 'zv' : 'vw') : 'pend'),
+      status: m.status, pill: this.statusPill(m.status),
+      kanAccepteren: m.status === 'ID-check', toonPill: m.status !== 'ID-check',
+      accepteer: () => this.setState({ tab: 'beoordeling', beoordeelNaam: m.naam, mzCallDone: false })
+    }));
+    const suggestieRows = s.suggesties.map((g, i) => ({
+      naam: g.naam, sub: g.sub, initial: g.naam[0], open: g.status === 'open', gedaan: g.status !== 'open',
+      nodigUit: () => {
+        if (!sub && this.vwCount() >= 2) { this.setState({ screen: 'main', tab: 'kring', kringView: 'abo', aboReturn: 'invite' }); return; }
+        const sug = s.suggesties.slice(); sug[i] = Object.assign({}, g, { status: 'uitgenodigd' });
+        const leden = s.leden.concat([{ naam: g.naam, sub: 'Vrijwilliger · wacht op kennismaking', kind: 'vw', status: 'ID-check' }]);
+        this.setState({ suggesties: sug, leden });
+      }
+    }));
+    const chatRows = s.chat.map(c => ({
+      van: c.van, tekst: c.tekst,
+      row: { display: 'flex', justifyContent: c.kant === 'vraag' ? 'flex-end' : 'flex-start' },
+      bubble: { maxWidth: '78%', borderRadius: c.kant === 'vraag' ? '18px 18px 6px 18px' : '18px 18px 18px 6px', padding: '11px 15px', background: c.kant === 'vraag' ? '#DEE8F4' : '#EAF5D8', color: '#112640' }
+    }));
+    const dagIdx = (d) => this.dagVolgorde.indexOf(d);
+    const roosterSorted = s.rooster.map((r, i) => ({ r, i })).sort((a, b) => (dagIdx(a.r.dag) - dagIdx(b.r.dag)) || a.r.tijd.localeCompare(b.r.tijd));
+    const roosterRows = roosterSorted.map(({ r, i }) => ({
+      dag: r.dag, datum: r.datum, taak: r.taak,
+      sub: (r.wie ? (r.tijd + ' · ' + r.wie) : (r.tijd + ' · nog niemand')) + (r.herhaal ? ' · wekelijks' : ''),
+      status: r.status === 'ingepland' ? 'Ingepland' : r.status === 'match' ? 'Buddy-pool ✓' : 'Nog open',
+      pill: r.status === 'open' ? this.statusPill('Nog open') : this.statusPill('Ingepland'),
+      kanZoeken: isMz && r.status === 'open', toonPill: !(isMz && r.status === 'open'),
+      zoek: () => { const ro = s.rooster.slice(); ro[i] = Object.assign({}, r, { status: 'match', wie: 'Tim (buddy-pool)' }); this.setState({ rooster: ro, roosterMatch: true }); }
+    }));
+    const weekPreview = s.rooster.slice(0, 3).map(r => ({
+      dag: r.dag, datum: r.datum, taak: r.taak,
+      sub: r.wie ? (r.tijd + ' · ' + r.wie) : (r.tijd + ' · nog niemand'),
+      status: r.status === 'open' ? 'Nog open' : 'Ingepland',
+      pill: r.status === 'open' ? this.statusPill('Nog open') : this.statusPill('Ingepland')
+    }));
+    const sel = s.selectedKring;
+    const catChip = (name) => {
+      const a = !!s.catSel[name];
+      return { height: '40px', padding: '0 16px', borderRadius: '999px', cursor: 'pointer', fontFamily: "'Baloo 2',sans-serif", fontWeight: 600, fontSize: '13.5px', border: a ? 'none' : '1.5px solid #E3E8F1', background: a ? '#1A4878' : '#FFFFFF', color: a ? '#FFFFFF' : '#5A687A' };
+    };
+    const togCat = (name) => () => { const c = Object.assign({}, s.catSel); c[name] = !c[name]; this.setState({ catSel: c }); };
+    const kringView = s.kringView;
+    const showAboScreen = isMain && tab === 'kring' && kringView === 'abo';
+    return {
+      showPanel: this.props.showFlowPanel ?? true,
+      darkChrome: screen === 'welcome',
+      isWelcome: screen === 'welcome', isSignup: screen === 'signup', isVerify: screen === 'verify', isRole: screen === 'role',
+      isMain, isMz, isV,
+      isKaart: isMain && tab === 'kaart' && !showAboScreen,
+      isVandaag: isMain && tab === 'vandaag' && screen === 'main',
+      isKringTab: isMain && tab === 'kring' && !showAboScreen && screen === 'main',
+      isProfiel: isMain && tab === 'profiel',
+      isAbo: showAboScreen, isIdUpload: isMain && tab === 'idupload',
+      nietSubscribed: !sub, subscribed: sub,
+      kbOn: () => this.setState({ kb: true }), kbOff: () => this.setState({ kb: false }),
+      toWelcome: this.set({ screen: 'welcome' }), toSignup: this.set({ screen: 'signup' }),
+      toVerify: this.set({ screen: 'verify', kb: false }), toRole: this.set({ screen: 'role' }),
+      pickMantelzorger: this.set({ screen: 'main', role: 'mantelzorger', tab: 'vandaag', walkthrough: { role: 'mantelzorger', step: 0 } }),
+      pickVrijwilliger: this.set({ screen: 'vid', role: 'vrijwilliger' }),
+      isVid: screen === 'vid',
+      vidFotoId: this.set({ vidId: true }), vidFotoSelfie: this.set({ vidSelfie: true }),
+      vidIdDone: s.vidId, vidSelfieDone: s.vidSelfie,
+      vidTileId: this.vidTile(s.vidId), vidTileSelfie: this.vidTile(s.vidSelfie),
+      vidKlaarStyle: { height: '64px', borderRadius: '999px', border: 'none', background: (s.vidId && s.vidSelfie) ? '#1A4878' : '#C6CFDC', color: '#FFFFFF', fontFamily: "'Baloo 2',sans-serif", fontWeight: 700, fontSize: '17px', cursor: (s.vidId && s.vidSelfie) ? 'pointer' : 'default' },
+      vidKlaar: () => { if (this.state.vidId && this.state.vidSelfie) this.setState({ screen: 'main', role: 'vrijwilliger', tab: 'vandaag', walkthrough: { role: 'vrijwilliger', step: 0 } }); },
+      tabVandaag: this.set({ tab: 'vandaag', selectedKring: null }),
+      tabKaart: this.set({ tab: 'kaart' }),
+      tabKring: this.set({ tab: 'kring', selectedKring: null }),
+      tabProfiel: this.set({ tab: 'profiel', selectedKring: null }),
+      tabStyleVandaag: tabStyle('vandaag'), tabStyleKaart: tabStyle('kaart'), tabStyleKring: tabStyle('kring'), tabStyleProfiel: tabStyle('profiel'),
+      mapRef: this.mapRef,
+      filterKringen: this.set({ mapFilter: 'kringen' }), filterBuddys: this.set({ mapFilter: 'buddys' }),
+      chipFilterKringen: Object.assign(chipNav(s.mapFilter === 'kringen'), { boxShadow: '0 4px 14px rgba(17,47,80,0.12)', height: '38px' }),
+      chipFilterBuddys: Object.assign(chipNav(s.mapFilter === 'buddys'), { boxShadow: '0 4px 14px rgba(17,47,80,0.12)', height: '38px' }),
+      hasSelectedKring: !!sel,
+      selNaam: sel ? sel.naam : '', selWijk: sel ? sel.wijk : '', selBuddies: sel ? sel.buddies : '',
+      selPlekLabel: sel ? (sel.plekken > 0 ? sel.plekken + (sel.plekken === 1 ? ' plek vrij' : ' plekken vrij') : 'Vol') : '',
+      selPlekPill: sel && sel.plekken > 0 ? Object.assign(this.pill('#F1F8E4', '#4C7A16'), { height: '30px' }) : Object.assign(this.pill('#EEF2F8', '#5A687A'), { height: '30px' }),
+      closeKring: this.set({ selectedKring: null }),
+      meldAan: this.set({ tab: 'idupload', selectedKring: null }),
+      afspraakOpen: s.afspraak === 'open', afspraakBevestigd: s.afspraak === 'bevestigd',
+      bevestigAfspraak: this.set({ afspraak: 'bevestigd' }),
+      roosterMatch: s.roosterMatch, weekPreview,
+      showKringEmpty: isMz && !s.hasKring && kringView !== 'create' && kringView !== 'code',
+      showKringCreate: isMz && kringView === 'create',
+      showKringCode: isMz && kringView === 'code',
+      showKringHome: isMz && s.hasKring && ['leden', 'chat', 'rooster', 'invite'].includes(kringView),
+      showLeden: kringView === 'leden', showInvite: kringView === 'invite',
+      showChat: kringView === 'chat', showRooster: kringView === 'rooster',
+      showVKring: isV, vGeenKring: isV && s.vStatus !== 'lid', vLid: s.vStatus === 'lid',
+      vInvited: s.vStatus === 'invited', vWachtKennismaking: s.vStatus === 'wacht',
+      vTaakOpen: s.vTaak === 'open', vTaakGedaan: s.vTaak === 'gedaan',
+      neemTaak: this.set({ vTaak: 'gedaan' }),
+      acceptUitnodiging: this.set({ tab: 'idupload' }),
+      laterMisschien: this.set({ vStatus: 'none' }),
+      uploadId: this.set({ tab: 'vandaag', vStatus: 'wacht', kb: false }),
+      chipOff: this.chipStyle(false),
+      isInbox: isMain && tab === 'inbox', isCall: isMain && tab === 'call',
+      isCancel: isMain && tab === 'cancel', isBeoordeling: isMain && tab === 'beoordeling',
+      showTabBar: isMain && !['call', 'cancel'].includes(tab) && !(tab === 'steun' && s.kb),
+      spontMzCta: isMz && s.spontMz === 'none' && !sel,
+      spontStart: this.set({ spontMz: 'compose', selectedKring: null }),
+      spontMzCard: isMz && ['compose', 'open', 'offer', 'active', 'done'].includes(s.spontMz),
+      spontMzCompose: s.spontMz === 'compose', spontMzOpen: s.spontMz === 'open',
+      spontMzOffer: s.spontMz === 'offer', spontMzActive: s.spontMz === 'active', spontMzDone: s.spontMz === 'done',
+      spontMzTaak: s.spontMzTaak, spontMzTaakLc: s.spontMzTaak.toLowerCase(),
+      spontTaakRows: ['Boodschappen', 'Vervoer', 'Medicijnen halen', 'Gezelschap'].map(l => ({ label: l, style: this.chipStyle(s.spontMzTaak === l), pick: () => this.setState({ spontMzTaak: l }) })),
+      spontPlaats: () => { this.setState({ spontMz: 'open' }); this._spontT = setTimeout(() => this.setState({ spontMz: 'offer' }), 3000); },
+      spontToestaan: this.set({ spontMz: 'active' }),
+      spontAfwijzen: () => { this.setState({ spontMz: 'open' }); this._spontT = setTimeout(() => this.setState({ spontMz: 'offer' }), 4000); },
+      spontMzClose: () => { if (this._spontT) clearTimeout(this._spontT); this.setState({ spontMz: 'none' }); },
+      spontKlaarMz: this.set({ spontMz: 'done' }),
+      vSpontCard: isV && s.selectedSpont,
+      spontVClose: this.set({ selectedSpont: false }),
+      vSpontAsk: s.spontVStage === 'ask', vSpontSent: s.spontVStage === 'sent',
+      vSpontApproved: s.spontVStage === 'approved', vSpontDone: s.spontVStage === 'done',
+      spontVMsg: s.spontVMsg, onSpontVMsg: (e) => this.setState({ spontVMsg: e.target.value }),
+      spontVSend: () => { this.setState({ spontVStage: 'sent', kb: false }); this._spontVT = setTimeout(() => this.setState({ spontVStage: 'approved' }), 2500); },
+      spontVDone: this.set({ spontVStage: 'done' }),
+      spontVCancel: this.set({ spontVStage: 'ask', spontVMsg: '', selectedSpont: false }),
+      jMzSpont: () => this.setState({ screen: 'main', role: 'mantelzorger', tab: 'kaart', selectedKring: null, spontMz: 'compose' }),
+      jVSpont: () => this.setState({ screen: 'main', role: 'vrijwilliger', tab: 'kaart', selectedKring: null, selectedSpont: true }),
+      weekStrip: this.dagVolgorde.map(d => {
+        const datums = { Ma: '27', Di: '28', Wo: '29', Do: '30', Vr: '31', Za: '1', Zo: '2' };
+        const tasks = s.rooster.filter(r => r.dag === d);
+        return {
+          label: d, datum: datums[d],
+          dots: tasks.slice(0, 3).map(t => ({ s: { width: '6px', height: '6px', borderRadius: '50%', background: t.status === 'open' ? '#9A6E0B' : '#8DC93F' } })),
+          style: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px', padding: '8px 0 7px', borderRadius: '10px', background: tasks.length ? '#FFFFFF' : 'transparent', border: tasks.length ? '1px solid #E3E8F1' : '1px dashed #D5DCE7', color: '#112640' }
+        };
+      }),
+      openInbox: this.set({ tab: 'inbox' }), inboxBack: this.set({ tab: 'vandaag' }),
+      openCancel: this.set({ tab: 'cancel' }), cancelBegrepen: this.set({ tab: 'inbox' }),
+      openBeoordeling: this.set({ tab: 'beoordeling' }),
+      beoordelingTerug: () => this.setState(Object.assign({ tab: 'kring' }, this.ensureKring(), { kringView: 'leden' })),
+      bNaam: s.beoordeelNaam, bInitial: s.beoordeelNaam[0],
+      bIntro: (s.vIntro.trim() || 'Hoi! Ik ben Tim, ik woon om de hoek en doe graag boodschappen of een wandeling. Tot snel?'),
+      mzCallDone: s.mzCallDone, mzCallNogNiet: !s.mzCallDone,
+      startCallMz: () => this.startCall('mz'),
+      startCallV: () => this.startCall('v'),
+      endCall: () => {
+        if (this._callInt) { clearInterval(this._callInt); this._callInt = null; }
+        if (s.callRole === 'mz') this.setState({ tab: 'beoordeling', mzCallDone: true });
+        else this.setState({ tab: 'vandaag', vStatus: 'lid' });
+      },
+      callTimer: Math.floor(s.callSec / 60) + ':' + String(s.callSec % 60).padStart(2, '0'),
+      callNaam: s.callRole === 'mz' ? s.beoordeelNaam : 'Jelle Weijland',
+      callInitial: s.callRole === 'mz' ? s.beoordeelNaam[0] : 'J',
+      callSelf: s.callRole === 'mz' ? 'J' : 'T',
+      accepteerB: () => {
+        const base = this.ensureKring();
+        let leden = (base.leden || s.leden).slice();
+        const i = leden.findIndex(m => m.naam === s.beoordeelNaam);
+        if (i >= 0) leden[i] = Object.assign({}, leden[i], { status: 'Actief', sub: 'Vrijwilliger \u00b7 via buddy-pool' });
+        else leden = leden.concat([{ naam: s.beoordeelNaam, sub: 'Vrijwilliger \u00b7 via buddy-pool', kind: 'vw', status: 'Actief' }]);
+        this.setState(Object.assign({}, base, { leden, tab: 'kring', kringView: 'leden', mzCallDone: false }));
+      },
+      afwijsB: () => {
+        const base = this.ensureKring();
+        const leden = (base.leden || s.leden).filter(m => !(m.naam === s.beoordeelNaam && m.status !== 'Actief'));
+        this.setState(Object.assign({}, base, { leden, tab: 'kring', kringView: 'leden', mzCallDone: false }));
+      },
+      poolOn: s.poolOptIn, togPool: this.set({ poolOptIn: !s.poolOptIn }),
+      poolTrack: { width: '54px', height: '32px', borderRadius: '999px', border: 'none', cursor: 'pointer', padding: '3px', display: 'flex', justifyContent: s.poolOptIn ? 'flex-end' : 'flex-start', background: s.poolOptIn ? '#8DC93F' : 'rgba(255,255,255,0.25)', transition: 'background 0.2s', flex: '0 0 auto' },
+      poolKnob: { width: '26px', height: '26px', borderRadius: '50%', background: '#FFFFFF', boxShadow: '0 1px 4px rgba(17,47,80,0.25)' },
+      wtActive: !!s.walkthrough,
+      wtTitle: s.walkthrough ? this.wtSteps[s.walkthrough.role][s.walkthrough.step].t : '',
+      wtText: s.walkthrough ? this.wtSteps[s.walkthrough.role][s.walkthrough.step].x : '',
+      wtBtn: s.walkthrough && s.walkthrough.step >= this.wtSteps[s.walkthrough.role].length - 1 ? 'Aan de slag' : 'Volgende',
+      wtPos: s.walkthrough ? Object.assign({ position: 'absolute' }, this.wtSteps[s.walkthrough.role][s.walkthrough.step].pos) : {},
+      wtArrow: s.walkthrough ? ({
+        'up-left': { position: 'absolute', top: '-7px', left: '36px', width: '15px', height: '15px', background: '#FFFFFF', transform: 'rotate(45deg)', borderRadius: '3px' },
+        'up-right': { position: 'absolute', top: '-7px', right: '36px', width: '15px', height: '15px', background: '#FFFFFF', transform: 'rotate(45deg)', borderRadius: '3px' },
+        'up': { position: 'absolute', top: '-7px', left: '50%', marginLeft: '-8px', width: '15px', height: '15px', background: '#FFFFFF', transform: 'rotate(45deg)', borderRadius: '3px' },
+        'down': { position: 'absolute', bottom: '-7px', left: '50%', marginLeft: '-8px', width: '15px', height: '15px', background: '#FFFFFF', transform: 'rotate(45deg)', borderRadius: '3px' },
+        'none': { display: 'none' }
+      })[this.wtSteps[s.walkthrough.role][s.walkthrough.step].arrow] : {},
+      wtDots: s.walkthrough ? this.wtSteps[s.walkthrough.role].map((_, i) => ({ style: { width: i === s.walkthrough.step ? '22px' : '8px', height: '8px', borderRadius: '5px', background: i < s.walkthrough.step ? '#8DC93F' : i === s.walkthrough.step ? '#1A4878' : '#E3E8F1', transition: 'all 0.25s' } })) : [],
+      wtNext: () => {
+        const w = this.state.walkthrough; if (!w) return;
+        const steps = this.wtSteps[w.role];
+        if (w.step >= steps.length - 1) this.setState({ walkthrough: null });
+        else this.setState(Object.assign({}, steps[w.step + 1].patch, { walkthrough: { role: w.role, step: w.step + 1 }, selectedKring: null, selectedSpont: false }));
+      },
+      wtSkip: this.set({ walkthrough: null }),
+      wtMzChip: () => this.setState({ screen: 'main', role: 'mantelzorger', tab: 'vandaag', walkthrough: { role: 'mantelzorger', step: 0 } }),
+      wtVChip: () => this.setState({ screen: 'main', role: 'vrijwilliger', tab: 'vandaag', walkthrough: { role: 'vrijwilliger', step: 0 } }),
+      wtZvChip: () => this.setState({ screen: 'main', role: 'hulpvrager', tab: 'vandaag', walkthrough: { role: 'hulpvrager', step: 0 } }),
+      jMzInbox: this.jump('mantelzorger', 'inbox'),
+      jMzBeoordeling: () => this.setState(Object.assign({ screen: 'main', role: 'mantelzorger', tab: 'beoordeling', selectedKring: null }, this.ensureKring(), { kringView: 'leden' })),
+      jVInbox: this.jump('vrijwilliger', 'inbox'),
+      jVCancelChip: this.jump('vrijwilliger', 'cancel'),
+      jVCallChip: () => { this.startCall('v', { screen: 'main', role: 'vrijwilliger', selectedKring: null }); },
+      vIntro: s.vIntro, onVIntro: (e) => this.setState({ vIntro: e.target.value }),
+      vIntroSent: s.vIntro.trim().length > 0,
+      planKennismaking: this.set({ vStatus: 'lid' }),
+      jVKaartBtn: this.set({ tab: 'kaart' }),
+      startKringCreate: this.set({ kringView: 'create' }),
+      backToKringEmpty: this.set({ kringView: 'empty' }),
+      createKring: () => this.setState(Object.assign({ kringView: 'code', kb: false }, { hasKring: true, leden: s.leden.length ? s.leden : this.defaultLeden() })),
+      kringCodeKlaar: this.set({ kringView: 'leden' }),
+      kringNaam: s.kringNaam, onKringNaam: (e) => this.setState({ kringNaam: e.target.value }),
+      kvLeden: this.set({ kringView: 'leden' }), kvChat: this.set({ kringView: 'chat' }), kvRooster: this.set({ kringView: 'rooster' }),
+      subLeden: subChip(kringView === 'leden' || kringView === 'invite'), subChat: subChip(kringView === 'chat'), subRooster: subChip(kringView === 'rooster'),
+      ledenRows, freeLimitNote: !sub,
+      startInvite: this.set({ kringView: 'invite' }),
+      inviteInput: s.inviteInput, onInviteInput: (e) => this.setState({ inviteInput: e.target.value }),
+      inviteByInput: () => {
+        if (!sub && this.vwCount() >= 2) { this.setState({ kringView: 'abo', aboReturn: 'invite' }); return; }
+        const naam = s.inviteInput.trim() || 'Nieuwe vrijwilliger';
+        this.setState({ leden: s.leden.concat([{ naam, sub: 'Vrijwilliger · uitnodiging verstuurd', kind: 'vw', status: 'Uitgenodigd' }]), inviteInput: '', kringView: 'leden', kb: false });
+      },
+      suggestieRows,
+      chatRows, chatDraft: s.chatDraft, onChatDraft: (e) => this.setState({ chatDraft: e.target.value }),
+      sendChat: () => {
+        const t = s.chatDraft.trim(); if (!t) return;
+        const chat = s.chat.concat([{ van: 'Jelle (beheerder)', kant: 'vraag', tekst: t }]);
+        this.setState({ chat, chatDraft: '' });
+        setTimeout(() => this.setState({ chat: this.state.chat.concat([{ van: 'Anna de Wit', kant: 'buddy', tekst: 'Komt goed, ik regel het! 👍' }]) }), 1400);
+      },
+      roosterRows, roosterLocked: false, roosterOpenTonen: true,
+      vRoosterRows: roosterSorted.map(({ r, i }) => {
+        const mijn = r.wie && r.wie.indexOf('(jij)') >= 0;
+        return {
+          dag: r.dag, datum: r.datum, taak: r.taak,
+          sub: (r.wie ? (r.tijd + ' \u00b7 ' + r.wie) : (r.tijd + ' \u00b7 nog niemand')) + (r.herhaal ? ' \u00b7 wekelijks' : ''),
+          status: r.status === 'gedaan' ? 'Gedaan ✓' : mijn ? 'Jij gaat' : (r.status === 'open' ? 'Nog open' : 'Ingepland'),
+          pill: (mijn || r.status === 'gedaan') ? this.pill('#F1F8E4', '#4C7A16') : (r.status === 'open' ? this.statusPill('Nog open') : this.statusPill('Ingepland')),
+          kanClaim: r.status === 'open',
+          kanAfronden: mijn && r.status === 'ingepland',
+          toonPill: r.status !== 'open' && !(mijn && r.status === 'ingepland'),
+          rondAf: () => this.setState({ logFor: i, logMsg: '' }),
+          card: { background: mijn ? '#F7FBEF' : '#FFFFFF', border: mijn ? '1.5px solid #8DC93F' : '1px solid #E3E8F1', borderRadius: '10px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px' },
+          claim: () => { const ro = this.state.rooster.slice(); ro[i] = Object.assign({}, ro[i], { status: 'ingepland', wie: 'Tim (jij)' }); this.setState({ rooster: ro, vTaak: 'gedaan', bannerGone: false }); }
+        };
+      }),
+      showTaskBanner: isMain && isV && s.vTaak === 'gedaan' && !s.bannerGone && !s.walkthrough && !['call', 'cancel', 'kaart', 'profiel'].includes(tab),
+      bannerWeg: this.set({ bannerGone: true }),
+      bannerNaarVandaag: this.set({ tab: 'vandaag' }),
+      naarKringRooster: () => this.setState(Object.assign({ tab: 'kring' }, this.ensureKring(), { kringView: 'rooster' })),
+      ncOpen: s.ncOpen,
+      ncKnop: s.ncOpen ? 'Sluit taakplanner' : '+ Taak inplannen',
+      togNc: this.set({ ncOpen: !s.ncOpen }),
+      ncTaakRows: ['Boodschappen', 'Wandelen', 'Vervoer', 'Gezelschap', 'Anders'].map(l => ({ label: l, style: this.chipStyle(s.ncTaak === l), pick: () => this.setState({ ncTaak: l }) })),
+      ncAnders: s.ncTaak === 'Anders',
+      ncCustom: s.ncCustom, onNcCustom: (e) => this.setState({ ncCustom: e.target.value }),
+      ncDagRows: ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map(l => ({ label: l, style: this.chipStyle(s.ncDag === l), pick: () => this.setState({ ncDag: l }) })),
+      ncTijdRows: ['09:00', '12:00', '14:00', '19:00'].map(l => ({ label: l, style: this.chipStyle(s.ncTijd === l), pick: () => this.setState({ ncTijd: l }) })),
+      ncTijd: s.ncTijd,
+      onNcTijd: (e) => this.setState({ ncTijd: e.target.value }),
+      isWeekplan: isMain && tab === 'weekplan',
+      openWeekplan: this.set({ tab: 'weekplan', ncOpen: false }),
+      weekplanTerug: this.set({ tab: 'vandaag' }),
+      weekAddLabel: '+ Zet in concept · ' + s.ncDag + ' wk ' + s.planWeek + ' · ' + s.ncTijd,
+      addTaakWeek: () => {
+        const naam = s.ncTaak === 'Anders' ? (s.ncCustom.trim() || 'Hulp nodig') : s.ncTaak;
+        this.setState({ draft: s.draft.concat([{ dag: s.ncDag, taak: naam, tijd: s.ncTijd, week: s.planWeek, herhaal: s.ncHerhaal === 'Elke week' }]), pubOk: false, kb: false });
+      },
+      planPeriodeRows: ['1 week', '2 weken', '1 maand', '2 maanden'].map(l => ({ label: l, style: this.chipStyle(s.planPeriode === l), pick: () => this.setState({ planPeriode: l, planWeek: 31 }) })),
+      planMeerWeken: s.planPeriode !== '1 week',
+      planWeekRows: (() => {
+        const n = { '1 week': 1, '2 weken': 2, '1 maand': 4, '2 maanden': 8 }[s.planPeriode] || 1;
+        return Array.from({ length: n }, (_, i) => 31 + i).map(w => ({ label: 'Wk ' + w, style: this.chipStyle(s.planWeek === w), pick: () => this.setState({ planWeek: w }) }));
+      })(),
+      draftCount: s.draft.length + (s.draft.length === 1 ? ' taak' : ' taken'),
+      draftLeeg: s.draft.length === 0, heeftDraft: s.draft.length > 0,
+      pubOk: s.pubOk && s.draft.length === 0,
+      pubLabel: 'Publiceer ' + s.draft.length + (s.draft.length === 1 ? ' taak' : ' taken') + ' naar de kring →',
+      draftRows: s.draft.map((d, i) => ({
+        dag: d.dag, week: 'wk ' + d.week, taak: d.taak,
+        sub: d.tijd + (d.herhaal ? ' · wekelijks' : ''),
+        weg: () => this.setState({ draft: this.state.draft.filter((_, j) => j !== i) })
+      })),
+      publiceer: () => {
+        const datums = { Ma: '27 jul', Di: '28 jul', Wo: '29 jul', Do: '30 jul', Vr: '31 jul', Za: '1 aug', Zo: '2 aug' };
+        const nieuw = this.state.draft.map(d => ({ dag: d.dag, datum: d.week === 31 ? datums[d.dag] : 'wk ' + d.week, taak: d.taak, tijd: d.tijd, wie: null, status: 'open', herhaal: d.herhaal }));
+        this.setState({ rooster: this.state.rooster.concat(nieuw), draft: [], pubOk: true });
+      },
+      jMzWeekplan: this.jump('mantelzorger', 'weekplan'),
+      chipMzWeekplan: this.chipStyle(isMain && isMz && tab === 'weekplan'),
+      zoek: s.zoek, onZoek: (e) => this.setState({ zoek: e.target.value, selectedKring: null }),
+      zoekClear: this.set({ zoek: '' }),
+      zoekActief: s.zoek.trim().length > 0,
+      zoekRows: this.kringen.filter(k => k.naam.toLowerCase().indexOf(s.zoek.trim().toLowerCase()) >= 0).map(k => ({
+        naam: k.naam, sub: k.wijk + ' · ' + k.buddies + " buddy's" + (k.plekken > 0 ? ' · ' + k.plekken + ' plek' + (k.plekken === 1 ? '' : 'ken') + ' vrij' : ''),
+        kies: () => { this.setState({ selectedKring: k, zoek: '', kb: false, selectedSpont: false }); if (this._map) this._map.panTo([k.lat, k.lng]); }
+      })),
+      zoekLeeg: s.zoek.trim().length > 0 && this.kringen.filter(k => k.naam.toLowerCase().indexOf(s.zoek.trim().toLowerCase()) >= 0).length === 0,
+      mapCountLabel: s.mapCountK + (s.mapCountK === 1 ? ' kring' : ' kringen') + ' · ' + s.mapCountS + (s.mapCountS === 1 ? ' directe aanvraag' : ' directe aanvragen') + ' in beeld',
+      ncHerhaalRows: ['Eenmalig', 'Elke week'].map(l => ({ label: l, style: this.chipStyle(s.ncHerhaal === l), pick: () => this.setState({ ncHerhaal: l }) })),
+      addTaak: () => {
+        const datums = { Ma: '27 jul', Di: '28 jul', Wo: '29 jul', Do: '30 jul', Vr: '31 jul', Za: '1 aug', Zo: '2 aug' };
+        const naam = s.ncTaak === 'Anders' ? (s.ncCustom.trim() || 'Hulp nodig') : s.ncTaak;
+        this.setState({ rooster: s.rooster.concat([{ dag: s.ncDag, datum: datums[s.ncDag], taak: naam, tijd: s.ncTijd, wie: null, status: 'open', herhaal: s.ncHerhaal === 'Elke week' }]), ncOpen: false, kb: false });
+      },
+      isZv: role === 'hulpvrager',
+      isSteun: isMain && tab === 'steun',
+      tabSteun: this.set({ tab: 'steun', selectedKring: null, selectedSpont: false }),
+      tabStyleSteun: tabStyle('steun'),
+      svForum: this.set({ steunView: 'forum', forumOpen: null }), svMakelaar: this.set({ steunView: 'makelaar' }),
+      subForum: subChip(s.steunView === 'forum'), subMakelaar: subChip(s.steunView === 'makelaar'),
+      showForumList: s.steunView === 'forum' && s.forumOpen === null,
+      showForumThread: s.steunView === 'forum' && s.forumOpen !== null,
+      showMakelaar: s.steunView === 'makelaar',
+      forumCompose: s.forumCompose,
+      forumNieuw: this.set({ forumCompose: !s.forumCompose }),
+      forumDraft: s.forumDraft, onForumDraft: (e) => this.setState({ forumDraft: e.target.value }),
+      forumAnnuleer: this.set({ forumCompose: false, forumDraft: '', kb: false }),
+      forumPlaats: () => {
+        const t = this.state.forumDraft.trim(); if (!t) { this.setState({ forumCompose: false }); return; }
+        this.setState({ forumPosts: [{ van: 'Jelle', wijk: 'Amsterdam', tijd: 'nu', tag: 'Nieuw', titel: t, tekst: t, replies: [] }].concat(this.state.forumPosts), forumDraft: '', forumCompose: false, kb: false });
+      },
+      forumTagRows: ['Alles', 'Wonen', 'Werk', 'Financiën', 'Dementie'].map(l => ({ label: l, style: this.chipStyle(s.forumTag === l), pick: () => this.setState({ forumTag: l }) })),
+      forumRows: s.forumPosts.map((p, i) => ({ p, i })).filter(({ p }) => s.forumTag === 'Alles' || p.tag === s.forumTag).map(({ p, i }) => ({
+        titel: p.titel, initial: p.van[0], meta: p.van + ' · ' + p.wijk + ' · ' + p.tijd, tag: p.tag,
+        tagPill: this.pill(p.tag === 'Nieuw' ? '#F1F8E4' : '#EAF1F9', p.tag === 'Nieuw' ? '#4C7A16' : '#1A4878'),
+        antwoorden: p.replies.length === 0 ? 'Nog geen antwoord' : p.replies.length + (p.replies.length === 1 ? ' antwoord' : ' antwoorden'),
+        open: () => this.setState({ forumOpen: i })
+      })),
+      forumTerug: this.set({ forumOpen: null, kb: false }),
+      threadTitel: s.forumOpen !== null ? s.forumPosts[s.forumOpen].titel : '',
+      threadTekst: s.forumOpen !== null ? s.forumPosts[s.forumOpen].tekst : '',
+      threadInitial: s.forumOpen !== null ? s.forumPosts[s.forumOpen].van[0] : '',
+      threadMeta: s.forumOpen !== null ? (s.forumPosts[s.forumOpen].van + ' · ' + s.forumPosts[s.forumOpen].wijk + ' · ' + s.forumPosts[s.forumOpen].tijd) : '',
+      threadAntwoordenKop: s.forumOpen !== null ? (s.forumPosts[s.forumOpen].replies.length === 0 ? 'Nog geen antwoorden — wees de eerste' : s.forumPosts[s.forumOpen].replies.length + ' antwoorden') : '',
+      threadReplies: s.forumOpen !== null ? s.forumPosts[s.forumOpen].replies.map(r => ({
+        van: r.van, tekst: r.tekst, initial: r.van[0], expert: !!r.expert,
+        card: { background: '#FFFFFF', border: r.expert ? '1.5px solid #8DC93F' : '1px solid #E3E8F1', borderRadius: '12px', padding: '16px' },
+        av: { width: '34px', height: '34px', borderRadius: '50%', flex: '0 0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Baloo 2',sans-serif", fontWeight: 700, fontSize: '14px', background: r.expert ? '#112F50' : '#EEF2F8', color: r.expert ? '#FFFFFF' : '#1A4878' }
+      })) : [],
+      replyDraft: s.replyDraft, onReplyDraft: (e) => this.setState({ replyDraft: e.target.value }),
+      sendReply: () => {
+        const t = this.state.replyDraft.trim(); if (t === '' || this.state.forumOpen === null) return;
+        const posts = this.state.forumPosts.slice(), i = this.state.forumOpen;
+        posts[i] = Object.assign({}, posts[i], { replies: posts[i].replies.concat([{ van: 'Jelle', tekst: t }]) });
+        this.setState({ forumPosts: posts, replyDraft: '', kb: false });
+      },
+      mkRows: s.mkChat.map(c => ({
+        van: c.van, tekst: c.tekst,
+        row: { display: 'flex', justifyContent: c.kant === 'mk' ? 'flex-start' : 'flex-end' },
+        bubble: { maxWidth: '82%', borderRadius: c.kant === 'mk' ? '18px 18px 18px 6px' : '18px 18px 6px 18px', padding: '12px 16px', background: c.kant === 'mk' ? '#EAF5D8' : '#DEE8F4', color: '#112640' }
+      })),
+      mkTyping: s.mkTyping,
+      mkShowChips: s.mkChat.length < 3,
+      mkChipRows: [
+        { l: 'Kan ik mijn ouders in huis nemen?', a: 'Dat kan zeker. Let op drie dingen: de toeslagen van je ouder, jullie eigen toeslagen (kostendelersnorm) en woningaanpassingen via de Wmo. Wil je dat ik het gesprek met je gemeente voor je aanvraag?' },
+        { l: 'Welke vergoeding kan ik krijgen?', a: 'Er is het mantelzorgcompliment via je gemeente, en soms zorgverlof via je werkgever. Vertel me je gemeente, dan kijk ik precies wat daar geldt.' },
+        { l: 'Ik ben overbelast, wat nu?', a: 'Dank dat je dat zegt — dat is de belangrijkste stap. Er bestaat respijtzorg: iemand neemt de zorg tijdelijk over. Ik kan je vandaag nog doorverwijzen naar het steunpunt in jouw wijk.' }
+      ].map(x => ({
+        label: x.l,
+        style: { height: '38px', padding: '0 15px', borderRadius: '999px', border: '1.5px solid #2A6CB0', background: '#FFFFFF', color: '#1A4878', fontFamily: "'Baloo 2',sans-serif", fontWeight: 600, fontSize: '12.5px', cursor: 'pointer', whiteSpace: 'nowrap', flex: '0 0 auto' },
+        pick: () => this.mkSend(x.l, x.a)
+      })),
+      mkDraft: s.mkDraft, onMkDraft: (e) => this.setState({ mkDraft: e.target.value }),
+      sendMk: () => { const t = this.state.mkDraft.trim(); if (t) this.mkSend(t); },
+      jMzForum: () => this.setState({ screen: 'main', role: 'mantelzorger', tab: 'steun', steunView: 'forum', forumOpen: null, selectedKring: null }),
+      jMzMakelaar: () => this.setState({ screen: 'main', role: 'mantelzorger', tab: 'steun', steunView: 'makelaar', selectedKring: null }),
+      chipMzForum: this.chipStyle(isMain && tab === 'steun' && s.steunView === 'forum'),
+      chipMzMakelaar: this.chipStyle(isMain && tab === 'steun' && s.steunView === 'makelaar'),
+      logOpen: s.logFor !== null,
+      logTaak: s.logFor !== null && s.rooster[s.logFor] ? s.rooster[s.logFor].taak : '',
+      logMsg: s.logMsg, onLogMsg: (e) => this.setState({ logMsg: e.target.value }),
+      logSluit: this.set({ logFor: null, kb: false }),
+      logKlaar: () => {
+        const i = this.state.logFor; if (i === null) return;
+        const ro = this.state.rooster.slice();
+        ro[i] = Object.assign({}, ro[i], { status: 'gedaan' });
+        const notes = [{ van: 'Tim Bakker', tijd: 'Zojuist', tekst: this.state.logMsg.trim() || (ro[i].taak + ' gedaan ✓') }].concat(this.state.kringNotes);
+        this.setState({ rooster: ro, kringNotes: notes, logFor: null, logMsg: '', kb: false, bannerGone: true });
+      },
+      uitKringRows: s.kringNotes.map(n => ({ van: n.van, tijd: n.tijd, tekst: n.tekst, initial: n.van[0] })),
+      togVakantie: this.set({ vakantie: !s.vakantie }), vakantieAan: s.vakantie,
+      vakTrack: { width: '50px', height: '30px', borderRadius: '999px', border: 'none', cursor: 'pointer', padding: '3px', display: 'flex', justifyContent: s.vakantie ? 'flex-end' : 'flex-start', background: s.vakantie ? '#9A6E0B' : '#E3E8F1', transition: 'background 0.2s', flex: '0 0 auto' },
+      vakKnob: { width: '24px', height: '24px', borderRadius: '50%', background: '#FFFFFF', boxShadow: '0 1px 4px rgba(17,47,80,0.25)' },
+      togCal: this.set({ calSync: !s.calSync }),
+      calTrack: { width: '54px', height: '32px', borderRadius: '999px', border: 'none', cursor: 'pointer', padding: '3px', display: 'flex', justifyContent: s.calSync ? 'flex-end' : 'flex-start', background: s.calSync ? '#8DC93F' : '#E3E8F1', transition: 'background 0.2s', flex: '0 0 auto' },
+      calKnob: { width: '26px', height: '26px', borderRadius: '50%', background: '#FFFFFF', boxShadow: '0 1px 4px rgba(17,47,80,0.25)' },
+      isAdmin: screen === 'admin',
+      jAdOverzicht: this.set({ screen: 'admin' }),
+      chipAdOverzicht: this.chipStyle(screen === 'admin'),
+      adGroeiRows: [{ mnd: 'Feb', n: 6 }, { mnd: 'Mrt', n: 11 }, { mnd: 'Apr', n: 17 }, { mnd: 'Mei', n: 24 }, { mnd: 'Jun', n: 33 }, { mnd: 'Jul', n: 42 }].map(g => ({
+        mnd: g.mnd, n: g.n,
+        bar: { width: '100%', maxWidth: '30px', height: Math.round(g.n / 42 * 66) + 'px', borderRadius: '5px 5px 2px 2px', background: g.mnd === 'Jul' ? '#8DC93F' : '#1A4878' }
+      })),
+      adTypeRows: [{ naam: 'Boodschappen', p: 34 }, { naam: 'Gezelschap', p: 26 }, { naam: 'Vervoer', p: 22 }, { naam: 'Wandelen', p: 18 }].map(t => ({
+        naam: t.naam, pct: t.p + '%',
+        bar: { width: t.p / 34 * 100 + '%', height: '100%', borderRadius: '5px', background: '#2A6CB0' }
+      })),
+      jZvVandaag: this.set({ screen: 'main', role: 'hulpvrager', tab: 'vandaag', selectedKring: null, selectedSpont: false }),
+      chipZvVandaag: this.chipStyle(isMain && role === 'hulpvrager' && tab === 'vandaag'),
+      beschikRows: this.dagVolgorde.map(d => ({ label: d, style: Object.assign(this.chipStyle(!!s.beschikbaar[d]), { flex: 1, padding: '0', fontSize: '12px', textAlign: 'center' }), tog: () => { const b = Object.assign({}, this.state.beschikbaar); b[d] = !b[d]; this.setState({ beschikbaar: b }); } })),
+      belastingRows: [{ naam: 'Anna', n: 6 }, { naam: 'Tim', n: 3 }, { naam: 'Sophie', n: 1 }].map(x => ({
+        naam: x.naam, count: x.n + (x.n === 1 ? ' taak' : ' taken'),
+        bar: { width: Math.round(x.n / 6 * 100) + '%', height: '100%', borderRadius: '5px', background: x.n >= 5 ? '#1A4878' : '#8DC93F' }
+      })),
+      openAbo: this.set({ tab: 'kring', kringView: 'abo', screen: 'main' }),
+      closeAbo: this.set({ kringView: s.hasKring ? 'leden' : 'empty', tab: 'kring' }),
+      subscribe: this.set({ subscribed: true }),
+      naarRooster: this.set({ tab: 'vandaag', kringView: 'leden' }),
+      aboStatusTekst: sub ? 'Actief · €4,99 per maand' : 'Gratis · max 2 vrijwilligers',
+      aboKnopTekst: sub ? 'Beheren' : 'Upgraden',
+      profielNaam: isV ? 'Tim Bakker' : 'Jelle Weijland',
+      profielInitial: isV ? 'T' : 'J',
+      profielRol: isV ? 'Buddy · Oud-Oost' : 'Beheerder van de kring',
+      profielRolPill: this.pill('#EAF1F9', '#1A4878'),
+      profielAvatar: { width: '76px', height: '76px', borderRadius: '50%', background: isV ? '#2A6CB0' : '#1A4878', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Baloo 2',sans-serif", fontWeight: 700, fontSize: '30px' },
+      togElderly: this.set({ elderly: !s.elderly }),
+      toggleTrack: { width: '54px', height: '32px', borderRadius: '999px', border: 'none', cursor: 'pointer', padding: '3px', display: 'flex', justifyContent: s.elderly ? 'flex-end' : 'flex-start', background: s.elderly ? '#8DC93F' : '#E3E8F1', transition: 'background 0.2s' },
+      toggleKnob: { width: '26px', height: '26px', borderRadius: '50%', background: '#FFFFFF', boxShadow: '0 1px 4px rgba(17,47,80,0.25)' },
+      vKringLeden: [
+        { naam: 'Riet Jansen', sub: 'Hulpvrager', initial: 'R', avStyle: avStyle('zv'), status: 'Kijkt mee', pill: this.statusPill('Kijkt mee') },
+        { naam: 'Jelle Weijland', sub: 'Beheerder van de kring', initial: 'J', avStyle: avStyle('zv'), status: 'Beheerder', pill: this.pill('#EAF1F9', '#1A4878') },
+        { naam: 'Anna de Wit', sub: 'Vrijwilliger', initial: 'A', avStyle: avStyle('vw'), status: 'Actief', pill: this.statusPill('Actief') },
+        { naam: 'Tim Bakker (jij)', sub: 'Vrijwilliger', initial: 'T', avStyle: avStyle('vw'), status: 'Actief', pill: this.statusPill('Actief') }
+      ],
+      chipBoodschappen: catChip('Boodschappen'), chipWandelen: catChip('Wandelen'), chipVervoer: catChip('Vervoer'), chipGezelschap: catChip('Gezelschap'),
+      togBoodschappen: togCat('Boodschappen'), togWandelen: togCat('Wandelen'), togVervoer: togCat('Vervoer'), togGezelschap: togCat('Gezelschap'),
+      jWelcome: this.set({ screen: 'welcome' }), jSignup: this.set({ screen: 'signup' }),
+      jVerify: this.set({ screen: 'verify' }), jRole: this.set({ screen: 'role' }),
+      jMzKaart: this.jump('mantelzorger', 'kaart'),
+      jMzVandaag: this.jump('mantelzorger', 'vandaag'),
+      jMzKring: () => this.setState(Object.assign({ screen: 'main', role: 'mantelzorger', tab: 'kring', selectedKring: null }, this.state.hasKring ? { kringView: 'leden' } : { kringView: 'empty' })),
+      jMzRooster: () => this.setState(Object.assign({ screen: 'main', role: 'mantelzorger', tab: 'kring', kringView: this.effSub() ? 'rooster' : 'rooster', selectedKring: null }, this.ensureKring(), { kringView: 'rooster' })),
+      jMzChat: () => this.setState(Object.assign({ screen: 'main', role: 'mantelzorger', tab: 'kring', selectedKring: null }, this.ensureKring(), { kringView: 'chat' })),
+      jMzAbo: () => this.setState(Object.assign({ screen: 'main', role: 'mantelzorger', tab: 'kring', selectedKring: null }, this.ensureKring(), { kringView: 'abo' })),
+      jMzProfiel: this.jump('mantelzorger', 'profiel'),
+      jVKaart: this.jump('vrijwilliger', 'kaart'),
+      jVUitnodiging: this.jump('vrijwilliger', 'vandaag', { vStatus: 'invited' }),
+      jVId: this.set({ screen: 'vid', role: 'vrijwilliger' }),
+      jVTaken: this.jump('vrijwilliger', 'vandaag', { vStatus: 'lid' }),
+      jVProfiel: this.jump('vrijwilliger', 'profiel'),
+      resetAll: () => this.setState({ screen: 'welcome', role: null, tab: 'vandaag', ncHerhaal: 'Eenmalig', ncCustom: '', ncTaak: 'Boodschappen', zoek: '', draft: [], pubOk: false, planPeriode: '1 week', planWeek: 31, steunView: 'forum', forumOpen: null, forumCompose: false, forumDraft: '', replyDraft: '', mkDraft: '', mkTyping: false, logFor: null, logMsg: '', vakantie: false, calSync: false, adminView: 'overzicht', spontMz: 'none', spontVStage: 'ask', spontVMsg: '', selectedSpont: false, vidId: false, vidSelfie: false, hasKring: false, kringView: 'empty', leden: [], subscribed: null, vStatus: 'invited', vTaak: 'open', afspraak: 'open', roosterMatch: false, selectedKring: null, walkthrough: null, mzCallDone: false, poolOptIn: false, vIntro: '', beoordeelNaam: 'Tim Bakker', suggesties: this.state.suggesties.map(g => Object.assign({}, g, { status: 'open' })), rooster: this.state.rooster.map(r => r.status === 'match' ? Object.assign({}, r, { status: 'open', wie: null }) : r) }),
+      chipWelcome: this.chipStyle(screen === 'welcome'), chipSignup: this.chipStyle(screen === 'signup'),
+      chipVerify: this.chipStyle(screen === 'verify'), chipRole: this.chipStyle(screen === 'role'),
+      chipMzKaart: this.chipStyle(at('main', 'mantelzorger', 'kaart')),
+      chipMzVandaag: this.chipStyle(isMain && isMz && tab === 'vandaag'),
+      chipMzKring: this.chipStyle(isMain && isMz && tab === 'kring' && ['empty', 'create', 'code', 'leden', 'invite'].includes(kringView)),
+      chipMzRooster: this.chipStyle(isMain && isMz && tab === 'kring' && kringView === 'rooster'),
+      chipMzChat: this.chipStyle(isMain && isMz && tab === 'kring' && kringView === 'chat'),
+      chipMzAbo: this.chipStyle(isMain && isMz && kringView === 'abo' && tab === 'kring'),
+      chipMzProfiel: this.chipStyle(isMain && isMz && tab === 'profiel'),
+      chipVKaart: this.chipStyle(isMain && isV && tab === 'kaart'),
+      chipVUitnodiging: this.chipStyle(isMain && isV && tab === 'vandaag' && s.vStatus === 'invited'),
+      chipVId: this.chipStyle(isMain && isV && tab === 'idupload'),
+      chipVTaken: this.chipStyle(isMain && isV && tab === 'vandaag' && s.vStatus === 'lid'),
+      chipVProfiel: this.chipStyle(isMain && isV && tab === 'profiel')
+    };
+  }
+}
+</script>
+</body>
+</html>

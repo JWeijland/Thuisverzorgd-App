@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+**/xcuserdata/
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# Secrets — nooit committen
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+
+# Supabase CLI lokale state
+supabase/.temp/
