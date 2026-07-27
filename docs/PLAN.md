@@ -109,9 +109,15 @@
 - [x] Tests: 29 groen (deeplink-mapping, categorie-dekking van alle trigger-kinds); lint + typecheck groen
 - **Let op:** push werkt pas echt in een development build/TestFlight (Expo Go ondersteunt geen remote push); lokale herinneringen en inbox werken overal
 
-### Fase 8 — Steun & advies
-- [ ] Forum: tags, threads, antwoorden, makelaar-badge, melden/blokkeren
-- [ ] Live chat met hulpmakelaars + wachtrij + "x online"; makelaar-webconsole
+### Fase 8 — Steun & advies ✅ (2026-07-28)
+- [x] Forum: composer ("Stel een vraag aan de community" → sheet met titel/tekst/tag), filterchips (Alles/Wonen/Werk/Financiën/Dementie), vraagkaarten met voornaam · plaats · tijd · tag · aantal antwoorden
+- [x] Thread-detail: vraag + antwoorden; makelaar-antwoorden met groene rand + badge "Hulpmakelaar" (automatisch via trigger); zelf reageren
+- [x] Melden + blokkeren (App Store-eis): ⋯-menu op elke post/reactie → melding (naar alle makelaars als notificatie) of gebruiker blokkeren; geblokkeerde auteurs verdwijnen overal (views filteren op user_blocks)
+- [x] Hulpmakelaar-chat: overlappende avatars, "x hulpmakelaars online · meestal antwoord binnen 2 minuten" via Supabase Presence (echt geteld), pulserende stip, vertrouwelijkheidsnotitie, startvraag-chips, realtime berichten
+- [x] Makelaar-console (route /makelaar, rol-guard): gesprekken beantwoorden + open meldingen afhandelen (inhoud verbergen of alleen afhandelen) — de console zet ook de online-status
+- [x] Veilige views (v_forum_posts/replies, v_broker_chat_overview, v_report_overview): voornamen zichtbaar zonder profielen open te zetten
+- [x] Tests 29 groen; lint + typecheck groen
+- **Open punt:** moderatie-e-mail (besluit #12) loopt nu via pushmeldingen naar makelaars; een e-mailkanaal kan er later bij (Resend) zodra er een moderatie-adres is
 
 ### Fase 9 — Abonnement (aangepast: zonder echte betaling)
 - [ ] Abonnementsscherm + entitlement-logica via `subscriptions`-tabel
