@@ -1,6 +1,8 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { NotificationSettings } from '@/features/notifications/NotificationSettings';
+import { removePushToken } from '@/features/notifications/push';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
@@ -51,11 +53,16 @@ export default function ProfielScreen() {
           </View>
         </Card>
 
+        <NotificationSettings />
+
         <Button
           label="Uitloggen"
           variant="danger"
           style={styles.logout}
-          onPress={() => supabase.auth.signOut()}
+          onPress={async () => {
+            await removePushToken();
+            supabase.auth.signOut();
+          }}
         />
         <TvzText preset="secondary" style={styles.note}>
           {t('placeholder.tekst')}

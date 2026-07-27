@@ -16,6 +16,7 @@ export type Profile = {
   pool_opt_in: boolean;
   large_text: boolean;
   helped_count: number;
+  notification_prefs: Record<string, boolean>;
 };
 
 type AuthValue = {
@@ -61,7 +62,7 @@ export function useProfile() {
       const { data, error } = await supabase
         .from('profiles')
         .select(
-          'id, role, name, email, tvz_id, avatar_path, id_verified, vacation_mode, pool_opt_in, large_text, helped_count',
+          'id, role, name, email, tvz_id, avatar_path, id_verified, vacation_mode, pool_opt_in, large_text, helped_count, notification_prefs',
         )
         .eq('id', session!.user.id)
         .single();

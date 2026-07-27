@@ -155,7 +155,14 @@ export function useTaskRpc(circleId: string | undefined) {
     },
     onSuccess: invalidate,
   });
-  return { claim, release, complete };
+  const cancel = useMutation({
+    mutationFn: async (taskId: string) => {
+      const { error } = await supabase.rpc('cancel_task', { p_task: taskId });
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+  return { claim, release, complete, cancel };
 }
 
 export function useTaskLogs(circleId: string | undefined) {

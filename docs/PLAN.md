@@ -97,12 +97,17 @@
 - [x] Locatie: expo-location + permissietekst; kaartviews geven lat/lon op wijkniveau
 - [x] Tests: 25 groen (haversine, afstandsformat, in-beeld-teller); lint + typecheck groen
 
-### Fase 7 — Meldingen
-- [ ] Push (expo-notifications + Edge Function + Expo Push API), tokens per gebruiker, opruimen bij uitloggen
-- [ ] Deeplink-payloads (`tvz://task/<id>` etc.), ook vanuit koude start
-- [ ] Inbox op `notifications`-tabel + ongelezen badge
-- [ ] Lokale herinnering 1 uur vooraf + persistente taakbanner
-- [ ] Alle triggers uit de superprompt; instellingen per categorie; vakantiemodus gerespecteerd
+### Fase 7 — Meldingen ✅ (2026-07-28)
+- [x] Push: device_tokens-tabel (RLS), registratie bij inloggen, opruimen bij uitloggen; Edge Function `send-push` (Expo Push API, ruimt DeviceNotRegistered-tokens op), realtime aangeroepen via pg_net-trigger op elke nieuwe melding
+- [x] 10 database-triggers maken meldingen aan: nieuwe taak, taak geclaimd, taak geannuleerd, aanbod, aanbod geaccepteerd/afgewezen, aanvraag ingetrokken, uitnodiging/aanvraag kring, kringbericht, forumantwoord, hulpmakelaar-antwoord — allemaal met Nederlandse teksten en deeplink-payload
+- [x] Centrale `notify()`-functie respecteert voorkeuren per categorie én de vakantiemodus (geen taaksuggesties)
+- [x] NotificationGateway: tap op push → navigatie naar het deeplink-doel, óók vanuit koude start (getLastNotificationResponseAsync)
+- [x] Inbox-scherm op de notifications-tabel (klikbaar, lang indrukken = verwijderen, alles-gelezen) + belletje met groene ongelezen-stip op beide rooster-headers, realtime
+- [x] Meldingsinstellingen per categorie (5 categorieën) op het Profiel
+- [x] Lokale herinnering 1 uur vóór een aangenomen taak (geannuleerd bij afronden/teruggeven)
+- [x] Restpunten Fase 5 opgelost: `cancel_task` (beheerder trekt in, aannemer krijgt melding, ✕ op de taakrij) en wekelijkse reeksen (8 voorkomens per serie + `cancel_task_series`)
+- [x] Tests: 29 groen (deeplink-mapping, categorie-dekking van alle trigger-kinds); lint + typecheck groen
+- **Let op:** push werkt pas echt in een development build/TestFlight (Expo Go ondersteunt geen remote push); lokale herinneringen en inbox werken overal
 
 ### Fase 8 — Steun & advies
 - [ ] Forum: tags, threads, antwoorden, makelaar-badge, melden/blokkeren

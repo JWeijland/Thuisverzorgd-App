@@ -138,6 +138,7 @@
     "logboekVerstuur": "Rond af en deel notitie",
     "logboekZonder": "Rond af zonder notitie",
     "teruggeven": "Taak teruggeven",
+    "intrekken": "Taak intrekken",
     "banner": "{dag} {tijd} · {taak} · jij gaat"
   },
   "planner": {
@@ -206,6 +207,21 @@
     "legeStaatTitel": "Nog geen kring",
     "legeStaatTekst": "Je bent nog geen lid van een hulpkring. Bekijk de kaart om kringen in de buurt te vinden, of wacht op een uitnodiging.",
     "bekijkKaart": "Bekijk de kaart"
+  },
+  "inbox": {
+    "titel": "Inbox",
+    "leegTitel": "Geen meldingen",
+    "leegTekst": "Zodra er iets gebeurt in je kring, zie je het hier.",
+    "allesGelezen": "Markeer alles als gelezen"
+  },
+  "meldingen": {
+    "titel": "Meldingen",
+    "uitleg": "Kies waar je een melding van wilt krijgen.",
+    "catTaken": "Taken en rooster",
+    "catDirecteHulp": "Directe hulp",
+    "catKringberichten": "Kringberichten",
+    "catForum": "Forum en hulpmakelaar",
+    "catUitnodigingen": "Uitnodigingen"
   },
   "buurt": {
     "zoekPlaceholder": "Zoek hulpkringen",

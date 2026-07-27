@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import type { Task } from '@/features/tasks/api';
 import { taskLabel } from '@/features/tasks/logic';
@@ -14,10 +14,20 @@ type Props = {
   onClaim?: (task: Task) => void;
   onComplete?: (task: Task) => void;
   onBuddyPool?: (task: Task) => void;
+  /** Beheerder: taak intrekken (de aannemer krijgt automatisch een melding). */
+  onCancelTask?: (task: Task) => void;
 };
 
 /** Eén roosterrij: daglabel links, taak + tijd + wie, status of actie rechts. */
-export function TaskRow({ task, myId, isBeheerder, onClaim, onComplete, onBuddyPool }: Props) {
+export function TaskRow({
+  task,
+  myId,
+  isBeheerder,
+  onClaim,
+  onComplete,
+  onBuddyPool,
+  onCancelTask,
+}: Props) {
   const date = parseDateString(task.date);
   const mine = !!myId && task.claimed_by === myId;
   const who = task.claimer
@@ -83,6 +93,18 @@ export function TaskRow({ task, myId, isBeheerder, onClaim, onComplete, onBuddyP
         </TvzText>
       </View>
       {right}
+      {isBeheerder && onCancelTask && task.status !== 'gedaan' ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('rooster.intrekken')}
+          onPress={() => onCancelTask(task)}
+          hitSlop={10}
+        >
+          <TvzText preset="meta" style={styles.cancel}>
+            ✕
+          </TvzText>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -119,5 +141,9 @@ const styles = StyleSheet.create({
     minHeight: 38,
     paddingVertical: 6,
     paddingHorizontal: 16,
+  },
+  cancel: {
+    color: colors.inkFaint,
+    fontSize: 15,
   },
 });

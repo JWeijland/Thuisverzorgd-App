@@ -16,6 +16,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { NotificationGateway } from '@/features/notifications/NotificationGateway';
 import { AuthProvider } from '@/features/onboarding/useAuth';
 import { queryClient } from '@/lib/queryClient';
 import { TextScaleProvider } from '@/theme';
@@ -49,6 +50,7 @@ export default function RootLayout() {
       <AuthProvider>
         <TextScaleProvider>
           <StatusBar style="light" />
+          <NotificationGateway />
           <Stack screenOptions={{ headerShown: false }} />
         </TextScaleProvider>
       </AuthProvider>

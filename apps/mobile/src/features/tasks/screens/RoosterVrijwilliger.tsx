@@ -4,6 +4,8 @@ import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useMyCircle } from '@/features/circles/api';
+import { InboxBell } from '@/features/notifications/InboxBell';
+import { cancelTaskReminder, scheduleTaskReminder } from '@/features/notifications/push';
 import { useTaskRpc, useTasks, type Task } from '@/features/tasks/api';
 import { TaskRow } from '@/features/tasks/TaskRow';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
@@ -35,7 +37,10 @@ export function RoosterVrijwilliger() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.container}>
-        <TvzText preset="screenTitle">Hoi {firstName}.</TvzText>
+        <View style={styles.headerRow}>
+          <TvzText preset="screenTitle">Hoi {firstName}.</TvzText>
+          <InboxBell />
+        </View>
 
         <LinearGradient {...gradient} style={styles.counter}>
           <TvzText preset="cardTitle" style={styles.counterTitle}>
@@ -58,7 +63,13 @@ export function RoosterVrijwilliger() {
                   task={task}
                   myId={profile.data?.id}
                   isBeheerder={false}
-                  onClaim={(item) => claim.mutate(item.id)}
+                  onClaim={(item) =>
+                    claim.mutate(item.id, {
+                      onSuccess: (won) => {
+                        if (won) scheduleTaskReminder(item);
+                      },
+                    })
+                  }
                   onComplete={(item) => setCompleting(item)}
                 />
               ))}
@@ -95,6 +106,7 @@ export function RoosterVrijwilliger() {
           size="lg"
           disabled={complete.isPending || note.trim().length === 0}
           onPress={() => {
+            cancelTaskReminder(completing!.id);
             complete.mutate(
               { taskId: completing!.id, note: note.trim() },
               { onSuccess: closeSheet },
@@ -116,6 +128,7 @@ export function RoosterVrijwilliger() {
           style={styles.sheetSecondary}
           disabled={release.isPending}
           onPress={() => {
+            cancelTaskReminder(completing!.id);
             release.mutate(completing!.id, { onSuccess: closeSheet });
           }}
         />
@@ -129,6 +142,11 @@ const styles = StyleSheet.create({
   container: {
     padding: spacing.screen,
     paddingBottom: 110,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   counter: {
     borderRadius: radius.card,

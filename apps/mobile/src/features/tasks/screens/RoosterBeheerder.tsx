@@ -4,7 +4,8 @@ import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useMyCircle } from '@/features/circles/api';
-import { useCreateTask, useTaskLogs, useTasks } from '@/features/tasks/api';
+import { InboxBell } from '@/features/notifications/InboxBell';
+import { useCreateTask, useTaskLogs, useTaskRpc, useTasks } from '@/features/tasks/api';
 import { taskLabel } from '@/features/tasks/logic';
 import { TaskPlanner } from '@/features/tasks/TaskPlanner';
 import { TaskRow } from '@/features/tasks/TaskRow';
@@ -31,6 +32,7 @@ export function RoosterBeheerder() {
   const tasks = useTasks(circle.data?.id, week[0]!, week[6]!);
   const logs = useTaskLogs(circle.data?.id);
   const createTask = useCreateTask(circle.data?.id);
+  const { cancel } = useTaskRpc(circle.data?.id);
   const [plannerOpen, setPlannerOpen] = useState(false);
 
   const firstName = profile.data?.name.split(' ')[0] ?? '';
@@ -42,10 +44,15 @@ export function RoosterBeheerder() {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView contentContainerStyle={styles.container}>
-        <TvzText preset="screenTitle">
-          {t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
-        </TvzText>
-        <TvzText preset="secondary">{formatHumanDate(now)}</TvzText>
+        <View style={styles.headerRow}>
+          <View style={styles.headerText}>
+            <TvzText preset="screenTitle">
+              {t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
+            </TvzText>
+            <TvzText preset="secondary">{formatHumanDate(now)}</TvzText>
+          </View>
+          <InboxBell />
+        </View>
 
         {!circle.isLoading && !circle.data ? (
           <Card style={styles.section}>
@@ -119,7 +126,13 @@ export function RoosterBeheerder() {
 
             <View style={styles.list}>
               {(tasks.data ?? []).map((task) => (
-                <TaskRow key={task.id} task={task} myId={profile.data?.id} isBeheerder />
+                <TaskRow
+                  key={task.id}
+                  task={task}
+                  myId={profile.data?.id}
+                  isBeheerder
+                  onCancelTask={(item) => cancel.mutate(item.id)}
+                />
               ))}
               {!tasks.isLoading && (tasks.data ?? []).length === 0 ? (
                 <Card>
@@ -155,6 +168,14 @@ const styles = StyleSheet.create({
   container: {
     padding: spacing.screen,
     paddingBottom: 110,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  headerText: {
+    flex: 1,
   },
   section: {
     marginTop: spacing.lg,
