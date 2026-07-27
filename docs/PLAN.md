@@ -52,13 +52,16 @@
 - [x] Animatie-helpers: tvzIn (FadeInDown 280ms), TvzBounce (2.6s-lus), PulseDot (1.8s pulse)
 - [x] Componenttests (Button, StatusPill, TvzText) — 11 tests groen
 
-### Fase 3 — Datamodel en RLS
-- [ ] Migraties: profiles, circles, circle_members, invitations, tasks, task_drafts, task_logs, spontaneous_requests (PostGIS), request_offers, messages, notifications, forum_posts, forum_replies, forum_reports, broker_chats, broker_messages, subscriptions, audit_log
-- [ ] RLS op alles, expliciete policies per rol
-- [ ] Locatievervaging (~1 km) vóór toestemming; exact adres pas na akkoord
-- [ ] ID: alleen boolean + timestamp in DB; privé bucket met 30-dagen-opruiming
-- [ ] Admin: uitsluitend geaggregeerde, geanonimiseerde views
-- [ ] SQL-tests die bewijzen dat een niet-lid géén kringdata kan lezen
+### Fase 3 — Datamodel en RLS ✅ (2026-07-28)
+- [x] Migraties (live op cloud-project): profiles, circles, circle_members, invitations, tasks, task_drafts, task_logs, spontaneous_requests (PostGIS), request_offers, messages, notifications, forum_posts, forum_replies, forum_reports, user_blocks, broker_chats, broker_messages, reviews, subscriptions, audit_log
+- [x] RLS op álle tabellen, expliciete policies per rol; admin heeft géén tabeltoegang
+- [x] RPC's: redeem_circle_code, claim_task (race-veilig), release_task, complete_task (+logboekje), publish_drafts, respond_invitation, accept/reject_offer, cancel/complete_request, get_request_address, activate_subscription_stub
+- [x] Gratis limiet (2 vrijwilligers) server-side via trigger; stub-abonnement ontgrendelt
+- [x] Locatievervaging ~1 km via trigger (location_rounded); exact adres alleen via RPC na acceptatie
+- [x] ID: alleen `id_verified` boolean + timestamp; privé buckets avatars/id-documents (30-dagen-opruiming volgt in Fase 4 bij de upload-flow)
+- [x] Views: v_map_circles, v_map_buddies, v_open_requests (zonder adres), v_buddy_cards, en admin-views (kerncijfers, groei per maand, taken per type, matchtijd) — uitsluitend geaggregeerd
+- [x] Realtime aan voor tasks, messages, notifications, spontaneous_requests, request_offers, broker_messages
+- [x] Bewijs: `apps/mobile/scripts/rls-smoke.mjs` — 23 checks groen tegen de echte database (niet-lid ziet niets; claim race-veilig; gratis limiet; adres pas na acceptatie; rol niet zelf te wijzigen) + pgTAP-bestand voor CI zodra Docker beschikbaar is
 
 ### Fase 4 — Auth en onboarding
 - [ ] Magic-link login + deep link terug in de app
