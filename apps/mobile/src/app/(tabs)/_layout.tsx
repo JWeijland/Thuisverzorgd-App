@@ -3,6 +3,7 @@ import { View } from 'react-native';
 
 import { WalkthroughOverlay } from '@/features/onboarding/WalkthroughOverlay';
 import { useProfile, useSession } from '@/features/onboarding/useAuth';
+import { TaskBanner } from '@/features/tasks/TaskBanner';
 import { t } from '@/i18n';
 import { TvzTabBar } from '@/ui/TabBar';
 
@@ -23,6 +24,7 @@ export default function TabsLayout() {
         <Tabs.Screen name="steun" options={{ title: t('tabs.steun') }} />
         <Tabs.Screen name="profiel" options={{ title: t('tabs.profiel') }} />
       </Tabs>
+      <TaskBanner />
       <WalkthroughOverlay
         uid={session?.user.id}
         role={

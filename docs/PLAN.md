@@ -74,12 +74,17 @@
 - [x] Tests: 18 groen (routebepaling, i18n, componenten); lint + typecheck groen
 - **Opmerking:** tab-schermen rooster/buurt/kring/steun zijn bewust placeholders tot Fase 5/6/8; ID-opruiming na 30 dagen staat gepland bij de edge functions van Fase 7
 
-### Fase 5 — Kring en rooster
-- [ ] Kring aanmaken + koppelcode, leden, uitnodigingen, gratis limiet 2
-- [ ] Belastingverdeling "Wie doet wat deze maand?", kringchat
-- [ ] Rooster: weekstrip, taakplanner (incl. "Anders"), herhaling, conceptplanner + publiceren
-- [ ] Claimen, afronden met logboekje, "Uit de kring"
-- [ ] Intrekken (beheerder) en teruggeven (vrijwilliger)
+### Fase 5 — Kring en rooster ✅ (2026-07-28)
+- [x] Kring aanmaken (formulier → koppelcode in gestippelde kaart → kringpagina), gradient-header met subnav Leden/Berichten
+- [x] Leden + statuspillen (Actief/Uitgenodigd/ID-check/Kijkt mee), uitnodigen op e-mail/TVZ-ID/profiel-id via `create_invitation`-RPC + "Best matches in de buurt", gratis-limiet-melding (server-side al afgedwongen sinds Fase 3)
+- [x] Belastingverdeling "Wie doet wat deze maand?" (staafjes + spreid-advies), kringchat realtime met merkbubbels
+- [x] Rooster beheerder: begroeting + datum, taak-van-vandaag-kaart met belknop, inline taakplanner (5 typen incl. "Anders" met vrije invoer, dag, 4 sneltijden + eigen tijd, eenmalig/elke week), weekstrip met stipjes, taaklijst, "Uit de kring"-notities
+- [x] Conceptplanner (aparte pagina): periode 1w/2w/1m/2m, weekchips, gestippelde conceptkaarten (verwijderbaar), "Publiceer X taken naar de kring →" + bevestiging + "Al gepubliceerd · week N"
+- [x] Rooster vrijwilliger: teller "N mensen geholpen" (gradient), aannemen (race-veilige RPC), "Jij gaat" groen, afronden met logboekje (bottom sheet, met/zonder notitie) én taak teruggeven
+- [x] Rooster hulpvrager: grote weergave "X is nu bij je" met pulserende stip en grote belknop (62px), "Straks", herkenningstip
+- [x] Persistente taakbanner (navy pill, blijft bij tabwissel, wegdrukbaar, tik → rooster)
+- [x] Tests: 22 groen (o.a. weekstrip-stipjes, belastingverdeling, taaklabels); lint + typecheck groen
+- **Nog open uit deze fase:** taak intrekken door beheerder ná claim (met nette melding) → gekoppeld aan notificaties in Fase 7; "Buddy-pool"-knop op open taken activeert zodra de buurtkaart (Fase 6) er is; wekelijkse herhaling genereert nu één taak — reeks-generatie komt bij de edge functions van Fase 7
 
 ### Fase 6 — Buurtkaart en directe hulp
 - [ ] Kaart met kringen/buddy's/aanvragen, live teller, zoeken met live filtering

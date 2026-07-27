@@ -31,3 +31,63 @@ export function isoWeekDays(date: Date): Date[] {
     return d;
   });
 }
+
+export const WEEKDAY_FULL = [
+  'maandag',
+  'dinsdag',
+  'woensdag',
+  'donderdag',
+  'vrijdag',
+  'zaterdag',
+  'zondag',
+] as const;
+
+export const MONTH_FULL = [
+  'januari',
+  'februari',
+  'maart',
+  'april',
+  'mei',
+  'juni',
+  'juli',
+  'augustus',
+  'september',
+  'oktober',
+  'november',
+  'december',
+] as const;
+
+/** "Donderdag 23 juli" — voor de begroetingsregel. */
+export function formatHumanDate(date: Date): string {
+  const day = WEEKDAY_FULL[(date.getDay() + 6) % 7]!;
+  return `${day.charAt(0).toUpperCase()}${day.slice(1)} ${date.getDate()} ${MONTH_FULL[date.getMonth()]}`;
+}
+
+/** Kort daglabel bij een taakrij: "Ma" + "27 jul". */
+export function formatShortDate(date: Date): string {
+  return `${date.getDate()} ${MONTH_FULL[date.getMonth()]!.slice(0, 3)}`;
+}
+
+/** "14:00:00" (Postgres time) → "14:00". */
+export function formatTime(time: string): string {
+  return time.slice(0, 5);
+}
+
+/** yyyy-mm-dd in lokale tijd (Postgres date-kolom). */
+export function toDateString(date: Date): string {
+  const m = `${date.getMonth() + 1}`.padStart(2, '0');
+  const d = `${date.getDate()}`.padStart(2, '0');
+  return `${date.getFullYear()}-${m}-${d}`;
+}
+
+export function parseDateString(value: string): Date {
+  const [y, m, d] = value.split('-').map(Number);
+  return new Date(y!, m! - 1, d!);
+}
+
+/** Begroeting op basis van het uur: goedemorgen / goedemiddag / goedenavond. */
+export function greetingKey(hour: number): 'goedemorgen' | 'goedemiddag' | 'goedenavond' {
+  if (hour < 12) return 'goedemorgen';
+  if (hour < 18) return 'goedemiddag';
+  return 'goedenavond';
+}
