@@ -119,13 +119,16 @@
 - [x] Tests 29 groen; lint + typecheck groen
 - **Open punt:** moderatie-e-mail (besluit #12) loopt nu via pushmeldingen naar makelaars; een e-mailkanaal kan er later bij (Resend) zodra er een moderatie-adres is
 
-### Fase 9 — Abonnement (aangepast: zonder echte betaling)
-- [ ] Abonnementsscherm + entitlement-logica via `subscriptions`-tabel
-- [ ] Gratis limiet afdwingen (server-side); upgrade-flow als stub
-- [ ] (Later) RevenueCat + Apple IAP + webhook
+### Fase 9 — Abonnement (stub, ADR-0002) ✅ (2026-07-28)
+- [x] Abonnementsscherm (screen 12): €4,99-gradient-kaart met de vier voordelen, groene CTA, incasso-tekst, "Later misschien", bevestiging na activeren + pilot-notitie ("eerste maand gratis, er wordt nog niets afgeschreven")
+- [x] Stub-activatie via `activate_subscription_stub` (proefmaand); gratis limiet was al server-side afgedwongen; entitlement geldt per account voor alle kringen
+- [x] Profiel beheerder: abonnementsregel (Gratis · max 2 vrijwilligers / Proefmaand actief) met Upgraden/Beheren
+- [x] Profiel volledig afgemaakt: buddy-pool-toggle (gradient-kaart), "Mijn beschikbaarheid" met dagchips, "Even afwezig" (vakantiemodus, amber melding), agenda-koppeling-toggle, TVZ-ID
+- [ ] (Vóór publieke release) RevenueCat + Apple IAP + webhook — zie Open punten
 
-### Fase 10 — Admin-inzichten
-- [ ] Geaggregeerde views + eenvoudig dashboard (Expo web-route, admin-rol)
+### Fase 10 — Admin-inzichten ✅ (2026-07-28)
+- [x] Dashboard op route `/admin` (rol-guard, werkt ook als web-route): vier kerncijfer-tegels, staafgrafiek groei per maand, taken per type met percentages, gemiddelde tijd tot match — uitsluitend uit de geaggregeerde `v_admin_*`-views (admin heeft geen tabeltoegang)
+- **Opmerking:** agenda-koppeling slaat nu de voorkeur op; echte EventKit-integratie staat op de Fase 11-lijst
 
 ### Fase 11 — Kwaliteit en release
 - [ ] Accessibility: dynamic type, VoiceOver, contrast, tikdoelen ≥44px, ouderen-modus 1,3×
