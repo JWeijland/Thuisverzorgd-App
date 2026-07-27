@@ -63,10 +63,16 @@
 - [x] Realtime aan voor tasks, messages, notifications, spontaneous_requests, request_offers, broker_messages
 - [x] Bewijs: `apps/mobile/scripts/rls-smoke.mjs` — 23 checks groen tegen de echte database (niet-lid ziet niets; claim race-veilig; gratis limiet; adres pas na acceptatie; rol niet zelf te wijzigen) + pgTAP-bestand voor CI zodra Docker beschikbaar is
 
-### Fase 4 — Auth en onboarding
-- [ ] Magic-link login + deep link terug in de app
-- [ ] Rolkeuze, ID + profielfoto (vrijwilliger, eenmalig, beide verplicht)
-- [ ] Rondleiding met Caveat-wolkjes (beheerder 4 / vrijwilliger 3 / hulpvrager 2 stappen)
+### Fase 4 — Auth en onboarding ✅ (2026-07-28)
+- [x] Magic-link login (naam + e-mail, geen wachtwoord) + deep link `tvz://auth/callback` die de sessie zet (implicit én PKCE afgehandeld); redirect-URLs via `supabase config push`
+- [x] Schermen: welkom (gradient + stuiterend logo), account, check-mail (met opnieuw versturen), rolkeuze (2 kaarten), koppelcode (hulpvrager → `redeem_circle_code`), ID + profielfoto (2 gestippelde tegels, beide verplicht, upload naar privé buckets, "De app in →")
+- [x] Routebepaling `getStartRoute()` (welkom → rolkeuze → id-en-foto → app) als pure, geteste functie
+- [x] i18n: `src/i18n/nl.json` + `t()` met variabelen — alle copy uit i18n, geen hardcoded strings
+- [x] Tabs-skelet met de zwevende witte pill-tabbalk (5 tabs, actief = navy pill, lucide-iconen lijndikte 2.2)
+- [x] Rondleiding: Caveat-wolkjes met pijltje naar de echte tabknoppen, beheerder 4 / vrijwilliger 3 / hulpvrager 2 stappen, navigeert per stap naar de juiste tab, overslaan kan altijd, één keer per gebruiker (AsyncStorage)
+- [x] Basis-profielscherm met uitloggen + ouderen-modus-toggle (volledige profielsecties volgen in latere fases)
+- [x] Tests: 18 groen (routebepaling, i18n, componenten); lint + typecheck groen
+- **Opmerking:** tab-schermen rooster/buurt/kring/steun zijn bewust placeholders tot Fase 5/6/8; ID-opruiming na 30 dagen staat gepland bij de edge functions van Fase 7
 
 ### Fase 5 — Kring en rooster
 - [ ] Kring aanmaken + koppelcode, leden, uitnodigingen, gratis limiet 2

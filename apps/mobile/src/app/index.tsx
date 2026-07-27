@@ -1,73 +1,35 @@
-import { Link } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { Redirect } from 'expo-router';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-// Tijdelijk startscherm — wordt in Fase 4 vervangen door de echte welkomflow.
-// De kleuren komen uit de handoff (primaryDark/accent); het volledige
-// designsysteem (theme.ts + primitives) volgt in Fase 2.
+import { getStartRoute } from '@/features/onboarding/startRoute';
+import { useProfile, useSession } from '@/features/onboarding/useAuth';
+import { colors } from '@/theme';
+
+/** Startpunt: stuurt door naar welkom, rolkeuze, ID-check of de app zelf. */
 export default function Index() {
-  return (
-    <View style={styles.container}>
-      <View style={styles.logoRow}>
-        <View style={[styles.bar, styles.barBlue]} />
-        <View style={[styles.bar, styles.barGreen]} />
+  const { session, loading } = useSession();
+  const profile = useProfile();
+
+  if (loading || (session && profile.isLoading)) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator color={colors.white} />
       </View>
-      <View style={styles.stem} />
-      <Text style={styles.wordmark}>thuisverzorgd</Text>
-      <Text style={styles.tagline}>Hulp dichtbij, geregeld door de buurt</Text>
-      <Link href="/dev/ui" style={styles.devLink}>
-        <Text style={styles.devLinkText}>Bekijk designsysteem (dev)</Text>
-      </Link>
-    </View>
+    );
+  }
+
+  const target = getStartRoute(
+    !!session,
+    profile.data ? { role: profile.data.role, id_verified: profile.data.id_verified } : null,
   );
+  return <Redirect href={target as never} />;
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loading: {
     flex: 1,
-    backgroundColor: '#112F50',
+    backgroundColor: colors.primaryDark,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  logoRow: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  bar: {
-    width: 34,
-    height: 16,
-    borderRadius: 999,
-  },
-  barBlue: {
-    backgroundColor: '#2A6CB0',
-  },
-  barGreen: {
-    backgroundColor: '#8DC93F',
-  },
-  stem: {
-    width: 16,
-    height: 40,
-    borderRadius: 999,
-    backgroundColor: '#FFFFFF',
-    marginTop: 4,
-  },
-  wordmark: {
-    color: '#FFFFFF',
-    fontSize: 28,
-    fontWeight: '700',
-    marginTop: 20,
-  },
-  tagline: {
-    color: '#FFFFFF',
-    opacity: 0.85,
-    fontSize: 15,
-    marginTop: 8,
-  },
-  devLink: {
-    marginTop: 40,
-  },
-  devLinkText: {
-    color: '#8DC93F',
-    fontSize: 14,
-    textDecorationLine: 'underline',
   },
 });

@@ -1,0 +1,102 @@
+{
+  "algemeen": {
+    "verder": "Verder",
+    "terug": "Terug",
+    "sluiten": "Sluiten",
+    "overslaan": "Overslaan",
+    "volgende": "Volgende",
+    "klaar": "Klaar",
+    "laden": "Even geduld...",
+    "foutTitel": "Dat ging even mis",
+    "foutOpnieuw": "Probeer het opnieuw"
+  },
+  "welkom": {
+    "tagline": "Hulp dichtbij, geregeld door de buurt",
+    "accountAanmaken": "Account aanmaken",
+    "inloggen": "Inloggen"
+  },
+  "account": {
+    "titelNieuw": "Maak je account",
+    "titelInloggen": "Log in",
+    "uitleg": "Alleen je naam en e-mailadres. Geen wachtwoord, je logt in via een link in je mail.",
+    "uitlegInloggen": "Vul je e-mailadres in, dan sturen we je een inloglink. Geen wachtwoord nodig.",
+    "naamLabel": "Je naam",
+    "naamPlaceholder": "Bijv. Jelle Weijland",
+    "emailLabel": "E-mailadres",
+    "emailPlaceholder": "naam@voorbeeld.nl",
+    "voorwaarden": "Door verder te gaan ga je akkoord met de voorwaarden. Je gegevens blijven van jou.",
+    "verstuur": "Stuur mij een inloglink",
+    "naamVerplicht": "Vul je naam in",
+    "emailOngeldig": "Vul een geldig e-mailadres in"
+  },
+  "checkMail": {
+    "titel": "Kijk in je mail",
+    "uitleg": "We hebben een inloglink gestuurd naar {email}. Tik op de link en je bent binnen.",
+    "nietOntvangen": "Niets ontvangen? Kijk in je spam of",
+    "opnieuw": "stuur de link opnieuw",
+    "opnieuwVerstuurd": "We hebben de link opnieuw gestuurd."
+  },
+  "callback": {
+    "bezig": "Je wordt ingelogd...",
+    "mislukt": "Inloggen is niet gelukt. De link is misschien verlopen.",
+    "terugNaarStart": "Terug naar het begin"
+  },
+  "rolkeuze": {
+    "titel": "Wat wil je doen?",
+    "uitleg": "Je kunt dit later altijd aanpassen.",
+    "beheerderTitel": "Ik regel hulp voor iemand",
+    "beheerderUitleg": "Maak een hulpkring rondom je naaste en nodig vrijwilligers uit.",
+    "vrijwilligerTitel": "Ik wil helpen in de buurt",
+    "vrijwilligerUitleg": "Word buddy en help af en toe iemand dichtbij. Jij bepaalt wanneer.",
+    "koppelcodeLink": "Ik heb een koppelcode gekregen"
+  },
+  "koppelcode": {
+    "titel": "Vul je koppelcode in",
+    "uitleg": "Je hebt een code gekregen van degene die de hulpkring beheert, bijvoorbeeld TVZ-4Q7B.",
+    "placeholder": "TVZ-XXXX",
+    "verstuur": "Koppel mij aan de kring",
+    "onbekend": "Deze code kennen we niet. Kijk of je hem goed hebt overgetikt."
+  },
+  "idFoto": {
+    "titel": "Nog twee foto's.",
+    "uitleg": "Eén keer bij je registratie, daarna nooit meer. Zo weet elke kring zeker wie je bent.",
+    "idTitel": "Foto van je ID",
+    "idUitleg": "Paspoort, ID-kaart of rijbewijs",
+    "fotoTitel": "Profielfoto",
+    "fotoUitleg": "Voor herkenning aan de deur",
+    "privacy": "We bewaren alleen de bevestiging van de check, niet je document. Je profielfoto zien alleen kringen waar je bij hoort.",
+    "deAppIn": "De app in →",
+    "uploadMislukt": "Uploaden is niet gelukt. Probeer het nog een keer."
+  },
+  "tabs": {
+    "rooster": "Rooster",
+    "buurt": "Buurt",
+    "kring": "Kring",
+    "steun": "Steun",
+    "profiel": "Profiel"
+  },
+  "rondleiding": {
+    "beheerder1Titel": "Plan hier taken in!",
+    "beheerder1Tekst": "Met de groene knop zet je in drie tikken een taak in het rooster. Je kring ziet hem direct en neemt hem aan.",
+    "beheerder2Titel": "Kijk eens in de buurt",
+    "beheerder2Tekst": "Op de kaart zie je hulpkringen en buddy's dichtbij. Even snel hulp nodig? Vraag directe hulp aan.",
+    "beheerder3Titel": "Dit is je kring",
+    "beheerder3Tekst": "Hier zie je de leden, nodig je vrijwilligers uit en chat je met de hele kring.",
+    "beheerder4Titel": "Je staat er niet alleen voor",
+    "beheerder4Tekst": "Stel vragen aan andere mantelzorgers op het forum of chat live met een hulpmakelaar.",
+    "vrijwilliger1Titel": "Hier staan de taken",
+    "vrijwilliger1Tekst": "Open taken kun je aannemen met één tik. Jij bepaalt wat je doet en wanneer.",
+    "vrijwilliger2Titel": "Help ook spontaan",
+    "vrijwilliger2Tekst": "Op de kaart zie je directe hulpvragen uit de buurt. Een berichtje en je bent onderweg.",
+    "vrijwilliger3Titel": "Jouw beschikbaarheid",
+    "vrijwilliger3Tekst": "Op je profiel stel je in op welke dagen je kunt helpen, en zet je de vakantiemodus aan.",
+    "hulpvrager1Titel": "Hier zie je wie er komt",
+    "hulpvrager1Tekst": "Vandaag en straks: wie er langskomt en hoe laat. Met een grote belknop.",
+    "hulpvrager2Titel": "Hulp nodig?",
+    "hulpvrager2Tekst": "Bel gerust, of vraag je beheerder om iets in het rooster te zetten."
+  },
+  "placeholder": {
+    "titel": "Dit scherm komt eraan",
+    "tekst": "Deze functie bouwen we in een volgende fase."
+  }
+}
