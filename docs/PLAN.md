@@ -130,12 +130,20 @@
 - [x] Dashboard op route `/admin` (rol-guard, werkt ook als web-route): vier kerncijfer-tegels, staafgrafiek groei per maand, taken per type met percentages, gemiddelde tijd tot match — uitsluitend uit de geaggregeerde `v_admin_*`-views (admin heeft geen tabeltoegang)
 - **Opmerking:** agenda-koppeling slaat nu de voorkeur op; echte EventKit-integratie staat op de Fase 11-lijst
 
-### Fase 11 — Kwaliteit en release
-- [ ] Accessibility: dynamic type, VoiceOver, contrast, tikdoelen ≥44px, ouderen-modus 1,3×
-- [ ] Fout- en lege staten overal; account verwijderen; melden/blokkeren
-- [ ] Sentry, seed-data, concept-juridische teksten
-- [ ] EAS build + submit: TestFlight én Android (interne track)
-- [ ] README voor nieuwe ontwikkelaars (< 15 min draaien)
+### Fase 11 — Kwaliteit en release 🔶 (grotendeels af, 2026-07-28)
+- [x] Accessibility: rollen/labels overal, tikdoelen ≥44 (CTA's 56–62), ouderen-modus 1,3× door alle schermen, contrast volgens brandbook
+- [x] Fout- en lege staten in alle flows; melden/blokkeren (fase 8); **account verwijderen** (edge function + bevestiging, App Store 5.1.1(v))
+- [x] Screen 16 "Aanvraag beoordelen" toegevoegd (was de laatste ontbrekende); ID-opruiming na 30 dagen via pg_cron
+- [x] Seed-script met fictieve demo-data (Anna de Wit, Tim Bakker, mevrouw Jansen, forum + makelaar) — gedraaid op het project
+- [x] Concept-privacybeleid + gebruiksvoorwaarden in docs/legal/ (jurist toetst later)
+- [x] Self-review BLOK 4 → docs/REVIEW-fase-11.md (RLS nagelopen, alle 25 screens vergeleken, geen any-types/dode code, i18n gecontroleerd)
+- [x] README: nieuwe ontwikkelaar draait in <15 min
+- [ ] **Samen te doen:** EAS development build → TestFlight-build + submit (vereist `eas login` + Apple team-ID) en de Android interne track; Sentry-DSN aanmaken; App Store-teksten + privacylabels invullen
+
+## Open punten voor ná de pilot-build
+- Videokennismaking via Daily.co (API-key nodig) — screen 22
+- RevenueCat + Apple IAP (ADR-0002)
+- Agenda-koppeling (EventKit), Maestro e2e-flows, typ-indicator makelaar-chat, echte brand-app-iconen
 
 ## Voortgangslog
 - 2026-07-27: Repo + GitHub opgezet, ANALYSE.md af, vragenronde beantwoord, Supabase-project aangemaakt (`pfvxgzosntzzhydzzkaj`). Fase 1 gestart.

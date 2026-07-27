@@ -15,20 +15,6 @@
     "accountAanmaken": "Account aanmaken",
     "inloggen": "Inloggen"
   },
-  "account": {
-    "titelNieuw": "Maak je account",
-    "titelInloggen": "Log in",
-    "uitleg": "Alleen je naam en e-mailadres. Geen wachtwoord, je logt in via een link in je mail.",
-    "uitlegInloggen": "Vul je e-mailadres in, dan sturen we je een inloglink. Geen wachtwoord nodig.",
-    "naamLabel": "Je naam",
-    "naamPlaceholder": "Bijv. Jelle Weijland",
-    "emailLabel": "E-mailadres",
-    "emailPlaceholder": "naam@voorbeeld.nl",
-    "voorwaarden": "Door verder te gaan ga je akkoord met de voorwaarden. Je gegevens blijven van jou.",
-    "verstuur": "Stuur mij een inloglink",
-    "naamVerplicht": "Vul je naam in",
-    "emailOngeldig": "Vul een geldig e-mailadres in"
-  },
   "checkMail": {
     "titel": "Kijk in je mail",
     "uitleg": "We hebben een inloglink gestuurd naar {email}. Tik op de link en je bent binnen.",
@@ -207,6 +193,42 @@
     "legeStaatTitel": "Nog geen kring",
     "legeStaatTekst": "Je bent nog geen lid van een hulpkring. Bekijk de kaart om kringen in de buurt te vinden, of wacht op een uitnodiging.",
     "bekijkKaart": "Bekijk de kaart"
+  },
+  "aanvraag": {
+    "titelAanvraag": "Aanvraag voor de kring",
+    "titelUitnodiging": "Uitnodiging",
+    "onbekendeVrijwilliger": "Onbekende vrijwilliger",
+    "helptIn": "Helpt al in {aantal} andere kringen",
+    "metaTaken": "{taken} taken in {kringen} andere kringen",
+    "voorstelVan": "Voorstelbericht van {naam}",
+    "uitnodigingVoor": "Je bent uitgenodigd voor {kring}",
+    "startVideo": "Start videokennismaking",
+    "videoGedaan": "Videokennismaking gedaan ✓",
+    "videoNodig": "Na de videokennismaking kun je toelaten.",
+    "videoBinnenkort": "Videobellen komt in de volgende update. Vink af als jullie elkaar (telefonisch) hebben gesproken.",
+    "toelaten": "Toelaten tot de kring",
+    "afwijzen": "Afwijzen",
+    "accepteren": "Uitnodiging accepteren",
+    "afgehandeld": "Deze aanvraag is al afgehandeld.",
+    "limiet": "Gratis tot 2 vrijwilligers. Activeer het abonnement om meer buddy's toe te laten."
+  },
+  "account": {
+    "titelNieuw": "Maak je account",
+    "titelInloggen": "Log in",
+    "uitleg": "Alleen je naam en e-mailadres. Geen wachtwoord, je logt in via een link in je mail.",
+    "uitlegInloggen": "Vul je e-mailadres in, dan sturen we je een inloglink. Geen wachtwoord nodig.",
+    "naamLabel": "Je naam",
+    "naamPlaceholder": "Bijv. Jelle Weijland",
+    "emailLabel": "E-mailadres",
+    "emailPlaceholder": "naam@voorbeeld.nl",
+    "voorwaarden": "Door verder te gaan ga je akkoord met de voorwaarden. Je gegevens blijven van jou.",
+    "verstuur": "Stuur mij een inloglink",
+    "naamVerplicht": "Vul je naam in",
+    "emailOngeldig": "Vul een geldig e-mailadres in",
+    "verwijderen": "Account verwijderen",
+    "verwijderenUitleg": "Je account en alle gegevens worden definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "verwijderenBevestig": "Verwijder mijn account definitief",
+    "verwijderenMislukt": "Verwijderen is niet gelukt. Probeer het later opnieuw."
   },
   "abonnement": {
     "titel": "Alle logistiek geregeld.",

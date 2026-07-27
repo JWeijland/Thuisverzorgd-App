@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { NotificationSettings } from '@/features/notifications/NotificationSettings';
@@ -11,7 +12,7 @@ import { supabase } from '@/lib/supabase';
 import { WEEKDAY_SHORT } from '@/lib/dates';
 import { colors, gradient, radius, spacing, useTextScale } from '@/theme';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Avatar, Button, Card, Chip, Pill, Toggle, TvzText } from '@/ui';
+import { Avatar, BottomSheet, Button, Card, Chip, Pill, Toggle, TvzText } from '@/ui';
 
 const ROLE_LABELS: Record<string, string> = {
   beheerder: 'Beheerder van de kring',
@@ -35,6 +36,8 @@ export default function ProfielScreen() {
   const subscribed =
     subscription.data?.status === 'proef' || subscription.data?.status === 'actief';
 
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
   const availability = (p as unknown as { availability?: string[] })?.availability ?? [];
   const vacation = p?.vacation_mode ?? false;
   const calendarSync = (p as unknown as { calendar_sync?: boolean })?.calendar_sync ?? false;
@@ -173,7 +176,52 @@ export default function ProfielScreen() {
             supabase.auth.signOut();
           }}
         />
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setDeleteOpen(true)}
+          hitSlop={8}
+          style={styles.deleteLink}
+        >
+          <TvzText preset="secondary" style={styles.deleteText}>
+            {t('account.verwijderen')}
+          </TvzText>
+        </Pressable>
       </ScrollView>
+
+      <BottomSheet
+        visible={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        title={t('account.verwijderen')}
+      >
+        <TvzText preset="secondary">{t('account.verwijderenUitleg')}</TvzText>
+        {deleteError ? (
+          <TvzText preset="secondary" style={styles.deleteText}>
+            {t('account.verwijderenMislukt')}
+          </TvzText>
+        ) : null}
+        <Button
+          label={t('account.verwijderenBevestig')}
+          variant="danger"
+          size="lg"
+          style={styles.logout}
+          onPress={async () => {
+            setDeleteError(false);
+            const { error } = await supabase.functions.invoke('delete-account');
+            if (error) {
+              setDeleteError(true);
+              return;
+            }
+            await removePushToken();
+            supabase.auth.signOut();
+          }}
+        />
+        <Button
+          label={t('abonnement.later')}
+          variant="outline"
+          style={styles.logout}
+          onPress={() => setDeleteOpen(false)}
+        />
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -246,5 +294,13 @@ const styles = StyleSheet.create({
   },
   logout: {
     marginTop: spacing.sm,
+  },
+  deleteLink: {
+    alignSelf: 'center',
+    marginTop: spacing.lg,
+  },
+  deleteText: {
+    color: colors.error,
+    textAlign: 'center',
   },
 });
