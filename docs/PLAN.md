@@ -86,9 +86,16 @@
 - [x] Tests: 22 groen (o.a. weekstrip-stipjes, belastingverdeling, taaklabels); lint + typecheck groen
 - **Nog open uit deze fase:** taak intrekken door beheerder ná claim (met nette melding) → gekoppeld aan notificaties in Fase 7; "Buddy-pool"-knop op open taken activeert zodra de buurtkaart (Fase 6) er is; wekelijkse herhaling genereert nu één taak — reeks-generatie komt bij de edge functions van Fase 7
 
-### Fase 6 — Buurtkaart en directe hulp
-- [ ] Kaart met kringen/buddy's/aanvragen, live teller, zoeken met live filtering
-- [ ] Directe hulp: volledige flow beide kanten, realtime, annuleren met bericht
+### Fase 6 — Buurtkaart en directe hulp ✅ (2026-07-28)
+- [x] Kaart (react-native-maps achter eigen `TvzMap`-wrapper, ADR-0004) met custom markers: hulpkring (witte cirkel + logo-balkjes + pootje), buddy (navy Ø26 met initiaal), directe hulp (navy + groene bliksem + pulsering), eigen locatie (groene stip)
+- [x] Zoekveld "Zoek hulpkringen" met live filterende suggesties (filtert ook markers; tik = kaart pant ernaartoe)
+- [x] Live teller voor de vrijwilliger ("N kringen · N directe aanvragen in beeld", telt mee bij zoomen/slepen); filterchips Hulpkringen/Buddy's voor de beheerder
+- [x] Directe hulp aanvrager: type kiezen + adres → "Zet op de kaart" → aanbod met berichtje → Toestaan/Afwijzen → "X is onderweg" + belknop → afronden; annuleren met bericht (bottom sheet)
+- [x] Directe hulp vrijwilliger: aanvraagkaart met afstand ("650 m van jou") → berichtje → "Ik kan helpen" (alleen met ID-check) → wachten op akkoord → adres + belknop → afronden/annuleren
+- [x] Fullscreen "hulpvraag ingetrokken"-scherm met geruststellende toon + eventueel bericht van de aanvrager
+- [x] Alles realtime (supabase realtime op requests + offers); contact/adres alleen via security-definer-RPC's ná acceptatie; één actieve aanvraag tegelijk (server-side)
+- [x] Locatie: expo-location + permissietekst; kaartviews geven lat/lon op wijkniveau
+- [x] Tests: 25 groen (haversine, afstandsformat, in-beeld-teller); lint + typecheck groen
 
 ### Fase 7 — Meldingen
 - [ ] Push (expo-notifications + Edge Function + Expo Push API), tokens per gebruiker, opruimen bij uitloggen

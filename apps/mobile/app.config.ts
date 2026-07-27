@@ -39,6 +39,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         imageWidth: 76,
       },
     ],
+    [
+      'expo-location',
+      {
+        locationWhenInUsePermission:
+          'Thuisverzorgd gebruikt je locatie om hulpkringen en hulpvragen bij jou in de buurt te tonen.',
+      },
+    ],
+    [
+      'expo-image-picker',
+      {
+        photosPermission:
+          'Thuisverzorgd gebruikt je fotobibliotheek voor je profielfoto en de eenmalige ID-check.',
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,
