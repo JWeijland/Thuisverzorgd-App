@@ -43,12 +43,14 @@
 - [x] CI (GitHub Actions): lint + typecheck + test
 - [x] `CLAUDE.md` in de repo-root
 
-### Fase 2 — Designsysteem
-- [ ] `theme.ts` met exact de tokens uit de handoff (kleuren, radii, schaduwen, typografie, spacing)
-- [ ] Fonts Baloo 2 / Comic Neue / Caveat via @expo-google-fonts
-- [ ] Primitives: Button, Pill, Card, Chip, StatusPill, SectionHeader, Avatar, Toggle, EmptyState, BottomSheet, Coachmark
-- [ ] `/dev/ui`-scherm met alle primitives
-- [ ] Animatie-helpers: tvzBounce, tvzIn, tvzPulse (reanimated)
+### Fase 2 — Designsysteem ✅ (2026-07-28)
+- [x] `src/theme/`: theme.ts (kleuren, radii, spacing, gradient), typography.ts, shadows.ts — exact de tokens uit de handoff
+- [x] Tekstschaal-provider voor de ouderen-modus (1,3×), door alle primitives gebruikt
+- [x] Fonts Baloo 2 (600/700/800), Comic Neue (400/700/italic), Caveat (500/600) via @expo-google-fonts, geladen in root-layout
+- [x] Primitives in `src/ui/`: TvzText, Button (primary/cta/outline/outlineOnDark/danger), Pill, Chip, StatusPill, Card (incl. dashed), SectionHeader, Avatar, Toggle, EmptyState, BottomSheet, Coachmark
+- [x] `/dev/ui`-scherm met alle primitives (incl. gradient-header, chatbubbels, live ouderen-modus-toggle)
+- [x] Animatie-helpers: tvzIn (FadeInDown 280ms), TvzBounce (2.6s-lus), PulseDot (1.8s pulse)
+- [x] Componenttests (Button, StatusPill, TvzText) — 11 tests groen
 
 ### Fase 3 — Datamodel en RLS
 - [ ] Migraties: profiles, circles, circle_members, invitations, tasks, task_drafts, task_logs, spontaneous_requests (PostGIS), request_offers, messages, notifications, forum_posts, forum_replies, forum_reports, broker_chats, broker_messages, subscriptions, audit_log

@@ -1,3 +1,4 @@
+import { Link } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
 // Tijdelijk startscherm — wordt in Fase 4 vervangen door de echte welkomflow.
@@ -13,6 +14,9 @@ export default function Index() {
       <View style={styles.stem} />
       <Text style={styles.wordmark}>thuisverzorgd</Text>
       <Text style={styles.tagline}>Hulp dichtbij, geregeld door de buurt</Text>
+      <Link href="/dev/ui" style={styles.devLink}>
+        <Text style={styles.devLinkText}>Bekijk designsysteem (dev)</Text>
+      </Link>
     </View>
   );
 }
@@ -57,5 +61,13 @@ const styles = StyleSheet.create({
     opacity: 0.85,
     fontSize: 15,
     marginTop: 8,
+  },
+  devLink: {
+    marginTop: 40,
+  },
+  devLinkText: {
+    color: '#8DC93F',
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
 });
