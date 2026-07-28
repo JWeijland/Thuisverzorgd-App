@@ -34,8 +34,26 @@ export default function AccountScreen() {
     if (Object.keys(next).length > 0) return;
 
     setBusy(true);
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Demo-accounts (@thuisverzorgd.dev) hebben geen echte mailbox en loggen
+    // direct in met het vaste demo-wachtwoord, zonder mailcode.
+    if (cleanEmail.endsWith('@thuisverzorgd.dev')) {
+      const { error: demoError } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password: 'DemoThuisverzorgd1!',
+      });
+      setBusy(false);
+      if (demoError) {
+        setErrors({ general: `${t('algemeen.foutTitel')}. ${t('algemeen.foutOpnieuw')}.` });
+        return;
+      }
+      router.replace('/');
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim().toLowerCase(),
+      email: cleanEmail,
       options: {
         emailRedirectTo: REDIRECT_URL,
         data: isLogin ? undefined : { name: name.trim() },
@@ -46,7 +64,7 @@ export default function AccountScreen() {
       setErrors({ general: `${t('algemeen.foutTitel')}. ${t('algemeen.foutOpnieuw')}.` });
       return;
     }
-    router.push({ pathname: '/check-mail', params: { email: email.trim().toLowerCase() } });
+    router.push({ pathname: '/check-mail', params: { email: cleanEmail } });
   }
 
   return (
