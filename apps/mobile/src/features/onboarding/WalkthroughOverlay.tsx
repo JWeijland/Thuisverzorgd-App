@@ -29,21 +29,33 @@ export function WalkthroughOverlay({ uid, role }: Props) {
 
   useEffect(() => {
     if (!uid || !role) return;
+    let cancelled = false;
     AsyncStorage.getItem(seenKey(uid)).then((seen) => {
-      if (!seen) {
-        start(role);
-      }
+      if (seen || cancelled) return;
+      // Even wachten tot de navigatie volledig staat: direct starten bij de
+      // allereerste render crashte productiebuilds.
+      setTimeout(() => {
+        if (!cancelled) start(role);
+      }, 1200);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [uid, role, start]);
 
   const steps = activeRole ? WALKTHROUGH_STEPS[activeRole] : [];
   const current = active ? steps[step] : undefined;
 
   useEffect(() => {
-    if (current) {
+    // Stap 0 wijst naar het rooster, waar de gebruiker al staat: niet navigeren.
+    if (!current || step === 0) return;
+    try {
       router.navigate(current.route as never);
+    } catch {
+      // navigatie is best effort; het wolkje wijst hoe dan ook naar de juiste tab
     }
-  }, [current]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current, step]);
 
   if (!active || !current || !uid) return null;
 

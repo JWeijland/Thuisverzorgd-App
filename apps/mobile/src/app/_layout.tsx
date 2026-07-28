@@ -20,6 +20,7 @@ import { NotificationGateway } from '@/features/notifications/NotificationGatewa
 import { AuthProvider } from '@/features/onboarding/useAuth';
 import { queryClient } from '@/lib/queryClient';
 import { TextScaleProvider } from '@/theme';
+import { ErrorBoundary } from '@/ui/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -46,14 +47,16 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TextScaleProvider>
-          <StatusBar style="light" />
-          <NotificationGateway />
-          <Stack screenOptions={{ headerShown: false }} />
-        </TextScaleProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TextScaleProvider>
+            <StatusBar style="light" />
+            <NotificationGateway />
+            <Stack screenOptions={{ headerShown: false }} />
+          </TextScaleProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
