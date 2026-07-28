@@ -95,7 +95,7 @@ export function useMessages(circleId: string | undefined) {
   useEffect(() => {
     if (!circleId) return;
     const channel = supabase
-      .channel(`messages-${circleId}`)
+      .channel(`messages-${circleId}-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {

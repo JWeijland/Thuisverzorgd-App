@@ -21,7 +21,7 @@ export function useNotifications() {
   useEffect(() => {
     if (!session) return;
     const channel = supabase
-      .channel('notifications')
+      .channel(`notifications-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {

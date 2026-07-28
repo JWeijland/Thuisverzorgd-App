@@ -174,7 +174,7 @@ export function useBrokerMessages(chatId: string | undefined) {
   useEffect(() => {
     if (!chatId) return;
     const channel = supabase
-      .channel(`broker-${chatId}`)
+      .channel(`broker-${chatId}-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         {
@@ -297,29 +297,49 @@ export function useResolveReport() {
   });
 }
 
-/** Presence: hoeveel hulpmakelaars zijn er nu online? Makelaars melden zich aan. */
+/**
+ * Presence: hoeveel hulpmakelaars zijn er nu online? Makelaars melden zich aan.
+ * Singleton-kanaal: de topicnaam moet voor iedereen gelijk zijn, maar binnen
+ * één app mag hetzelfde kanaal niet twee keer gesubscribed worden.
+ */
+type PresenceListener = (count: number) => void;
+let presenceChannel: ReturnType<typeof supabase.channel> | null = null;
+const presenceListeners = new Set<PresenceListener>();
+let presenceTracked = false;
+let presenceCount = 0;
+
+function ensurePresenceChannel(userId: string) {
+  if (presenceChannel) return presenceChannel;
+  presenceChannel = supabase.channel('online-makelaars', {
+    config: { presence: { key: userId } },
+  });
+  presenceChannel
+    .on('presence', { event: 'sync' }, () => {
+      presenceCount = Object.keys(presenceChannel!.presenceState()).length;
+      presenceListeners.forEach((listener) => listener(presenceCount));
+    })
+    .subscribe();
+  return presenceChannel;
+}
+
 export function useBrokerPresence(): number {
   const profile = useProfile();
   const { session } = useSession();
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(presenceCount);
   const isBroker = profile.data?.role === 'makelaar';
 
   useEffect(() => {
     if (!session) return;
-    const channel = supabase.channel('online-makelaars', {
-      config: { presence: { key: session.user.id } },
-    });
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        setCount(Object.keys(channel.presenceState()).length);
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED' && isBroker) {
-          await channel.track({ online: true });
-        }
-      });
+    const channel = ensurePresenceChannel(session.user.id);
+    presenceListeners.add(setCount);
+    const sync = setTimeout(() => setCount(presenceCount), 0);
+    if (isBroker && !presenceTracked) {
+      presenceTracked = true;
+      channel.track({ online: true }).catch(() => {});
+    }
     return () => {
-      supabase.removeChannel(channel);
+      clearTimeout(sync);
+      presenceListeners.delete(setCount);
     };
   }, [session, isBroker]);
 

@@ -47,7 +47,7 @@ export function useTasks(circleId: string | undefined, from: Date, to: Date) {
   useEffect(() => {
     if (!circleId) return;
     const channel = supabase
-      .channel(`tasks-${circleId}`)
+      .channel(`tasks-${circleId}-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'tasks', filter: `circle_id=eq.${circleId}` },

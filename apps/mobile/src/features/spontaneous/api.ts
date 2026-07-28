@@ -38,8 +38,10 @@ export type Offer = {
 function useSpontaneousRealtime() {
   const queryClient = useQueryClient();
   useEffect(() => {
+    // Unieke kanaalnaam per component: hetzelfde kanaal twee keer subscriben
+    // (BuurtScreen + VolunteerFlow) gooit een realtime-fout.
     const channel = supabase
-      .channel('spontaneous')
+      .channel(`spontaneous-${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'spontaneous_requests' },
