@@ -23,7 +23,7 @@ export default function WelkomScreen() {
           </View>
           <View style={styles.stem} />
           <TvzText preset="screenTitle" style={styles.wordmark}>
-            thuisverzorgd
+            Thuisverzorgd
           </TvzText>
           <TvzText preset="body" style={styles.tagline}>
             {t('welkom.tagline')}
