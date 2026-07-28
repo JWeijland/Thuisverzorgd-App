@@ -20,11 +20,14 @@ export default function RolkeuzeScreen() {
     if (!session || busy) return;
     setBusy(true);
     const { error } = await supabase.from('profiles').update({ role }).eq('id', session.user.id);
-    setBusy(false);
     if (!error) {
+      // Direct naar het doel navigeren (niet via '/'): voorkomt dat het
+      // rolkeuzescherm nogmaals verschijnt terwijl het profiel nog herlaadt.
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      router.replace('/');
+      router.replace(role === 'vrijwilliger' ? '/id-en-foto' : '/rooster');
+      return;
     }
+    setBusy(false);
   }
 
   return (

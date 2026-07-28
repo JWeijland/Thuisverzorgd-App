@@ -54,6 +54,8 @@ module.exports = ({ config }) => ({
       {
         photosPermission:
           'Thuisverzorgd gebruikt je fotobibliotheek voor je profielfoto en de eenmalige ID-check.',
+        cameraPermission:
+          'Thuisverzorgd gebruikt je camera om ter plekke een profielfoto of ID-foto te maken.',
       },
     ],
   ],

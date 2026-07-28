@@ -33,7 +33,7 @@ export default function KoppelcodeScreen() {
       return;
     }
     await queryClient.invalidateQueries({ queryKey: ['profile'] });
-    router.replace('/');
+    router.replace('/rooster');
   }
 
   return (

@@ -1,61 +1,87 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { decode } from 'base64-arraybuffer';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CreditCard, User } from 'lucide-react-native';
+import { Camera, CreditCard, Images, User } from 'lucide-react-native';
 
 import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, dashedBorder, radius, spacing } from '@/theme';
-import { Button, TvzText } from '@/ui';
+import { BottomSheet, Button, TvzText } from '@/ui';
 
 type Slot = 'id' | 'foto';
+type Picked = { uri: string; base64: string };
+
+const PICKER_OPTIONS = {
+  mediaTypes: 'images' as const,
+  quality: 0.6,
+  base64: true,
+};
 
 /**
  * ID + profielfoto (screen 18): alleen voor vrijwilligers, één keer bij registratie.
- * Beide verplicht voordat "De app in →" actief wordt. Alleen de bevestiging wordt
- * bewaard; het ID-document gaat naar een privé bucket met korte bewaartermijn (ADR-0005).
+ * Foto's via camera óf bibliotheek; upload als base64 (betrouwbaar in productie).
+ * Alleen de bevestiging wordt bewaard; het ID-document is kortlopend (ADR-0005).
  */
 export default function IdEnFotoScreen() {
   const { session } = useSession();
   const queryClient = useQueryClient();
-  const [uris, setUris] = useState<{ id?: string; foto?: string }>({});
+  const [picked, setPicked] = useState<{ id?: Picked; foto?: Picked }>({});
+  const [choosing, setChoosing] = useState<Slot | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
-  async function pick(slot: Slot) {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: 'images',
-      quality: 0.8,
+  function handleResult(slot: Slot, result: ImagePicker.ImagePickerResult) {
+    const asset = !result.canceled ? result.assets[0] : undefined;
+    if (asset?.base64) {
+      setPicked((prev) => ({ ...prev, [slot]: { uri: asset.uri, base64: asset.base64! } }));
+    }
+    setChoosing(null);
+  }
+
+  async function pickFromCamera(slot: Slot) {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      setChoosing(null);
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      ...PICKER_OPTIONS,
       allowsEditing: slot === 'foto',
       aspect: slot === 'foto' ? [1, 1] : undefined,
     });
-    if (!result.canceled && result.assets[0]) {
-      setUris((prev) => ({ ...prev, [slot]: result.assets[0]!.uri }));
-    }
+    handleResult(slot, result);
   }
 
-  async function upload(bucket: string, path: string, uri: string) {
-    const response = await fetch(uri);
-    const body = await response.arrayBuffer();
+  async function pickFromLibrary(slot: Slot) {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      ...PICKER_OPTIONS,
+      allowsEditing: slot === 'foto',
+      aspect: slot === 'foto' ? [1, 1] : undefined,
+    });
+    handleResult(slot, result);
+  }
+
+  async function upload(bucket: string, path: string, item: Picked) {
     const { error: uploadError } = await supabase.storage
       .from(bucket)
-      .upload(path, body, { contentType: 'image/jpeg', upsert: true });
+      .upload(path, decode(item.base64), { contentType: 'image/jpeg', upsert: true });
     if (uploadError) throw uploadError;
   }
 
   async function submit() {
-    if (!session || !uris.id || !uris.foto || busy) return;
+    if (!session || !picked.id || !picked.foto || busy) return;
     setBusy(true);
     setError(undefined);
     try {
       const uid = session.user.id;
-      await upload('id-documents', `${uid}/id.jpg`, uris.id);
-      await upload('avatars', `${uid}/avatar.jpg`, uris.foto);
+      await upload('id-documents', `${uid}/id.jpg`, picked.id);
+      await upload('avatars', `${uid}/avatar.jpg`, picked.foto);
       const { error: updateError } = await supabase
         .from('profiles')
         .update({
@@ -66,15 +92,14 @@ export default function IdEnFotoScreen() {
         .eq('id', uid);
       if (updateError) throw updateError;
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      router.replace('/');
+      router.replace('/rooster');
     } catch {
       setError(t('idFoto.uploadMislukt'));
-    } finally {
       setBusy(false);
     }
   }
 
-  const ready = !!uris.id && !!uris.foto;
+  const ready = !!picked.id && !!picked.foto;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -85,9 +110,13 @@ export default function IdEnFotoScreen() {
         </TvzText>
 
         <View style={styles.tiles}>
-          <Pressable accessibilityRole="button" onPress={() => pick('id')} style={styles.tile}>
-            {uris.id ? (
-              <Image source={{ uri: uris.id }} style={styles.preview} />
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setChoosing('id')}
+            style={styles.tile}
+          >
+            {picked.id ? (
+              <Image source={{ uri: picked.id.uri }} style={styles.preview} />
             ) : (
               <CreditCard color={colors.primaryMid} size={26} strokeWidth={2.2} />
             )}
@@ -98,9 +127,16 @@ export default function IdEnFotoScreen() {
               {t('idFoto.idUitleg')}
             </TvzText>
           </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => pick('foto')} style={styles.tile}>
-            {uris.foto ? (
-              <Image source={{ uri: uris.foto }} style={[styles.preview, styles.previewRound]} />
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setChoosing('foto')}
+            style={styles.tile}
+          >
+            {picked.foto ? (
+              <Image
+                source={{ uri: picked.foto.uri }}
+                style={[styles.preview, styles.previewRound]}
+              />
             ) : (
               <User color={colors.primaryMid} size={26} strokeWidth={2.2} />
             )}
@@ -135,6 +171,33 @@ export default function IdEnFotoScreen() {
           />
         </View>
       </View>
+
+      <BottomSheet
+        visible={!!choosing}
+        onClose={() => setChoosing(null)}
+        title={choosing === 'id' ? t('idFoto.idTitel') : t('idFoto.fotoTitel')}
+      >
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => choosing && pickFromCamera(choosing)}
+          style={styles.sourceRow}
+        >
+          <Camera color={colors.primary} size={22} strokeWidth={2.2} />
+          <TvzText preset="cardTitle" style={styles.sourceLabel}>
+            {t('idFoto.maakFoto')}
+          </TvzText>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => choosing && pickFromLibrary(choosing)}
+          style={styles.sourceRow}
+        >
+          <Images color={colors.primary} size={22} strokeWidth={2.2} />
+          <TvzText preset="cardTitle" style={styles.sourceLabel}>
+            {t('idFoto.uitBibliotheek')}
+          </TvzText>
+        </Pressable>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -206,5 +269,17 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: 'auto',
+  },
+  sourceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+    minHeight: 56,
+  },
+  sourceLabel: {
+    fontSize: 16,
   },
 });
