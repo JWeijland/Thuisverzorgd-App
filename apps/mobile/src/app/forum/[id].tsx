@@ -163,10 +163,11 @@ export default function ForumThreadScreen() {
           label={t('steun.meldenVerstuur')}
           variant="primary"
           onPress={() => {
+            if (!moderating) return;
             report.mutate(
               {
-                targetKind: moderating!.kind,
-                targetId: moderating!.targetId,
+                targetKind: moderating.kind,
+                targetId: moderating.targetId,
                 reason: reportReason.trim() || undefined,
               },
               {
@@ -184,7 +185,8 @@ export default function ForumThreadScreen() {
           variant="danger"
           style={styles.blockButton}
           onPress={() => {
-            block.mutate(moderating!.authorId, {
+            if (!moderating) return;
+            block.mutate(moderating.authorId, {
               onSuccess: () => {
                 setModerating(null);
                 setFeedback(t('steun.geblokkeerd'));

@@ -106,9 +106,10 @@ export function RoosterVrijwilliger() {
           size="lg"
           disabled={complete.isPending || note.trim().length === 0}
           onPress={() => {
-            cancelTaskReminder(completing!.id);
+            if (!completing) return;
+            cancelTaskReminder(completing.id);
             complete.mutate(
-              { taskId: completing!.id, note: note.trim() },
+              { taskId: completing.id, note: note.trim() },
               { onSuccess: closeSheet },
             );
           }}
@@ -119,7 +120,8 @@ export function RoosterVrijwilliger() {
           style={styles.sheetSecondary}
           disabled={complete.isPending}
           onPress={() => {
-            complete.mutate({ taskId: completing!.id }, { onSuccess: closeSheet });
+            if (!completing) return;
+            complete.mutate({ taskId: completing.id }, { onSuccess: closeSheet });
           }}
         />
         <Button
@@ -128,8 +130,9 @@ export function RoosterVrijwilliger() {
           style={styles.sheetSecondary}
           disabled={release.isPending}
           onPress={() => {
-            cancelTaskReminder(completing!.id);
-            release.mutate(completing!.id, { onSuccess: closeSheet });
+            if (!completing) return;
+            cancelTaskReminder(completing.id);
+            release.mutate(completing.id, { onSuccess: closeSheet });
           }}
         />
       </BottomSheet>

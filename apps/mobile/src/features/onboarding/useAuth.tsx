@@ -35,7 +35,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
+      // Dev-only: automatisch inloggen met testtokens uit .env (voor de simulator).
+      if (__DEV__ && !data.session && process.env.EXPO_PUBLIC_DEV_ACCESS_TOKEN) {
+        const { data: devData } = await supabase.auth.setSession({
+          access_token: process.env.EXPO_PUBLIC_DEV_ACCESS_TOKEN,
+          refresh_token: process.env.EXPO_PUBLIC_DEV_REFRESH_TOKEN ?? '',
+        });
+        setSession(devData.session);
+        setLoading(false);
+        return;
+      }
       setSession(data.session);
       setLoading(false);
     });

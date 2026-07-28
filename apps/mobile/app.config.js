@@ -60,7 +60,9 @@ module.exports = ({ config }) => ({
   ],
   experiments: {
     typedRoutes: true,
-    reactCompiler: true,
+    // React Compiler uit: de experimentele compiler evalueerde closure-afhankelijkheden
+    // (completing!.id) al tijdens het renderen en crashte productiebuilds.
+    reactCompiler: false,
   },
   updates: {
     url: 'https://u.expo.dev/fe37e87d-93d5-47bf-8414-2709177f8a0b',
