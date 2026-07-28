@@ -31,7 +31,8 @@
     "production": {
       "ios": {
         "appleId": "j.p.weijland@gmail.com",
-        "appleTeamId": "5QFB2FHYYQ"
+        "appleTeamId": "5QFB2FHYYQ",
+        "ascAppId": "6795415722"
       }
     }
   }
