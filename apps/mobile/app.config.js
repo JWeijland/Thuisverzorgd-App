@@ -13,6 +13,10 @@ module.exports = ({ config }) => ({
     bundleIdentifier: 'nl.thuisverzorgd.app',
     supportsTablet: false,
     icon: './assets/expo.icon',
+    infoPlist: {
+      // Alleen standaard HTTPS-encryptie; scheelt een exportvraag per TestFlight-build.
+      ITSAppUsesNonExemptEncryption: false,
+    },
   },
   android: {
     package: 'nl.thuisverzorgd.app',
@@ -56,6 +60,12 @@ module.exports = ({ config }) => ({
   experiments: {
     typedRoutes: true,
     reactCompiler: true,
+  },
+  updates: {
+    url: 'https://u.expo.dev/fe37e87d-93d5-47bf-8414-2709177f8a0b',
+  },
+  runtimeVersion: {
+    policy: 'appVersion',
   },
   extra: {
     eas: {
