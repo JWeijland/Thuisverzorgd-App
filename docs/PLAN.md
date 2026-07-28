@@ -145,6 +145,12 @@
 - RevenueCat + Apple IAP (ADR-0002)
 - Agenda-koppeling (EventKit), Maestro e2e-flows, typ-indicator makelaar-chat, echte brand-app-iconen
 
+## Actuele stand (overdracht, 28-07-2026 einde dag)
+- App staat op TestFlight en werkt op het toestel van de opdrachtgever; login via 6-cijferige code uit de mail (magic link werkt ook). JS-fixes gaan via `eas update --channel production --environment production --platform ios`; native wijzigingen vergen een nieuwe build.
+- Productie-crashes opgelost: env vars in EAS (build + update-environments), robuuste magic-link callback, React Compiler UIT (evalueerde `x!.id` in handlers tijdens render), realtime-kanalen uniek per component, presence als singleton, storage-policies voor ID-upsert.
+- Reproduceren/testen kan lokaal: `npx expo start --ios --go` + dev-autologin via `EXPO_PUBLIC_DEV_ACCESS_TOKEN`/`REFRESH` in `.env` (zie useAuth.tsx, alleen __DEV__). Lokale `expo run:ios` faalt op spaties in het pad — Expo Go gebruiken.
+- **Direct te doen:** gebruiker test de realtime-fix; daarna verse iOS-build + submit (echte app-icoon + NL-camerateksten zitten dan ingebakken), daarna Android-build, Sentry, App Store-teksten.
+
 ## Voortgangslog
 - 2026-07-27: Repo + GitHub opgezet, ANALYSE.md af, vragenronde beantwoord, Supabase-project aangemaakt (`pfvxgzosntzzhydzzkaj`). Fase 1 gestart.
 
