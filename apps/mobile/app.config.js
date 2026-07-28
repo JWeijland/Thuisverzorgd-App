@@ -1,6 +1,5 @@
-import type { ConfigContext, ExpoConfig } from 'expo/config';
-
-export default ({ config }: ConfigContext): ExpoConfig => ({
+// Bewust JavaScript (geen .ts): de configlader van eas-cli struikelt over TypeScript 6.
+module.exports = ({ config }) => ({
   ...config,
   name: 'Thuisverzorgd',
   slug: 'thuisverzorgd',
