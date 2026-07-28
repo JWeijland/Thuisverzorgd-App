@@ -93,8 +93,9 @@ export default function IdEnFotoScreen() {
       if (updateError) throw updateError;
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
       router.replace('/rooster');
-    } catch {
-      setError(t('idFoto.uploadMislukt'));
+    } catch (err) {
+      const detail = err instanceof Error ? ` (${err.message})` : '';
+      setError(`${t('idFoto.uploadMislukt')}${detail}`);
       setBusy(false);
     }
   }
