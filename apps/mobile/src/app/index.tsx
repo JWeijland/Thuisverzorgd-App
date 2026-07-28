@@ -1,9 +1,10 @@
 import { Redirect } from 'expo-router';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { getStartRoute } from '@/features/onboarding/startRoute';
 import { useProfile, useSession } from '@/features/onboarding/useAuth';
 import { colors } from '@/theme';
+import { TvzLoader } from '@/ui/TvzLoader';
 
 /** Startpunt: stuurt door naar welkom, rolkeuze, ID-check of de app zelf. */
 export default function Index() {
@@ -13,7 +14,7 @@ export default function Index() {
   if (loading || (session && profile.isLoading)) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator color={colors.white} />
+        <TvzLoader onDark />
       </View>
     );
   }
