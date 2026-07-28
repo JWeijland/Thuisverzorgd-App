@@ -149,7 +149,7 @@
 - 2026-07-27: Repo + GitHub opgezet, ANALYSE.md af, vragenronde beantwoord, Supabase-project aangemaakt (`pfvxgzosntzzhydzzkaj`). Fase 1 gestart.
 
 ## Open punten / niet vergeten
-- Apple team-ID invullen zodra bekend (developer.apple.com → Membership → Team ID).
+- Apple team-ID: 5QFB2FHYYQ (Individual) — staat in eas.json.
 - Docker installeren voor lokale Supabase-stack (`supabase start`) — tot die tijd migraties via `supabase db push` naar cloud.
 - RevenueCat/IAP-implementatie (besluit #5) — vóór publieke release met betaald abonnement.
 - Universal links definitief domein (nu vercel-URL).
