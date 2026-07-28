@@ -12,7 +12,6 @@ module.exports = ({ config }) => ({
   ios: {
     bundleIdentifier: 'nl.thuisverzorgd.app',
     supportsTablet: false,
-    icon: './assets/expo.icon',
     infoPlist: {
       // Alleen standaard HTTPS-encryptie; scheelt een exportvraag per TestFlight-build.
       ITSAppUsesNonExemptEncryption: false,
