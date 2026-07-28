@@ -17,10 +17,13 @@
   },
   "checkMail": {
     "titel": "Kijk in je mail",
-    "uitleg": "We hebben een inloglink gestuurd naar {email}. Tik op de link en je bent binnen.",
+    "uitleg": "We hebben een mail gestuurd naar {email} met een inlogcode van 6 cijfers.",
+    "codeLabel": "Vul de code uit de mail in",
+    "codeKnop": "Log mij in",
+    "codeFout": "Deze code klopt niet (meer). Kijk in de nieuwste mail of vraag een nieuwe aan.",
     "nietOntvangen": "Niets ontvangen? Kijk in je spam of",
-    "opnieuw": "stuur de link opnieuw",
-    "opnieuwVerstuurd": "We hebben de link opnieuw gestuurd."
+    "opnieuw": "stuur een nieuwe code",
+    "opnieuwVerstuurd": "We hebben een nieuwe code gestuurd. Pak de nieuwste mail."
   },
   "callback": {
     "bezig": "Je wordt ingelogd...",

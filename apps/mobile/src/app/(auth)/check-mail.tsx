@@ -6,20 +6,45 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, spacing } from '@/theme';
-import { Card, EmptyState, TvzText } from '@/ui';
+import { Button, Card, EmptyState, TextField, TvzText } from '@/ui';
 
-/** Kijk in je mail (screen 02b): magic-link bevestiging. */
+/**
+ * Kijk in je mail (screen 02b): magic-link bevestiging + invoer van de
+ * 6-cijferige code uit dezelfde mail (robuuster dan de link: geen deeplink
+ * of verlopen-link-gedoe, en werkt ook als de mail op een ander apparaat staat).
+ */
 export default function CheckMailScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
   const [resent, setResent] = useState(false);
+  const [code, setCode] = useState('');
+  const [error, setError] = useState<string | undefined>();
+  const [busy, setBusy] = useState(false);
+
+  async function verifyCode() {
+    if (!email || busy) return;
+    setBusy(true);
+    setError(undefined);
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email,
+      token: code.trim(),
+      type: 'email',
+    });
+    setBusy(false);
+    if (verifyError) {
+      setError(t('checkMail.codeFout'));
+      return;
+    }
+    router.replace('/');
+  }
 
   async function resend() {
     if (!email) return;
+    setResent(true);
+    setError(undefined);
     await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: 'tvz://auth/callback' },
     });
-    setResent(true);
   }
 
   return (
@@ -32,6 +57,23 @@ export default function CheckMailScreen() {
           <EmptyState
             title={t('checkMail.titel')}
             body={t('checkMail.uitleg', { email: email ?? '' })}
+          />
+          <TextField
+            label={t('checkMail.codeLabel')}
+            placeholder="123456"
+            value={code}
+            onChangeText={(value) => setCode(value.replace(/\D/g, ''))}
+            keyboardType="number-pad"
+            maxLength={6}
+            error={error}
+            style={styles.codeInput}
+          />
+          <Button
+            label={busy ? t('algemeen.laden') : t('checkMail.codeKnop')}
+            variant="cta"
+            size="lg"
+            disabled={busy || code.trim().length !== 6}
+            onPress={verifyCode}
           />
           <View style={styles.resendRow}>
             {resent ? (
@@ -71,8 +113,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.lg,
   },
+  codeInput: {
+    textAlign: 'center',
+    fontSize: 24,
+    letterSpacing: 6,
+  },
   resendRow: {
-    paddingBottom: spacing.md,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
     paddingHorizontal: spacing.md,
   },
   center: {
