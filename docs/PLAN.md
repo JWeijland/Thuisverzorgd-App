@@ -145,6 +145,15 @@
 - RevenueCat + Apple IAP (ADR-0002)
 - Agenda-koppeling (EventKit), Maestro e2e-flows, typ-indicator makelaar-chat, echte brand-app-iconen
 
+## Feedbackronde 29-07-2026 ✅ (12 punten, live via EAS-update)
+- Taakbanner klapt uit naar detailkaart: afronden pas vanaf de afgesproken tijd (server-side afgedwongen in `complete_task`) en terugdraaien via nieuwe RPC `uncomplete_task`
+- Ledenlijst zonder "gekoppeld via code"; hulpvrager met blauw randje; profielfoto's overal (ProfileAvatar + signed URLs) en instelbaar op de profielpagina
+- Typebalk onderaan forum, forumthread en makelaarchat; keyboard-offset gefixt (`useKeyboardOpen`); hulpmakelaars met echte foto's (`v_makelaars` + storage-policy)
+- Kringchat: vaste bubbeltint per afzender (`chatTintFor`)
+- Kaart: beschikbaarheidsknop voor spontane hulp (`profiles.spontaneous_available`); teller-pil opent lijst op afstand gesorteerd
+- GradientHeader ook op planning- en profielpagina; weekstrip-dagen filteren het rooster; tabbalk met korte namen; rondleiding uitgebreid (5/4/3 stappen)
+- Beschikbaarheid: default alle dagen aan, per week instelbaar voor 4 weken (`availability_weeks`; het rooster-voorstel-algoritme leest die kolom nog niet, zie open punten)
+
 ## Actuele stand (overdracht, 28-07-2026 einde dag)
 - App staat op TestFlight en werkt op het toestel van de opdrachtgever; login via 6-cijferige code uit de mail (magic link werkt ook). JS-fixes gaan via `eas update --channel production --environment production --platform ios`; native wijzigingen vergen een nieuwe build.
 - Productie-crashes opgelost: env vars in EAS (build + update-environments), robuuste magic-link callback, React Compiler UIT (evalueerde `x!.id` in handlers tijdens render), realtime-kanalen uniek per component, presence als singleton, storage-policies voor ID-upsert.
@@ -160,3 +169,4 @@
 - RevenueCat/IAP-implementatie (besluit #5) — vóór publieke release met betaald abonnement.
 - Universal links definitief domein (nu vercel-URL).
 - Moderatie-e-mailadres bepalen.
+- `availability_weeks` meenemen in taakvoorstellen/notificaties (nu alleen UI + opslag).
