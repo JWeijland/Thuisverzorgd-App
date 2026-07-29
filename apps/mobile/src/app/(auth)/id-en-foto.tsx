@@ -105,6 +105,14 @@ export default function IdEnFotoScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('algemeen.terug')}
+          onPress={() => router.replace('/rolkeuze')}
+          style={styles.back}
+        >
+          <TvzText preset="cardTitle">←</TvzText>
+        </Pressable>
         <TvzText preset="screenTitle">{t('idFoto.titel')}</TvzText>
         <TvzText preset="secondary" style={styles.uitleg}>
           {t('idFoto.uitleg')}
@@ -211,6 +219,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: spacing.screen,
+  },
+  back: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.surfaceAlt,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.lg,
   },
   uitleg: {
     marginTop: spacing.xs,

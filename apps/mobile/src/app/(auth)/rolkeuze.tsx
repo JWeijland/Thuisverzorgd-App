@@ -19,7 +19,9 @@ export default function RolkeuzeScreen() {
   async function chooseRole(role: 'beheerder' | 'vrijwilliger') {
     if (!session || busy) return;
     setBusy(true);
-    const { error } = await supabase.from('profiles').update({ role }).eq('id', session.user.id);
+    // Via de RPC, zodat ook iemand die al een rol koos (en bijv. terugkwam
+    // vanaf het ID-scherm) hier alsnog van rol kan wisselen.
+    const { error } = await supabase.rpc('change_role', { p_role: role });
     if (!error) {
       // Direct naar het doel navigeren (niet via '/'): voorkomt dat het
       // rolkeuzescherm nogmaals verschijnt terwijl het profiel nog herlaadt.
