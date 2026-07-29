@@ -3,13 +3,10 @@ import { Image, StyleSheet, View } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
 import Svg, {
   Circle as SvgCircle,
-  Defs,
   Ellipse,
   G,
-  LinearGradient,
   Path,
   Rect,
-  Stop,
   Text as SvgText,
 } from 'react-native-svg';
 
@@ -50,18 +47,20 @@ export type { Region };
 export { Marker };
 
 /**
- * Druppelmarkers naar het handoff-ontwerp (docs/design/markers/): viewBox 52x66,
- * punt van de druppel op y≈53. De blur-filters uit de SVG's rendert
- * react-native-svg niet; de grondschaduw is daarom een vlakke ellips.
+ * Druppelmarkers naar het handoff-ontwerp 1d ("druppel met labelpill", zonder
+ * de labelpill): kleinere druppels; hulpkring wit met twee stipjes, directe
+ * hulp navy met groene bliksem. ViewBox 52x66, punt van de druppel op y≈53.
+ * De blur-filters uit de SVG's rendert react-native-svg niet; de grondschaduw
+ * is daarom een vlakke ellips.
  */
 const PIN_PATH =
   'M26 2.75a20.75 20.75 0 0 1 14.67 35.42L26 52.84 11.33 38.17A20.75 20.75 0 0 1 26 2.75z';
-const PIN_W = 44;
-const PIN_H = 56;
+const PIN_W = 34;
+const PIN_H = 43;
 // De punt van de druppel (y 52.84 van 66) hoort op de coördinaat te staan.
 const PIN_ANCHOR_Y = 52.84 / 66;
 
-/** Hulpkring: navy druppel met twee buurtgenoten, optioneel "+N plekken vrij". */
+/** Hulpkring: witte druppel met navy rand en twee stipjes (blauw + groen). */
 export function KringMarker({
   lat,
   lon,
@@ -82,35 +81,24 @@ export function KringMarker({
       centerOffset={{ x: 0, y: (0.5 - PIN_ANCHOR_Y) * PIN_H }}
     >
       <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
-        <Defs>
-          <LinearGradient id="kringPin" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor="#2A6CB0" />
-            <Stop offset="1" stopColor="#1A4878" />
-          </LinearGradient>
-        </Defs>
-        <Ellipse cx={26} cy={61} rx={11} ry={3.5} fill="#112F50" opacity={0.15} />
-        <Path d={PIN_PATH} fill="url(#kringPin)" stroke={colors.white} strokeWidth={2.5} />
-        <SvgCircle cx={26} cy={24} r={13.5} fill={colors.white} />
-        <G translate="14 12">
-          <SvgCircle cx={8.2} cy={9} r={3.1} fill="#2A6CB0" />
-          <SvgCircle cx={15.8} cy={9} r={3.1} fill="#8DC93F" />
-          <Path d="M2.6 22c0-3.2 2.5-5.8 5.6-5.8s5.6 2.6 5.6 5.8" fill="#2A6CB0" />
-          <Path d="M10.2 22c0-3.2 2.5-5.8 5.6-5.8s5.6 2.6 5.6 5.8" fill="#8DC93F" />
-        </G>
+        <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill="#112F50" opacity={0.15} />
+        <Path d={PIN_PATH} fill={colors.white} stroke={colors.primary} strokeWidth={4} />
+        <Rect x={13} y={20.5} width={11} height={8} rx={4} fill={colors.primaryMid} />
+        <Rect x={28} y={20.5} width={11} height={8} rx={4} fill={colors.accent} />
         {plekkenVrij > 0 ? (
-          <G translate="31 1">
+          <G translate="30 0">
             <Rect
-              width={20}
-              height={20}
-              rx={10}
+              width={22}
+              height={22}
+              rx={11}
               fill="#8DC93F"
               stroke={colors.white}
-              strokeWidth={2}
+              strokeWidth={2.5}
             />
             <SvgText
-              x={10}
-              y={14.2}
-              fontSize={11}
+              x={11}
+              y={15.7}
+              fontSize={12.5}
               fontWeight="700"
               fill="#112F50"
               textAnchor="middle"
@@ -155,7 +143,7 @@ export function BuddyMarker({
   );
 }
 
-/** Directe hulp: groene druppel met hartje en een zachte gloed eromheen. */
+/** Directe hulp: navy druppel met groene bliksem en een zachte gloed eromheen. */
 export function RequestMarker({
   lat,
   lon,
@@ -174,29 +162,10 @@ export function RequestMarker({
       centerOffset={{ x: 0, y: (0.5 - PIN_ANCHOR_Y) * PIN_H }}
     >
       <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
-        <Defs>
-          <LinearGradient id="requestPin" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor="#9AD44E" />
-            <Stop offset="1" stopColor="#73B02B" />
-          </LinearGradient>
-        </Defs>
-        <Ellipse cx={26} cy={61} rx={11} ry={3.5} fill="#112F50" opacity={0.15} />
-        <SvgCircle cx={26} cy={24} r={21} fill="#8DC93F" opacity={0.18} />
-        <Path d={PIN_PATH} fill="url(#requestPin)" stroke={colors.white} strokeWidth={2.5} />
-        <SvgCircle cx={26} cy={24} r={13.5} fill={colors.white} />
-        <G translate="14.5 12.5">
-          <Path
-            d="M12 21c-3.6-2.2-7-5-7-8.6A4.4 4.4 0 0 1 12 9.4a4.4 4.4 0 0 1 7 3c0 3.6-3.4 6.4-7 8.6z"
-            fill="#73B02B"
-          />
-          <Path
-            d="M8.9 6.6c1.1-1 2.6-1 3.6.1M15.4 6.6c-1.1-1-2.6-1-3.6.1"
-            stroke="#73B02B"
-            strokeWidth={1.7}
-            strokeLinecap="round"
-            fill="none"
-          />
-        </G>
+        <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill="#112F50" opacity={0.15} />
+        <SvgCircle cx={26} cy={24} r={22} fill="#8DC93F" opacity={0.18} />
+        <Path d={PIN_PATH} fill="#112F50" stroke={colors.white} strokeWidth={3.5} />
+        <Path d="M29.5 10.5 L17.5 27.5 h6.5 L22.5 39 L34.5 22.5 h-6.5 Z" fill={colors.accent} />
       </Svg>
     </Marker>
   );
