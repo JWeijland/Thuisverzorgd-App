@@ -1,5 +1,4 @@
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useCircleMembers, useMyCircle } from '@/features/circles/api';
 import { useTasks } from '@/features/tasks/api';
@@ -8,7 +7,7 @@ import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { formatHumanDate, formatTime, greetingKey, isoWeekDays, toDateString } from '@/lib/dates';
 import { colors, radius, shadows, spacing } from '@/theme';
-import { Avatar, Card, EmptyState, PulseDot, TvzText } from '@/ui';
+import { Avatar, Card, EmptyState, GradientHeader, PulseDot, TvzText } from '@/ui';
 
 /**
  * Rooster · hulpvrager (screen 24): grote weergave. "Anna is nu bij je" met
@@ -48,15 +47,12 @@ export function RoosterHulpvrager() {
   const beheerder = (members.data ?? []).find((member) => member.member_role === 'beheerder');
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <View style={styles.safe}>
+      <GradientHeader
+        title={t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
+        subtitle={formatHumanDate(now)}
+      />
       <ScrollView contentContainerStyle={styles.container}>
-        <TvzText preset="screenTitle" style={styles.title}>
-          {t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
-        </TvzText>
-        <TvzText preset="body" style={styles.date}>
-          {formatHumanDate(now)}
-        </TvzText>
-
         {current?.claimer ? (
           <View style={[styles.nowCard, shadows.card]}>
             <View style={styles.nowRow}>
@@ -118,21 +114,15 @@ export function RoosterHulpvrager() {
           </>
         ) : null}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
+  safe: { flex: 1, backgroundColor: colors.bg },
   container: {
     padding: spacing.screen,
     paddingBottom: 110,
-  },
-  title: {
-    fontSize: 29,
-  },
-  date: {
-    marginBottom: spacing.lg,
   },
   nowCard: {
     backgroundColor: colors.white,

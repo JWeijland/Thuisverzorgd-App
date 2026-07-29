@@ -11,12 +11,13 @@ import {
   type Member,
 } from '@/features/circles/api';
 import { ChatView } from '@/features/circles/ChatView';
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useTasks } from '@/features/tasks/api';
 import { computeWorkload } from '@/features/tasks/logic';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { colors, gradient, radius, spacing } from '@/theme';
-import { Avatar, Button, Card, EmptyState, StatusPill, TextField, TvzText } from '@/ui';
+import { Button, Card, EmptyState, StatusPill, TextField, TvzText } from '@/ui';
 
 const STATUS_MAP: Record<Member['status'], { key: string; kind: 'success' | 'warn' | 'info' }> = {
   actief: { key: 'kring.statusActief', kind: 'success' },
@@ -199,10 +200,18 @@ function KringDetail({
                 : member.member_role === 'beheerder'
                   ? t('kring.rolBeheerder')
                   : t('kring.rolVrijwilliger');
+            const isHulpvrager = member.member_role === 'hulpvrager';
             return (
-              <Card key={member.id} style={styles.memberCard}>
+              <Card
+                key={member.id}
+                style={[styles.memberCard, isHulpvrager && styles.hulpvragerCard]}
+              >
                 <View style={styles.memberRow}>
-                  <Avatar name={member.profile?.name ?? '?'} />
+                  <ProfileAvatar
+                    name={member.profile?.name ?? '?'}
+                    avatarPath={member.profile?.avatar_path}
+                    backgroundColor={isHulpvrager ? colors.primaryDark : undefined}
+                  />
                   <View style={styles.memberInfo}>
                     <TvzText preset="cardTitle">{member.profile?.name ?? ''}</TvzText>
                     <TvzText preset="secondary">{roleLabel}</TvzText>
@@ -351,6 +360,11 @@ const styles = StyleSheet.create({
   },
   memberCard: {
     paddingVertical: spacing.md,
+  },
+  hulpvragerCard: {
+    borderWidth: 1.5,
+    borderColor: colors.primaryMid,
+    backgroundColor: colors.tintBlue,
   },
   memberRow: {
     flexDirection: 'row',

@@ -11,8 +11,8 @@ export type WalkthroughStep = {
 };
 
 /**
- * Rondleiding per rol: beheerder 4 stappen, vrijwilliger 3, hulpvrager 2.
- * Overslaan kan altijd (eis uit de handoff).
+ * Rondleiding per rol: beheerder 5 stappen, vrijwilliger 4, hulpvrager 3.
+ * Elk wolkje legt uit welke knop wat doet. Overslaan kan altijd (eis handoff).
  */
 export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
   beheerder: [
@@ -40,6 +40,12 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       tabIndex: 3,
       route: '/steun',
     },
+    {
+      titleKey: 'rondleiding.beheerder5Titel',
+      textKey: 'rondleiding.beheerder5Tekst',
+      tabIndex: 4,
+      route: '/profiel',
+    },
   ],
   vrijwilliger: [
     {
@@ -57,6 +63,12 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
     {
       titleKey: 'rondleiding.vrijwilliger3Titel',
       textKey: 'rondleiding.vrijwilliger3Tekst',
+      tabIndex: 3,
+      route: '/steun',
+    },
+    {
+      titleKey: 'rondleiding.vrijwilliger4Titel',
+      textKey: 'rondleiding.vrijwilliger4Tekst',
       tabIndex: 4,
       route: '/profiel',
     },
@@ -73,6 +85,12 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       textKey: 'rondleiding.hulpvrager2Tekst',
       tabIndex: 2,
       route: '/kring',
+    },
+    {
+      titleKey: 'rondleiding.hulpvrager3Titel',
+      textKey: 'rondleiding.hulpvrager3Tekst',
+      tabIndex: 4,
+      route: '/profiel',
     },
   ],
 };

@@ -13,7 +13,8 @@ import { Send } from 'lucide-react-native';
 import { useMessages, useSendMessage } from '@/features/circles/api';
 import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
-import { colors, radius, spacing } from '@/theme';
+import { useKeyboardOpen } from '@/lib/keyboard';
+import { chatTintFor, colors, radius, spacing } from '@/theme';
 import { TvzText } from '@/ui';
 
 type Props = {
@@ -27,6 +28,7 @@ export function ChatView({ circleId, roleSuffix }: Props) {
   const { session } = useSession();
   const messages = useMessages(circleId);
   const send = useSendMessage(circleId);
+  const keyboardOpen = useKeyboardOpen();
   const [draft, setDraft] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
@@ -45,14 +47,21 @@ export function ChatView({ circleId, roleSuffix }: Props) {
     <KeyboardAvoidingView
       style={styles.fill}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={90}
     >
       <ScrollView ref={scrollRef} contentContainerStyle={styles.list}>
         {(messages.data ?? []).map((message) => {
           const own = message.sender_id === session?.user.id;
           const name = message.sender?.name.split(' ')[0] ?? '';
           return (
-            <View key={message.id} style={[styles.bubble, own ? styles.own : styles.other]}>
+            <View
+              key={message.id}
+              style={[
+                styles.bubble,
+                own ? styles.own : styles.other,
+                // Per kringgenoot een vaste eigen tint, zodat je afzenders kunt onderscheiden.
+                !own && { backgroundColor: chatTintFor(message.sender_id) },
+              ]}
+            >
               <TvzText preset="meta" style={styles.sender}>
                 {name}
                 {roleSuffix ? roleSuffix(message.sender_id) : ''}
@@ -64,7 +73,7 @@ export function ChatView({ circleId, roleSuffix }: Props) {
           );
         })}
       </ScrollView>
-      <View style={styles.inputRow}>
+      <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
         <TextInput
           value={draft}
           onChangeText={setDraft}
@@ -128,7 +137,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     paddingHorizontal: spacing.screen,
-    paddingBottom: spacing.md,
+    // Boven de zwevende tabbalk uitkomen zolang het toetsenbord dicht is.
+    paddingBottom: 100,
+  },
+  inputRowKeyboard: {
+    paddingBottom: spacing.sm,
   },
   input: {
     flex: 1,

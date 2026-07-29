@@ -14,10 +14,12 @@ export type Profile = {
   id_verified: boolean;
   vacation_mode: boolean;
   pool_opt_in: boolean;
+  spontaneous_available: boolean;
   large_text: boolean;
   helped_count: number;
   notification_prefs: Record<string, boolean>;
   availability: string[];
+  availability_weeks: Record<string, string[]>;
   calendar_sync: boolean;
 };
 
@@ -74,7 +76,7 @@ export function useProfile() {
       const { data, error } = await supabase
         .from('profiles')
         .select(
-          'id, role, name, email, tvz_id, avatar_path, id_verified, vacation_mode, pool_opt_in, large_text, helped_count, notification_prefs, availability, calendar_sync',
+          'id, role, name, email, tvz_id, avatar_path, id_verified, vacation_mode, pool_opt_in, spontaneous_available, large_text, helped_count, notification_prefs, availability, availability_weeks, calendar_sync',
         )
         .eq('id', session!.user.id)
         .single();

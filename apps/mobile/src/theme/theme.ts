@@ -44,6 +44,20 @@ export const colors = {
   chatOther: '#EAF5D8',
 } as const;
 
+/**
+ * Zachte bubbeltinten voor kringgenoten in de chat: iedere afzender krijgt
+ * (op basis van zijn id) een vaste eigen tint, zodat je berichten van
+ * verschillende mensen in één oogopslag uit elkaar houdt.
+ */
+export const chatTints = ['#EAF5D8', '#FDF0DC', '#EFE6F7', '#DFF2F0', '#FBE8E8'] as const;
+
+/** Deterministische tint voor een afzender (zelfde id → altijd dezelfde kleur). */
+export function chatTintFor(senderId: string): string {
+  let sum = 0;
+  for (let i = 0; i < senderId.length; i += 1) sum = (sum + senderId.charCodeAt(i)) % 997;
+  return chatTints[sum % chatTints.length]!;
+}
+
 /** Standaard-gradient (headers, welkom, videocall): 115deg primaryDark → primaryMid. */
 export const gradient = {
   colors: [colors.primaryDark, colors.primaryMid] as [string, string],

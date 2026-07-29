@@ -54,7 +54,6 @@ export function WalkthroughOverlay({ uid, role }: Props) {
     } catch {
       // navigatie is best effort; het wolkje wijst hoe dan ook naar de juiste tab
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, step]);
 
   if (!active || !current || !uid) return null;

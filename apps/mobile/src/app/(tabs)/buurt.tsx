@@ -1,11 +1,12 @@
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search } from 'lucide-react-native';
+import { Search, Zap } from 'lucide-react-native';
 import type MapView from 'react-native-maps';
 
 import { useMapBuddies, useMapCircles } from '@/features/map/api';
+import { useUpdateProfile } from '@/features/subscription/api';
 import {
   BuddyMarker,
   KringMarker,
@@ -16,12 +17,12 @@ import {
 } from '@/features/map/TvzMap';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { useOpenRequests, type OpenRequest } from '@/features/spontaneous/api';
-import { RequesterFlow } from '@/features/spontaneous/RequesterFlow';
+import { REQUEST_TYPE_LABEL, RequesterFlow } from '@/features/spontaneous/RequesterFlow';
 import { VolunteerFlow } from '@/features/spontaneous/VolunteerFlow';
-import { countInRegion, DEFAULT_REGION, type LatLng } from '@/lib/geo';
+import { countInRegion, DEFAULT_REGION, formatDistance, haversineKm, type LatLng } from '@/lib/geo';
 import { t } from '@/i18n';
 import { colors, radius, shadows, spacing } from '@/theme';
-import { Chip, TvzText } from '@/ui';
+import { BottomSheet, Chip, PulseDot, TvzText } from '@/ui';
 
 /** Buurt (screens 08/20/21): kaart met kringen, buddy's en directe hulpvragen. */
 export default function BuurtScreen() {
@@ -31,6 +32,7 @@ export default function BuurtScreen() {
 
   const circles = useMapCircles();
   const requests = useOpenRequests();
+  const update = useUpdateProfile();
   const [showBuddies, setShowBuddies] = useState(false);
   const buddies = useMapBuddies(!isVolunteer && showBuddies);
 
@@ -39,6 +41,9 @@ export default function BuurtScreen() {
   const [ownLocation, setOwnLocation] = useState<LatLng | null>(null);
   const [query, setQuery] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<OpenRequest | null>(null);
+  const [listOpen, setListOpen] = useState(false);
+
+  const available = profile.data?.spontaneous_available ?? true;
 
   useEffect(() => {
     Location.requestForegroundPermissionsAsync().then(async ({ status }) => {
@@ -60,9 +65,36 @@ export default function BuurtScreen() {
   );
   const suggestions = query.trim().length > 0 ? circleList.slice(0, 4) : [];
 
-  const requestList = (requests.data ?? []).filter(
-    (request) => request.lat != null && request.lon != null,
-  );
+  // Niet beschikbaar? Dan blijven spontane aanvragen voor deze vrijwilliger van de kaart.
+  const requestList =
+    isVolunteer && !available
+      ? []
+      : (requests.data ?? []).filter((request) => request.lat != null && request.lon != null);
+
+  const distanceTo = (point: LatLng): number | null =>
+    ownLocation ? haversineKm(ownLocation, point) : null;
+  const sortedRequests = [...requestList].sort((a, b) => {
+    if (!ownLocation) return 0;
+    return (
+      haversineKm(ownLocation, { lat: a.lat!, lon: a.lon! }) -
+      haversineKm(ownLocation, { lat: b.lat!, lon: b.lon! })
+    );
+  });
+  const sortedCircles = [...circleList].sort((a, b) => {
+    if (!ownLocation) return 0;
+    return (
+      haversineKm(ownLocation, { lat: a.lat, lon: a.lon }) -
+      haversineKm(ownLocation, { lat: b.lat, lon: b.lon })
+    );
+  });
+
+  function focusOn(lat: number, lon: number) {
+    setListOpen(false);
+    mapRef.current?.animateToRegion(
+      { latitude: lat, longitude: lon, latitudeDelta: 0.03, longitudeDelta: 0.02 },
+      500,
+    );
+  }
 
   const circlesInView = countInRegion(
     circleList.map((circle) => ({ lat: circle.lat, lon: circle.lon })),
@@ -160,12 +192,42 @@ export default function BuurtScreen() {
         ) : null}
 
         {isVolunteer ? (
-          <View style={[styles.teller, shadows.card]}>
-            <View style={styles.tellerDot} />
-            <TvzText preset="meta" style={styles.tellerText}>
-              {tellerText}
-            </TvzText>
-          </View>
+          <>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={tellerText}
+              onPress={() => setListOpen(true)}
+              style={[styles.teller, shadows.card]}
+            >
+              <View style={styles.tellerDot} />
+              <TvzText preset="meta" style={styles.tellerText}>
+                {tellerText}
+              </TvzText>
+              <TvzText preset="meta" style={styles.tellerChevron}>
+                ⌄
+              </TvzText>
+            </Pressable>
+            <Pressable
+              accessibilityRole="switch"
+              accessibilityState={{ checked: available }}
+              accessibilityLabel={t('buurt.beschikbaarKnop')}
+              disabled={update.isPending}
+              onPress={() => update.mutate({ spontaneous_available: !available })}
+              style={[
+                styles.beschikbaar,
+                shadows.card,
+                available ? styles.beschikbaarAan : styles.beschikbaarUit,
+              ]}
+            >
+              {available ? <PulseDot size={8} /> : <View style={styles.beschikbaarUitDot} />}
+              <TvzText
+                preset="meta"
+                style={available ? styles.beschikbaarAanText : styles.beschikbaarUitText}
+              >
+                {available ? t('buurt.beschikbaarAan') : t('buurt.beschikbaarUit')}
+              </TvzText>
+            </Pressable>
+          </>
         ) : (
           <View style={styles.filterRow}>
             <Chip
@@ -181,6 +243,86 @@ export default function BuurtScreen() {
           </View>
         )}
       </SafeAreaView>
+
+      <BottomSheet
+        visible={listOpen}
+        onClose={() => setListOpen(false)}
+        title={t('buurt.lijstTitel')}
+      >
+        <ScrollView style={styles.sheetScroll}>
+          <TvzText preset="meta" style={styles.sheetKop}>
+            {t('buurt.lijstAanvragen')}
+          </TvzText>
+          {sortedRequests.length === 0 ? (
+            <TvzText preset="secondary" style={styles.sheetLeeg}>
+              {t('buurt.lijstGeenAanvragen')}
+            </TvzText>
+          ) : null}
+          {sortedRequests.map((request) => {
+            const km = distanceTo({ lat: request.lat!, lon: request.lon! });
+            return (
+              <Pressable
+                key={request.id}
+                accessibilityRole="button"
+                onPress={() => {
+                  focusOn(request.lat!, request.lon!);
+                  if (isVolunteer) setSelectedRequest(request);
+                }}
+                style={styles.sheetRow}
+              >
+                <View style={styles.sheetZap}>
+                  <Zap
+                    color={colors.primaryDark}
+                    size={15}
+                    strokeWidth={2.2}
+                    fill={colors.accent}
+                  />
+                </View>
+                <View style={styles.sheetRowText}>
+                  <TvzText preset="cardTitle" style={styles.sheetRowTitle}>
+                    {t(REQUEST_TYPE_LABEL[request.type])} · {request.voornaam}
+                  </TvzText>
+                  <TvzText preset="secondary" style={styles.sheetRowMeta}>
+                    {km != null ? t('buurt.afstandVanJou', { afstand: formatDistance(km) }) : ''}
+                  </TvzText>
+                </View>
+              </Pressable>
+            );
+          })}
+
+          <TvzText preset="meta" style={[styles.sheetKop, styles.sheetKopKringen]}>
+            {t('buurt.lijstKringen')}
+          </TvzText>
+          {sortedCircles.map((circle) => {
+            const km = distanceTo({ lat: circle.lat, lon: circle.lon });
+            return (
+              <Pressable
+                key={circle.id}
+                accessibilityRole="button"
+                onPress={() => focusOn(circle.lat, circle.lon)}
+                style={styles.sheetRow}
+              >
+                <View style={styles.sheetKringDot} />
+                <View style={styles.sheetRowText}>
+                  <TvzText preset="cardTitle" style={styles.sheetRowTitle}>
+                    {circle.name}
+                  </TvzText>
+                  <TvzText preset="secondary" style={styles.sheetRowMeta}>
+                    {[
+                      km != null ? t('buurt.afstandVanJou', { afstand: formatDistance(km) }) : null,
+                      circle.plekken_vrij > 0
+                        ? t('buurt.plekkenVrij', { aantal: circle.plekken_vrij })
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </TvzText>
+                </View>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </BottomSheet>
 
       <View pointerEvents="box-none" style={styles.bottomLayer}>
         {isVolunteer ? (
@@ -257,6 +399,88 @@ const styles = StyleSheet.create({
   },
   tellerText: {
     color: colors.white,
+  },
+  tellerChevron: {
+    color: 'rgba(255,255,255,0.7)',
+  },
+  beschikbaar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    alignSelf: 'flex-start',
+    borderRadius: radius.pill,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginTop: spacing.sm,
+  },
+  beschikbaarAan: {
+    backgroundColor: colors.white,
+    borderWidth: 1.5,
+    borderColor: colors.accent,
+  },
+  beschikbaarUit: {
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1.5,
+    borderColor: colors.line,
+  },
+  beschikbaarAanText: {
+    color: colors.successText,
+  },
+  beschikbaarUitText: {
+    color: colors.inkSoft,
+  },
+  beschikbaarUitDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.inkFaint,
+  },
+  sheetScroll: {
+    maxHeight: 420,
+  },
+  sheetKop: {
+    color: colors.primaryMid,
+    marginBottom: spacing.sm,
+  },
+  sheetKopKringen: {
+    marginTop: spacing.lg,
+  },
+  sheetLeeg: {
+    marginBottom: spacing.sm,
+  },
+  sheetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+    minHeight: 56,
+  },
+  sheetZap: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: colors.successBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sheetKringDot: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: colors.tintBlue,
+    borderWidth: 1.5,
+    borderColor: colors.primaryMid,
+  },
+  sheetRowText: {
+    flex: 1,
+  },
+  sheetRowTitle: {
+    fontSize: 15.5,
+  },
+  sheetRowMeta: {
+    fontSize: 13,
   },
   bottomLayer: {
     position: 'absolute',

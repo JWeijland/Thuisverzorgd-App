@@ -14,6 +14,14 @@ export function isoWeekNumber(date: Date): number {
   return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }
 
+/** Sleutel voor beschikbaarheid per week, bijv. "2026-W31" (ISO-weekjaar). */
+export function isoWeekKey(date: Date): string {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  return `${d.getUTCFullYear()}-W${`${isoWeekNumber(date)}`.padStart(2, '0')}`;
+}
+
 /** Maandag van de week waarin `date` valt (lokale tijd, 00:00). */
 export function startOfIsoWeek(date: Date): Date {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());

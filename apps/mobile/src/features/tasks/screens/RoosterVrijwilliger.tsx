@@ -1,7 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useMyCircle } from '@/features/circles/api';
 import { InboxBell } from '@/features/notifications/InboxBell';
@@ -11,9 +10,17 @@ import { TaskRow } from '@/features/tasks/TaskRow';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
-import { MONTH_FULL, isoWeekDays, isoWeekNumber } from '@/lib/dates';
+import { MONTH_FULL, formatHumanDate, isoWeekDays, isoWeekNumber } from '@/lib/dates';
 import { colors, gradient, radius, spacing } from '@/theme';
-import { BottomSheet, Button, Card, EmptyState, SectionHeader, TvzText } from '@/ui';
+import {
+  BottomSheet,
+  Button,
+  Card,
+  EmptyState,
+  GradientHeader,
+  SectionHeader,
+  TvzText,
+} from '@/ui';
 
 /** Rooster · vrijwilliger (screen 19): teller, weekstrip, aannemen en afronden met logboekje. */
 export function RoosterVrijwilliger() {
@@ -25,9 +32,14 @@ export function RoosterVrijwilliger() {
   const { claim, complete, release } = useTaskRpc(circle.data?.id);
   const [completing, setCompleting] = useState<Task | null>(null);
   const [note, setNote] = useState('');
+  const [selectedDay, setSelectedDay] = useState<string | undefined>();
 
   const firstName = profile.data?.name.split(' ')[0] ?? '';
   const helped = profile.data?.helped_count ?? 0;
+  // Tik op Ma/Di/Wo in de weekstrip = alleen de taken van die dag bekijken.
+  const visibleTasks = (tasks.data ?? []).filter(
+    (task) => !selectedDay || task.date === selectedDay,
+  );
 
   function closeSheet() {
     setCompleting(null);
@@ -35,13 +47,13 @@ export function RoosterVrijwilliger() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <View style={styles.safe}>
+      <GradientHeader
+        title={`Hoi ${firstName}.`}
+        subtitle={formatHumanDate(now)}
+        right={<InboxBell />}
+      />
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.headerRow}>
-          <TvzText preset="screenTitle">Hoi {firstName}.</TvzText>
-          <InboxBell />
-        </View>
-
         <LinearGradient {...gradient} style={styles.counter}>
           <TvzText preset="cardTitle" style={styles.counterTitle}>
             {t('rooster.mensenGeholpen', { aantal: helped })}
@@ -55,9 +67,14 @@ export function RoosterVrijwilliger() {
         {circle.data ? (
           <>
             <SectionHeader title={t('rooster.weekTitel', { week: isoWeekNumber(now) })} />
-            <WeekStrip anchor={now} tasks={tasks.data ?? []} />
+            <WeekStrip
+              anchor={now}
+              tasks={tasks.data ?? []}
+              selected={selectedDay}
+              onSelectDay={(key) => setSelectedDay(key === selectedDay ? undefined : key)}
+            />
             <View style={styles.list}>
-              {(tasks.data ?? []).map((task) => (
+              {visibleTasks.map((task) => (
                 <TaskRow
                   key={task.id}
                   task={task}
@@ -73,7 +90,7 @@ export function RoosterVrijwilliger() {
                   onComplete={(item) => setCompleting(item)}
                 />
               ))}
-              {!tasks.isLoading && (tasks.data ?? []).length === 0 ? (
+              {!tasks.isLoading && visibleTasks.length === 0 ? (
                 <Card>
                   <EmptyState title={t('rooster.geenTaken')} body={t('rooster.openTakenTip')} />
                 </Card>
@@ -136,25 +153,19 @@ export function RoosterVrijwilliger() {
           }}
         />
       </BottomSheet>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
+  safe: { flex: 1, backgroundColor: colors.bg },
   container: {
     padding: spacing.screen,
     paddingBottom: 110,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
   counter: {
     borderRadius: radius.card,
     padding: spacing.cardPadding,
-    marginTop: spacing.lg,
   },
   counterTitle: {
     color: colors.white,

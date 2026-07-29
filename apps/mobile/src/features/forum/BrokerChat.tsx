@@ -10,14 +10,17 @@ import {
 } from 'react-native';
 import { Send } from 'lucide-react-native';
 
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import {
   useBrokerMessages,
   useBrokerPresence,
+  useMakelaars,
   useMyBrokerChat,
   useSendBrokerMessage,
 } from '@/features/forum/api';
 import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
+import { useKeyboardOpen } from '@/lib/keyboard';
 import { colors, radius, spacing } from '@/theme';
 import { Avatar, Chip, PulseDot, TvzText } from '@/ui';
 
@@ -30,6 +33,8 @@ export function BrokerChat() {
   const messages = useBrokerMessages(chat.data);
   const send = useSendBrokerMessage(chat.data);
   const online = useBrokerPresence();
+  const makelaars = useMakelaars();
+  const keyboardOpen = useKeyboardOpen();
   const [draft, setDraft] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
@@ -55,19 +60,32 @@ export function BrokerChat() {
     <KeyboardAvoidingView
       style={styles.fill}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={90}
     >
       <View style={styles.statusRow}>
         <View style={styles.avatars}>
-          {['M', 'S', 'J'].map((letter, i) => (
-            <View key={letter} style={[styles.avatarWrap, { marginLeft: i === 0 ? 0 : -10 }]}>
-              <Avatar
-                name={letter}
-                size={30}
-                backgroundColor={i === 2 ? colors.accent : undefined}
-              />
-            </View>
-          ))}
+          {(makelaars.data ?? []).length > 0
+            ? makelaars.data!.map((makelaar, i) => (
+                <View
+                  key={makelaar.id}
+                  style={[styles.avatarWrap, { marginLeft: i === 0 ? 0 : -10 }]}
+                >
+                  <ProfileAvatar
+                    name={makelaar.voornaam}
+                    avatarPath={makelaar.avatar_path}
+                    size={30}
+                    backgroundColor={i === 2 ? colors.accent : undefined}
+                  />
+                </View>
+              ))
+            : ['M', 'S', 'J'].map((letter, i) => (
+                <View key={letter} style={[styles.avatarWrap, { marginLeft: i === 0 ? 0 : -10 }]}>
+                  <Avatar
+                    name={letter}
+                    size={30}
+                    backgroundColor={i === 2 ? colors.accent : undefined}
+                  />
+                </View>
+              ))}
         </View>
         <TvzText preset="meta" style={styles.statusText}>
           {onlineText}
@@ -105,7 +123,7 @@ export function BrokerChat() {
         </ScrollView>
       ) : null}
 
-      <View style={styles.inputRow}>
+      <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
         <TextInput
           value={draft}
           onChangeText={setDraft}
@@ -201,7 +219,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     paddingHorizontal: spacing.screen,
+    // Boven de zwevende tabbalk uitkomen zolang het toetsenbord dicht is.
     paddingBottom: 100,
+  },
+  inputRowKeyboard: {
+    paddingBottom: spacing.sm,
   },
   input: {
     flex: 1,

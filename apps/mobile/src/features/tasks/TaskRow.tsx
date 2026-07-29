@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import type { Task } from '@/features/tasks/api';
+import { taskStart, type Task } from '@/features/tasks/api';
+import { useNow } from '@/lib/useNow';
 import { taskLabel } from '@/features/tasks/logic';
 import { WEEKDAY_SHORT, formatShortDate, formatTime, parseDateString } from '@/lib/dates';
 import { t } from '@/i18n';
@@ -28,6 +29,7 @@ export function TaskRow({
   onBuddyPool,
   onCancelTask,
 }: Props) {
+  const now = useNow();
   const date = parseDateString(task.date);
   const mine = !!myId && task.claimed_by === myId;
   const who = task.claimer
@@ -62,11 +64,14 @@ export function TaskRow({
       right = <StatusPill label={t('rooster.open')} kind="warn" />;
     }
   } else if (mine && onComplete) {
+    // Afronden kan pas vanaf de afgesproken tijd (de server dwingt dit ook af).
+    const started = now >= taskStart(task).getTime();
     right = (
       <Button
         label={t('rooster.rondAf')}
         variant="primary"
         style={styles.smallButton}
+        disabled={!started}
         onPress={() => onComplete(task)}
       />
     );

@@ -147,6 +147,29 @@ export function useForumActions() {
 // Hulpmakelaar-chat
 // ---------------------------------------------------------------------------
 
+export type Makelaar = {
+  id: string;
+  voornaam: string;
+  avatar_path: string | null;
+};
+
+/** De hulpmakelaars (voornaam + profielfoto), voor de kopregel van de chat. */
+export function useMakelaars() {
+  return useQuery({
+    queryKey: ['makelaars'],
+    staleTime: 10 * 60 * 1000,
+    queryFn: async (): Promise<Makelaar[]> => {
+      const { data, error } = await supabase
+        .from('v_makelaars')
+        .select('id, voornaam, avatar_path')
+        .order('voornaam')
+        .limit(3);
+      if (error) throw error;
+      return data as Makelaar[];
+    },
+  });
+}
+
 export type BrokerMessage = {
   id: string;
   chat_id: string;

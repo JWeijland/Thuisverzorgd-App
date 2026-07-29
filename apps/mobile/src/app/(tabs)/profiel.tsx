@@ -1,18 +1,22 @@
+import { useQueryClient } from '@tanstack/react-query';
+import { decode } from 'base64-arraybuffer';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Camera, Images } from 'lucide-react-native';
 
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { NotificationSettings } from '@/features/notifications/NotificationSettings';
 import { removePushToken } from '@/features/notifications/push';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { useSubscription, useUpdateProfile } from '@/features/subscription/api';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
-import { WEEKDAY_SHORT } from '@/lib/dates';
+import { WEEKDAY_SHORT, isoWeekKey, isoWeekNumber } from '@/lib/dates';
 import { colors, gradient, radius, spacing, useTextScale } from '@/theme';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Avatar, BottomSheet, Button, Card, Chip, Pill, Toggle, TvzText } from '@/ui';
+import { BottomSheet, Button, Card, Chip, GradientHeader, Pill, Toggle, TvzText } from '@/ui';
 
 const ROLE_LABELS: Record<string, string> = {
   beheerder: 'Beheerder van de kring',
@@ -36,24 +40,98 @@ export default function ProfielScreen() {
   const subscribed =
     subscription.data?.status === 'proef' || subscription.data?.status === 'actief';
 
+  const queryClient = useQueryClient();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
+  const [photoOpen, setPhotoOpen] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
   const availability = (p as unknown as { availability?: string[] })?.availability ?? [];
+  const availabilityWeeks = p?.availability_weeks ?? {};
   const vacation = p?.vacation_mode ?? false;
   const calendarSync = (p as unknown as { calendar_sync?: boolean })?.calendar_sync ?? false;
 
+  // Beschikbaarheid is per week in te stellen voor de komende vier weken;
+  // zonder eigen invulling geldt het vaste weekpatroon (standaard: alle dagen).
+  const [weekOffset, setWeekOffset] = useState(0);
+  const weekDates = [0, 1, 2, 3].map((offset) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offset * 7);
+    return d;
+  });
+  const weekKey = isoWeekKey(weekDates[weekOffset]!);
+  const weekDays = availabilityWeeks[weekKey] ?? availability;
+
   function toggleDay(day: string) {
-    const next = availability.includes(day)
-      ? availability.filter((code) => code !== day)
-      : [...availability, day];
-    update.mutate({ availability: next });
+    const next = weekDays.includes(day)
+      ? weekDays.filter((code) => code !== day)
+      : [...weekDays, day];
+    update.mutate({ availability_weeks: { ...availabilityWeeks, [weekKey]: next } });
+  }
+
+  const PHOTO_OPTIONS = {
+    mediaTypes: 'images' as const,
+    quality: 0.6,
+    base64: true,
+    allowsEditing: true,
+    aspect: [1, 1] as [number, number],
+  };
+
+  async function savePhoto(result: ImagePicker.ImagePickerResult) {
+    const asset = !result.canceled ? result.assets[0] : undefined;
+    if (!asset?.base64 || !p) {
+      setPhotoOpen(false);
+      return;
+    }
+    setPhotoBusy(true);
+    setPhotoError(false);
+    try {
+      const path = `${p.id}/avatar.jpg`;
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, decode(asset.base64), { contentType: 'image/jpeg', upsert: true });
+      if (uploadError) throw uploadError;
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_path: path })
+        .eq('id', p.id);
+      if (updateError) throw updateError;
+      await queryClient.invalidateQueries({ queryKey: ['avatar-url'] });
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+      setPhotoOpen(false);
+    } catch {
+      setPhotoError(true);
+    } finally {
+      setPhotoBusy(false);
+    }
+  }
+
+  async function photoFromCamera() {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) return;
+    savePhoto(await ImagePicker.launchCameraAsync(PHOTO_OPTIONS));
+  }
+
+  async function photoFromLibrary() {
+    savePhoto(await ImagePicker.launchImageLibraryAsync(PHOTO_OPTIONS));
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <View style={styles.safe}>
+      <GradientHeader title={t('profiel.titel')} subtitle={t('profiel.subtitel')} />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
-          <Avatar name={p?.name ?? '?'} size={72} />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('profiel.fotoWijzigen')}
+            onPress={() => setPhotoOpen(true)}
+            style={styles.avatarWrap}
+          >
+            <ProfileAvatar name={p?.name ?? '?'} avatarPath={p?.avatar_path} size={72} />
+            <View style={styles.avatarBadge}>
+              <Camera color={colors.white} size={13} strokeWidth={2.2} />
+            </View>
+          </Pressable>
           <TvzText preset="screenTitle" style={styles.name}>
             {p?.name ?? ''}
           </TvzText>
@@ -105,11 +183,25 @@ export default function ProfielScreen() {
               <TvzText preset="cardTitle">{t('profiel.beschikbaarheid')}</TvzText>
               <TvzText preset="secondary">{t('profiel.beschikbaarheidUitleg')}</TvzText>
               <View style={styles.days}>
+                {weekDates.map((date, offset) => (
+                  <Chip
+                    key={offset}
+                    label={
+                      offset === 0
+                        ? t('profiel.dezeWeek', { week: isoWeekNumber(date) })
+                        : t('profiel.weekLabel', { week: isoWeekNumber(date) })
+                    }
+                    selected={weekOffset === offset}
+                    onPress={() => setWeekOffset(offset)}
+                  />
+                ))}
+              </View>
+              <View style={styles.days}>
                 {DAY_CODES.map((day, i) => (
                   <Chip
                     key={day}
                     label={WEEKDAY_SHORT[i]!}
-                    selected={availability.includes(day)}
+                    selected={weekDays.includes(day)}
                     onPress={() => toggleDay(day)}
                   />
                 ))}
@@ -189,6 +281,40 @@ export default function ProfielScreen() {
       </ScrollView>
 
       <BottomSheet
+        visible={photoOpen}
+        onClose={() => setPhotoOpen(false)}
+        title={t('profiel.fotoWijzigen')}
+      >
+        {photoBusy ? (
+          <TvzText preset="secondary">{t('algemeen.laden')}</TvzText>
+        ) : (
+          <>
+            <Pressable accessibilityRole="button" onPress={photoFromCamera} style={styles.photoRow}>
+              <Camera color={colors.primary} size={22} strokeWidth={2.2} />
+              <TvzText preset="cardTitle" style={styles.photoLabel}>
+                {t('idFoto.maakFoto')}
+              </TvzText>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              onPress={photoFromLibrary}
+              style={styles.photoRow}
+            >
+              <Images color={colors.primary} size={22} strokeWidth={2.2} />
+              <TvzText preset="cardTitle" style={styles.photoLabel}>
+                {t('idFoto.uitBibliotheek')}
+              </TvzText>
+            </Pressable>
+            {photoError ? (
+              <TvzText preset="secondary" style={styles.deleteText}>
+                {t('idFoto.uploadMislukt')}
+              </TvzText>
+            ) : null}
+          </>
+        )}
+      </BottomSheet>
+
+      <BottomSheet
         visible={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         title={t('account.verwijderen')}
@@ -222,12 +348,12 @@ export default function ProfielScreen() {
           onPress={() => setDeleteOpen(false)}
         />
       </BottomSheet>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
+  safe: { flex: 1, backgroundColor: colors.bg },
   container: {
     padding: spacing.screen,
     paddingBottom: 110,
@@ -236,6 +362,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
     marginBottom: spacing.xl,
+  },
+  avatarWrap: {
+    position: 'relative',
+  },
+  avatarBadge: {
+    position: 'absolute',
+    right: -2,
+    bottom: -2,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.primary,
+    borderWidth: 2,
+    borderColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+    minHeight: 56,
+  },
+  photoLabel: {
+    fontSize: 16,
   },
   name: {
     fontSize: 22,

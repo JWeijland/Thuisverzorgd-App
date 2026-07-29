@@ -99,7 +99,14 @@ export function KringMarker({
         </G>
         {plekkenVrij > 0 ? (
           <G translate="31 1">
-            <Rect width={20} height={20} rx={10} fill="#8DC93F" stroke={colors.white} strokeWidth={2} />
+            <Rect
+              width={20}
+              height={20}
+              rx={10}
+              fill="#8DC93F"
+              stroke={colors.white}
+              strokeWidth={2}
+            />
             <SvgText
               x={10}
               y={14.2}

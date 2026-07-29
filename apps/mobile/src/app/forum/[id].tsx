@@ -6,9 +6,11 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Send } from 'lucide-react-native';
 
 import { useForumActions, usePost, useReplies } from '@/features/forum/api';
 import { TAG_LABEL } from '@/app/(tabs)/steun';
@@ -34,6 +36,12 @@ export default function ForumThreadScreen() {
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const item = post.data;
+
+  function submitReply() {
+    const body = draft.trim();
+    if (createReply.isPending || body.length < 2 || !id) return;
+    createReply.mutate({ postId: id, body }, { onSuccess: () => setDraft('') });
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -127,24 +135,23 @@ export default function ForumThreadScreen() {
         </ScrollView>
 
         <View style={styles.composer}>
-          <TextField
-            label={t('steun.tabForum')}
-            placeholder={t('steun.reageerPlaceholder')}
+          <TextInput
             value={draft}
             onChangeText={setDraft}
-            multiline
+            placeholder={t('steun.reageerPlaceholder')}
+            placeholderTextColor={colors.inkFaint}
+            style={styles.composerInput}
+            onSubmitEditing={submitReply}
+            returnKeyType="send"
           />
-          <Button
-            label={t('steun.plaatsVraag')}
-            variant="cta"
-            disabled={createReply.isPending || draft.trim().length < 2 || !id}
-            onPress={() =>
-              createReply.mutate(
-                { postId: id!, body: draft.trim() },
-                { onSuccess: () => setDraft('') },
-              )
-            }
-          />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('steun.reageerPlaceholder')}
+            onPress={submitReply}
+            style={styles.sendButton}
+          >
+            <Send color={colors.white} size={18} strokeWidth={2.2} />
+          </Pressable>
         </View>
       </KeyboardAvoidingView>
 
@@ -255,8 +262,32 @@ const styles = StyleSheet.create({
     color: colors.successText,
   },
   composer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
     paddingHorizontal: spacing.screen,
     paddingBottom: spacing.md,
+  },
+  composerInput: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderWidth: 1.5,
+    borderColor: colors.line,
+    borderRadius: radius.pill,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontFamily: 'ComicNeue_400Regular',
+    fontSize: 15,
+    color: colors.ink,
+    minHeight: 46,
+  },
+  sendButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   blockButton: {
     marginTop: spacing.sm,

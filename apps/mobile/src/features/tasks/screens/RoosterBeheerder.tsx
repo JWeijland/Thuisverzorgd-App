@@ -1,7 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useMyCircle } from '@/features/circles/api';
 import { InboxBell } from '@/features/notifications/InboxBell';
@@ -21,7 +20,16 @@ import {
   toDateString,
 } from '@/lib/dates';
 import { colors, spacing } from '@/theme';
-import { Avatar, Button, Card, EmptyState, PulseDot, SectionHeader, TvzText } from '@/ui';
+import {
+  Avatar,
+  Button,
+  Card,
+  EmptyState,
+  GradientHeader,
+  PulseDot,
+  SectionHeader,
+  TvzText,
+} from '@/ui';
 
 /** Rooster · beheerder (screen 05/06): begroeting, taak van vandaag, planner, weekstrip, lijst, Uit de kring. */
 export function RoosterBeheerder() {
@@ -34,26 +42,26 @@ export function RoosterBeheerder() {
   const createTask = useCreateTask(circle.data?.id);
   const { cancel } = useTaskRpc(circle.data?.id);
   const [plannerOpen, setPlannerOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<string | undefined>();
 
   const firstName = profile.data?.name.split(' ')[0] ?? '';
   const todayKey = toDateString(now);
   const todayTask = (tasks.data ?? []).find(
     (task) => task.date === todayKey && task.status === 'ingepland' && task.claimer,
   );
+  // Tik op Ma/Di/Wo in de weekstrip = alleen de taken van die dag bekijken.
+  const visibleTasks = (tasks.data ?? []).filter(
+    (task) => !selectedDay || task.date === selectedDay,
+  );
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <View style={styles.safe}>
+      <GradientHeader
+        title={t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
+        subtitle={formatHumanDate(now)}
+        right={<InboxBell />}
+      />
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.headerRow}>
-          <View style={styles.headerText}>
-            <TvzText preset="screenTitle">
-              {t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
-            </TvzText>
-            <TvzText preset="secondary">{formatHumanDate(now)}</TvzText>
-          </View>
-          <InboxBell />
-        </View>
-
         {!circle.isLoading && !circle.data ? (
           <Card style={styles.section}>
             <EmptyState title={t('rooster.geenKring')} body={t('rooster.geenKringTekst')} />
@@ -121,11 +129,16 @@ export function RoosterBeheerder() {
             ) : null}
 
             <View style={styles.weekStrip}>
-              <WeekStrip anchor={now} tasks={tasks.data ?? []} />
+              <WeekStrip
+                anchor={now}
+                tasks={tasks.data ?? []}
+                selected={selectedDay}
+                onSelectDay={(key) => setSelectedDay(key === selectedDay ? undefined : key)}
+              />
             </View>
 
             <View style={styles.list}>
-              {(tasks.data ?? []).map((task) => (
+              {visibleTasks.map((task) => (
                 <TaskRow
                   key={task.id}
                   task={task}
@@ -134,7 +147,7 @@ export function RoosterBeheerder() {
                   onCancelTask={(item) => cancel.mutate(item.id)}
                 />
               ))}
-              {!tasks.isLoading && (tasks.data ?? []).length === 0 ? (
+              {!tasks.isLoading && visibleTasks.length === 0 ? (
                 <Card>
                   <EmptyState title={t('rooster.geenTaken')} body={t('rooster.geenTakenTekst')} />
                 </Card>
@@ -159,26 +172,18 @@ export function RoosterBeheerder() {
           </>
         ) : null}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
+  safe: { flex: 1, backgroundColor: colors.bg },
   container: {
     padding: spacing.screen,
     paddingBottom: 110,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-  },
-  headerText: {
-    flex: 1,
-  },
   section: {
-    marginTop: spacing.lg,
+    marginBottom: spacing.lg,
   },
   todayRow: {
     flexDirection: 'row',

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import {
   Calendar,
   MapPin,
@@ -8,7 +8,9 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 
+import { t } from '@/i18n';
 import { colors, radius, shadows, tabBar } from '@/theme';
+import { fonts } from '@/theme/typography';
 
 const ICONS: Record<string, LucideIcon> = {
   rooster: Calendar,
@@ -32,7 +34,7 @@ type TabBarProps = {
   };
 };
 
-/** Zwevende witte pill-tabbalk: 5 tabs × 64, actief = navy pill (handoff). */
+/** Zwevende witte pill-tabbalk: 5 tabs × 64 met korte naam, actief = navy pill. */
 export function TvzTabBar({ state, navigation }: TabBarProps) {
   return (
     <View pointerEvents="box-none" style={styles.wrap}>
@@ -40,12 +42,13 @@ export function TvzTabBar({ state, navigation }: TabBarProps) {
         {state.routes.map((route, index) => {
           const Icon = ICONS[route.name] ?? User;
           const active = state.index === index;
+          const label = t(`tabs.${route.name}`);
           return (
             <Pressable
               key={route.key}
               accessibilityRole="tab"
               accessibilityState={{ selected: active }}
-              accessibilityLabel={route.name}
+              accessibilityLabel={label}
               onPress={() => {
                 const event = navigation.emit({
                   type: 'tabPress',
@@ -58,7 +61,13 @@ export function TvzTabBar({ state, navigation }: TabBarProps) {
               }}
               style={[styles.tab, active && styles.tabActive]}
             >
-              <Icon color={active ? colors.white : colors.inkSoft} size={22} strokeWidth={2.2} />
+              <Icon color={active ? colors.white : colors.inkSoft} size={20} strokeWidth={2.2} />
+              <Text
+                numberOfLines={1}
+                style={[styles.label, { color: active ? colors.white : colors.inkSoft }]}
+              >
+                {label}
+              </Text>
             </Pressable>
           );
         })}
@@ -95,12 +104,17 @@ const styles = StyleSheet.create({
   },
   tab: {
     width: tabBar.tabWidth,
-    height: 52,
+    height: 54,
     borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 2,
   },
   tabActive: {
     backgroundColor: colors.primary,
+  },
+  label: {
+    fontFamily: fonts.heading,
+    fontSize: 10,
   },
 });

@@ -16,6 +16,7 @@ export type Task = {
   status: 'open' | 'ingepland' | 'gedaan' | 'geannuleerd';
   claimed_by: string | null;
   claimer: { id: string; name: string; phone: string | null } | null;
+  circle: { name: string } | null;
 };
 
 export type TaskDraft = {
@@ -36,7 +37,7 @@ export type TaskLog = {
 };
 
 const TASK_SELECT =
-  'id, circle_id, type, custom_label, date, time, recurrence, status, claimed_by, claimer:profiles!tasks_claimed_by_fkey (id, name, phone)';
+  'id, circle_id, type, custom_label, date, time, recurrence, status, claimed_by, claimer:profiles!tasks_claimed_by_fkey (id, name, phone), circle:circles (name)';
 
 /** Taken van een kring in een datumbereik, realtime bijgewerkt. */
 export function useTasks(circleId: string | undefined, from: Date, to: Date) {
@@ -162,7 +163,22 @@ export function useTaskRpc(circleId: string | undefined) {
     },
     onSuccess: invalidate,
   });
-  return { claim, release, complete, cancel };
+  const uncomplete = useMutation({
+    mutationFn: async (taskId: string) => {
+      const { data, error } = await supabase.rpc('uncomplete_task', { p_task: taskId });
+      if (error) throw error;
+      return data as boolean;
+    },
+    onSuccess: invalidate,
+  });
+  return { claim, release, complete, cancel, uncomplete };
+}
+
+/** Begintijdstip van een taak (datum + tijd, lokale tijd). */
+export function taskStart(task: Pick<Task, 'date' | 'time'>): Date {
+  const [y, m, d] = task.date.split('-').map(Number);
+  const [hh, mm] = task.time.split(':').map(Number);
+  return new Date(y!, m! - 1, d!, hh ?? 0, mm ?? 0);
 }
 
 export function useTaskLogs(circleId: string | undefined) {
