@@ -23,7 +23,7 @@ type Kerncijfers = {
  */
 export default function AdminScreen() {
   const profile = useProfile();
-  const isAdmin = profile.data?.role === 'admin';
+  const isAdmin = profile.data?.role === 'admin' || profile.data?.platform_admin === true;
 
   const kerncijfers = useQuery({
     queryKey: ['admin-kerncijfers'],

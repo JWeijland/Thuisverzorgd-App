@@ -295,6 +295,23 @@ export default function ProfielScreen() {
           ) : null}
         </Card>
 
+        {p?.platform_admin || p?.role === 'admin' ? (
+          <Card style={styles.card}>
+            <View style={styles.row}>
+              <View style={styles.rowText}>
+                <TvzText preset="cardTitle">{t('profiel.adminTitel')}</TvzText>
+                <TvzText preset="secondary">{t('profiel.adminUitleg')}</TvzText>
+              </View>
+              <Button
+                label={t('profiel.adminOpenen')}
+                variant="outline"
+                style={styles.smallButton}
+                onPress={() => router.push('/admin')}
+              />
+            </View>
+          </Card>
+        ) : null}
+
         <NotificationSettings />
 
         <Button

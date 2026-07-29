@@ -291,6 +291,9 @@
     "rolHulpvragerTitel": "Ik krijg zelf hulp",
     "rolHulpvragerUitleg": "Kijk mee in de hulpkring die voor jou is opgezet: wie er komt en wanneer.",
     "rolFout": "Rol wijzigen is niet gelukt. Probeer het opnieuw.",
+    "adminTitel": "Thuisverzorgd Admin",
+    "adminUitleg": "Kerncijfers van de pilot, geen persoonsgegevens.",
+    "adminOpenen": "Openen",
     "fotoWijzigen": "Profielfoto wijzigen",
     "uitloggen": "Uitloggen"
   },
