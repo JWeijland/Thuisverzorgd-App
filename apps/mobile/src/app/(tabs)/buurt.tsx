@@ -87,6 +87,7 @@ export default function BuurtScreen() {
             key={circle.id}
             lat={circle.lat}
             lon={circle.lon}
+            plekkenVrij={circle.plekken_vrij}
             onPress={() => {
               mapRef.current?.animateToRegion(
                 {

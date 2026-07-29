@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="208" height="264" viewBox="0 0 52 66">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2A6CB0"></stop><stop offset="1" stop-color="#1A4878"></stop>
+    </linearGradient>
+    <filter id="s" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#112F50" flood-opacity="0.38"></feDropShadow>
+    </filter>
+    <filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.2"></feGaussianBlur></filter>
+  </defs>
+  <ellipse cx="26" cy="61" rx="11" ry="3.5" fill="#112F50" opacity="0.22" filter="url(#b)"></ellipse>
+  <g filter="url(#s)">
+    <path d="M26 2.75a20.75 20.75 0 0 1 14.67 35.42L26 52.84 11.33 38.17A20.75 20.75 0 0 1 26 2.75z" fill="url(#g)" stroke="#fff" stroke-width="2.5"></path>
+  </g>
+  <circle cx="26" cy="24" r="13.5" fill="#fff"></circle>
+  <g transform="translate(14 12)">
+    <circle cx="8.2" cy="9" r="3.1" fill="#2A6CB0"></circle><circle cx="15.8" cy="9" r="3.1" fill="#8DC93F"></circle>
+    <path d="M2.6 22c0-3.2 2.5-5.8 5.6-5.8s5.6 2.6 5.6 5.8" fill="#2A6CB0"></path>
+    <path d="M10.2 22c0-3.2 2.5-5.8 5.6-5.8s5.6 2.6 5.6 5.8" fill="#8DC93F"></path>
+  </g>
+</svg>

@@ -2,14 +2,22 @@ import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from '@/lib/supabase';
 
-export type MapCircle = { id: string; name: string; lat: number; lon: number };
+export type MapCircle = {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  plekken_vrij: number;
+};
 export type MapBuddy = { id: string; voornaam: string; lat: number; lon: number };
 
 export function useMapCircles() {
   return useQuery({
     queryKey: ['map-circles'],
     queryFn: async (): Promise<MapCircle[]> => {
-      const { data, error } = await supabase.from('v_map_circles').select('id, name, lat, lon');
+      const { data, error } = await supabase
+        .from('v_map_circles')
+        .select('id, name, lat, lon, plekken_vrij');
       if (error) throw error;
       return data as MapCircle[];
     },
