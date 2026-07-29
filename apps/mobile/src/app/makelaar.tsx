@@ -89,6 +89,11 @@ export default function MakelaarConsole() {
                 <Avatar name={chat.voornaam} />
                 <View style={styles.chatInfo}>
                   <TvzText preset="cardTitle">{chat.voornaam}</TvzText>
+                  {chat.makelaar_voornaam ? (
+                    <TvzText preset="meta" style={styles.gerichtAan}>
+                      {t('makelaar.gerichtAan', { naam: chat.makelaar_voornaam })}
+                    </TvzText>
+                  ) : null}
                   {chat.laatste_bericht ? (
                     <TvzText preset="secondary" numberOfLines={1}>
                       {chat.laatste_bericht}
@@ -253,6 +258,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   chatInfo: { flex: 1 },
+  gerichtAan: {
+    color: colors.primaryMid,
+  },
   reportTitle: {
     fontSize: 15,
   },

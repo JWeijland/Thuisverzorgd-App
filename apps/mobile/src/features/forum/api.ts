@@ -151,9 +151,12 @@ export type Makelaar = {
   id: string;
   voornaam: string;
   avatar_path: string | null;
+  bio: string | null;
+  onderwerpen: string[];
+  city: string | null;
 };
 
-/** De hulpmakelaars (voornaam + profielfoto), voor de kopregel van de chat. */
+/** De hulpmakelaars met profiel (foto, bio, onderwerpen), voor deck en chat. */
 export function useMakelaars() {
   return useQuery({
     queryKey: ['makelaars'],
@@ -161,9 +164,9 @@ export function useMakelaars() {
     queryFn: async (): Promise<Makelaar[]> => {
       const { data, error } = await supabase
         .from('v_makelaars')
-        .select('id, voornaam, avatar_path')
+        .select('id, voornaam, avatar_path, bio, onderwerpen, city')
         .order('voornaam')
-        .limit(3);
+        .limit(6);
       if (error) throw error;
       return data as Makelaar[];
     },
@@ -178,13 +181,17 @@ export type BrokerMessage = {
   created_at: string;
 };
 
-export function useMyBrokerChat() {
+/**
+ * Eigen chat ophalen of aanmaken. Met `brokerId` is het gesprek gericht aan
+ * die ene makelaar; zonder keuze is het de algemene wachtrij.
+ */
+export function useMyBrokerChat(brokerId: string | null = null) {
   const { session } = useSession();
   return useQuery({
-    queryKey: ['broker-chat', session?.user.id],
+    queryKey: ['broker-chat', session?.user.id, brokerId],
     enabled: !!session,
     queryFn: async (): Promise<string> => {
-      const { data, error } = await supabase.rpc('ensure_broker_chat');
+      const { data, error } = await supabase.rpc('ensure_broker_chat', { p_broker: brokerId });
       if (error) throw error;
       return data as string;
     },
@@ -255,6 +262,8 @@ export type BrokerChatOverview = {
   status: string;
   created_at: string;
   voornaam: string;
+  broker_id: string | null;
+  makelaar_voornaam: string | null;
   laatste_bericht: string | null;
   laatste_activiteit: string | null;
 };
@@ -321,15 +330,16 @@ export function useResolveReport() {
 }
 
 /**
- * Presence: hoeveel hulpmakelaars zijn er nu online? Makelaars melden zich aan.
+ * Presence: welke hulpmakelaars zijn er nu online? Makelaars melden zich aan
+ * met hun eigen id als key, dus we weten het ook per makelaar.
  * Singleton-kanaal: de topicnaam moet voor iedereen gelijk zijn, maar binnen
  * één app mag hetzelfde kanaal niet twee keer gesubscribed worden.
  */
-type PresenceListener = (count: number) => void;
+type PresenceListener = (ids: string[]) => void;
 let presenceChannel: ReturnType<typeof supabase.channel> | null = null;
 const presenceListeners = new Set<PresenceListener>();
 let presenceTracked = false;
-let presenceCount = 0;
+let presenceIds: string[] = [];
 
 function ensurePresenceChannel(userId: string) {
   if (presenceChannel) return presenceChannel;
@@ -338,33 +348,38 @@ function ensurePresenceChannel(userId: string) {
   });
   presenceChannel
     .on('presence', { event: 'sync' }, () => {
-      presenceCount = Object.keys(presenceChannel!.presenceState()).length;
-      presenceListeners.forEach((listener) => listener(presenceCount));
+      presenceIds = Object.keys(presenceChannel!.presenceState());
+      presenceListeners.forEach((listener) => listener(presenceIds));
     })
     .subscribe();
   return presenceChannel;
 }
 
-export function useBrokerPresence(): number {
+/** Ids van makelaars die nu online zijn (live bijgewerkt). */
+export function useBrokerPresenceIds(): string[] {
   const profile = useProfile();
   const { session } = useSession();
-  const [count, setCount] = useState(presenceCount);
+  const [ids, setIds] = useState(presenceIds);
   const isBroker = profile.data?.role === 'makelaar';
 
   useEffect(() => {
     if (!session) return;
     const channel = ensurePresenceChannel(session.user.id);
-    presenceListeners.add(setCount);
-    const sync = setTimeout(() => setCount(presenceCount), 0);
+    presenceListeners.add(setIds);
+    const sync = setTimeout(() => setIds(presenceIds), 0);
     if (isBroker && !presenceTracked) {
       presenceTracked = true;
       channel.track({ online: true }).catch(() => {});
     }
     return () => {
       clearTimeout(sync);
-      presenceListeners.delete(setCount);
+      presenceListeners.delete(setIds);
     };
   }, [session, isBroker]);
 
-  return count;
+  return ids;
+}
+
+export function useBrokerPresence(): number {
+  return useBrokerPresenceIds().length;
 }
