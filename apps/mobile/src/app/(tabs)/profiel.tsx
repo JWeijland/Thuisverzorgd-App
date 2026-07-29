@@ -46,6 +46,30 @@ export default function ProfielScreen() {
   const [photoOpen, setPhotoOpen] = useState(false);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState(false);
+  const [roleOpen, setRoleOpen] = useState(false);
+  const [roleBusy, setRoleBusy] = useState(false);
+  const [roleError, setRoleError] = useState(false);
+  const canChangeRole =
+    p?.role === 'beheerder' || p?.role === 'vrijwilliger' || p?.role === 'hulpvrager';
+
+  async function switchRole(role: 'beheerder' | 'vrijwilliger' | 'hulpvrager') {
+    if (roleBusy) return;
+    if (role === p?.role) {
+      setRoleOpen(false);
+      return;
+    }
+    setRoleBusy(true);
+    setRoleError(false);
+    const { error } = await supabase.rpc('change_role', { p_role: role });
+    setRoleBusy(false);
+    if (error) {
+      setRoleError(true);
+      return;
+    }
+    await queryClient.invalidateQueries();
+    setRoleOpen(false);
+    router.replace('/');
+  }
   const availability = (p as unknown as { availability?: string[] })?.availability ?? [];
   const availabilityWeeks = p?.availability_weeks ?? {};
   const vacation = p?.vacation_mode ?? false;
@@ -255,6 +279,20 @@ export default function ProfielScreen() {
             <TvzText preset="cardTitle">{t('profiel.tvzId')}</TvzText>
             <TvzText preset="secondary">{p?.tvz_id ?? ''}</TvzText>
           </View>
+          {canChangeRole ? (
+            <View style={[styles.row, styles.rowBorder]}>
+              <View style={styles.rowText}>
+                <TvzText preset="cardTitle">{t('profiel.rolTitel')}</TvzText>
+                <TvzText preset="secondary">{p?.role ? (ROLE_LABELS[p.role] ?? '') : ''}</TvzText>
+              </View>
+              <Button
+                label={t('profiel.rolWijzigen')}
+                variant="outline"
+                style={styles.smallButton}
+                onPress={() => setRoleOpen(true)}
+              />
+            </View>
+          ) : null}
         </Card>
 
         <NotificationSettings />
@@ -279,6 +317,48 @@ export default function ProfielScreen() {
           </TvzText>
         </Pressable>
       </ScrollView>
+
+      <BottomSheet
+        visible={roleOpen}
+        onClose={() => setRoleOpen(false)}
+        title={t('profiel.rolSheetTitel')}
+      >
+        <TvzText preset="secondary" style={styles.rolUitleg}>
+          {t('profiel.rolSheetUitleg')}
+        </TvzText>
+        {(
+          [
+            ['beheerder', 'rolkeuze.beheerderTitel', 'rolkeuze.beheerderUitleg'],
+            ['vrijwilliger', 'rolkeuze.vrijwilligerTitel', 'rolkeuze.vrijwilligerUitleg'],
+            ['hulpvrager', 'profiel.rolHulpvragerTitel', 'profiel.rolHulpvragerUitleg'],
+          ] as const
+        ).map(([role, titelKey, uitlegKey]) => (
+          <Pressable
+            key={role}
+            accessibilityRole="button"
+            accessibilityState={{ selected: p?.role === role }}
+            disabled={roleBusy}
+            onPress={() => switchRole(role)}
+            style={[styles.rolOptie, p?.role === role && styles.rolOptieActief]}
+          >
+            <View style={styles.rowText}>
+              <TvzText preset="cardTitle">{t(titelKey)}</TvzText>
+              <TvzText preset="secondary">{t(uitlegKey)}</TvzText>
+            </View>
+            {p?.role === role ? (
+              <TvzText preset="cardTitle" style={styles.rolVink}>
+                ✓
+              </TvzText>
+            ) : null}
+          </Pressable>
+        ))}
+        {roleBusy ? <TvzText preset="secondary">{t('algemeen.laden')}</TvzText> : null}
+        {roleError ? (
+          <TvzText preset="secondary" style={styles.deleteText}>
+            {t('profiel.rolFout')}
+          </TvzText>
+        ) : null}
+      </BottomSheet>
 
       <BottomSheet
         visible={photoOpen}
@@ -390,6 +470,26 @@ const styles = StyleSheet.create({
   },
   photoLabel: {
     fontSize: 16,
+  },
+  rolUitleg: {
+    marginBottom: spacing.md,
+  },
+  rolOptie: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    borderWidth: 1.5,
+    borderColor: colors.line,
+    borderRadius: radius.card,
+    padding: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  rolOptieActief: {
+    borderColor: colors.primaryMid,
+    backgroundColor: colors.tintBlue,
+  },
+  rolVink: {
+    color: colors.primaryMid,
   },
   name: {
     fontSize: 22,

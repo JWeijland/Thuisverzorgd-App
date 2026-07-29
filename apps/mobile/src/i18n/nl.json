@@ -284,6 +284,13 @@
     "agenda": "Agenda-koppeling",
     "agendaUitleg": "Taken automatisch in je eigen agenda",
     "tvzId": "Mijn TVZ-ID",
+    "rolTitel": "Mijn rol",
+    "rolWijzigen": "Wijzigen",
+    "rolSheetTitel": "Wat wil je doen in de app?",
+    "rolSheetUitleg": "Kies je rol. Je gegevens en kringen blijven gewoon bewaard.",
+    "rolHulpvragerTitel": "Ik krijg zelf hulp",
+    "rolHulpvragerUitleg": "Kijk mee in de hulpkring die voor jou is opgezet: wie er komt en wanneer.",
+    "rolFout": "Rol wijzigen is niet gelukt. Probeer het opnieuw.",
     "fotoWijzigen": "Profielfoto wijzigen",
     "uitloggen": "Uitloggen"
   },

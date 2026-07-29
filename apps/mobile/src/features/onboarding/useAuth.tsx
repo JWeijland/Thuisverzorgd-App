@@ -1,5 +1,6 @@
 import type { Session } from '@supabase/supabase-js';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
 import { supabase } from '@/lib/supabase';
@@ -51,10 +52,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(data.session);
       setLoading(false);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
       if (!newSession) {
         queryClient.clear();
+      }
+      // Na uitloggen terug naar het welkomstscherm, anders blijf je in de
+      // tabs hangen met lege schermen en kun je geen (nieuw) account maken.
+      if (event === 'SIGNED_OUT') {
+        try {
+          router.replace('/welkom');
+        } catch {
+          // navigator nog niet klaar; de startroute vangt dit dan op
+        }
       }
     });
     return () => sub.subscription.unsubscribe();
