@@ -57,13 +57,19 @@ export default function SteunScreen() {
   const posts = usePosts(filter);
   const { createPost } = useForumActions();
 
+  // De vraag landt in de categorie die bovenin geselecteerd staat.
   function submitQuick() {
     const quickTitle = quick.trim();
     if (quickTitle.length < 8 || createPost.isPending) return;
     createPost.mutate(
-      { title: quickTitle, body: '', tag: 'overig' },
+      { title: quickTitle, body: '', tag: filter ?? 'overig' },
       { onSuccess: () => setQuick('') },
     );
+  }
+
+  function openComposer() {
+    setComposeTag(filter ?? 'overig');
+    setComposerOpen(true);
   }
 
   return (
@@ -105,12 +111,7 @@ export default function SteunScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <ScrollView contentContainerStyle={styles.list}>
-            <Button
-              label={t('steun.stelVraag')}
-              variant="cta"
-              size="lg"
-              onPress={() => setComposerOpen(true)}
-            />
+            <Button label={t('steun.stelVraag')} variant="cta" size="lg" onPress={openComposer} />
             <View style={styles.chips}>
               <Chip
                 label={t('steun.tagAlles')}
@@ -160,11 +161,23 @@ export default function SteunScreen() {
               </Pressable>
             ))}
           </ScrollView>
+          {filter ? (
+            <View style={styles.categorieRij}>
+              <View style={styles.categorieDot} />
+              <TvzText preset="meta" style={styles.categorieText}>
+                {t('steun.plaatsInCategorie', { categorie: t(TAG_LABEL[filter]) })}
+              </TvzText>
+            </View>
+          ) : null}
           <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
             <TextInput
               value={quick}
               onChangeText={setQuick}
-              placeholder={t('steun.forumSnelPlaceholder')}
+              placeholder={
+                filter
+                  ? t('steun.forumSnelPlaceholderTag', { categorie: t(TAG_LABEL[filter]) })
+                  : t('steun.forumSnelPlaceholder')
+              }
               placeholderTextColor={colors.inkFaint}
               style={styles.input}
               onSubmitEditing={submitQuick}
@@ -275,6 +288,22 @@ const styles = StyleSheet.create({
     padding: spacing.screen,
     paddingBottom: spacing.md,
     gap: spacing.cardGap,
+  },
+  categorieRij: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.screen,
+    paddingBottom: spacing.xs,
+  },
+  categorieDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: colors.primaryMid,
+  },
+  categorieText: {
+    color: colors.primaryMid,
   },
   inputRow: {
     flexDirection: 'row',

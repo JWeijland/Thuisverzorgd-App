@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import type { NewTask, Task } from '@/features/tasks/api';
 import { WEEKDAY_SHORT, isoWeekDays, toDateString } from '@/lib/dates';
 import { t } from '@/i18n';
-import { spacing } from '@/theme';
+import { colors, spacing } from '@/theme';
 import { Button, Chip, TextField, TvzText } from '@/ui';
 
 const TYPES: Task['type'][] = ['boodschappen', 'wandelen', 'vervoer', 'gezelschap', 'anders'];
@@ -18,9 +18,25 @@ type Props = {
   busy?: boolean;
 };
 
+/** Genummerd stap-label, zodat de vier keuzerijen duidelijk uit elkaar blijven. */
+function StepLabel({ nr, label, first }: { nr: number; label: string; first?: boolean }) {
+  return (
+    <View style={[styles.stepRow, !first && styles.stepRowBorder]}>
+      <View style={styles.stepNr}>
+        <TvzText preset="meta" style={styles.stepNrText}>
+          {nr}
+        </TvzText>
+      </View>
+      <TvzText preset="cardTitle" style={styles.stepLabel}>
+        {label}
+      </TvzText>
+    </View>
+  );
+}
+
 /**
  * De inline taakplanner (screens 05/06): Wat is er nodig? · Welke dag? ·
- * Hoe laat? · Herhalen? — plannen in drie tikken.
+ * Hoe laat? · Herhalen? — plannen in vier duidelijke stappen.
  */
 export function TaskPlanner({ anchor, submitLabel, onSubmit, busy }: Props) {
   const days = isoWeekDays(anchor);
@@ -54,9 +70,7 @@ export function TaskPlanner({ anchor, submitLabel, onSubmit, busy }: Props) {
 
   return (
     <View>
-      <TvzText preset="meta" style={styles.label}>
-        {t('planner.watNodig')}
-      </TvzText>
+      <StepLabel nr={1} label={t('planner.watNodig')} first />
       <View style={styles.chips}>
         {TYPES.map((option) => (
           <Chip
@@ -76,18 +90,14 @@ export function TaskPlanner({ anchor, submitLabel, onSubmit, busy }: Props) {
         />
       ) : null}
 
-      <TvzText preset="meta" style={styles.label}>
-        {t('planner.welkeDag')}
-      </TvzText>
+      <StepLabel nr={2} label={t('planner.welkeDag')} />
       <View style={styles.chips}>
         {WEEKDAY_SHORT.map((day, i) => (
           <Chip key={day} label={day} selected={dayIndex === i} onPress={() => setDayIndex(i)} />
         ))}
       </View>
 
-      <TvzText preset="meta" style={styles.label}>
-        {t('planner.hoeLaat')}
-      </TvzText>
+      <StepLabel nr={3} label={t('planner.hoeLaat')} />
       <View style={styles.chips}>
         {QUICK_TIMES.map((option) => (
           <Chip
@@ -116,9 +126,7 @@ export function TaskPlanner({ anchor, submitLabel, onSubmit, busy }: Props) {
         />
       ) : null}
 
-      <TvzText preset="meta" style={styles.label}>
-        {t('planner.herhalen')}
-      </TvzText>
+      <StepLabel nr={4} label={t('planner.herhalen')} />
       <View style={styles.chips}>
         <Chip
           label={t('planner.eenmalig')}
@@ -145,9 +153,31 @@ export function TaskPlanner({ anchor, submitLabel, onSubmit, busy }: Props) {
 }
 
 const styles = StyleSheet.create({
-  label: {
-    marginTop: spacing.md,
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
     marginBottom: spacing.sm,
+  },
+  stepRowBorder: {
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.line,
+  },
+  stepNr: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.tintBlue,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepNrText: {
+    color: colors.primary,
+  },
+  stepLabel: {
+    fontSize: 15.5,
   },
   chips: {
     flexDirection: 'row',
@@ -155,6 +185,6 @@ const styles = StyleSheet.create({
     gap: spacing.chipGap,
   },
   submit: {
-    marginTop: spacing.lg,
+    marginTop: spacing.xl,
   },
 });

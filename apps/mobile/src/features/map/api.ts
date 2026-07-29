@@ -9,7 +9,13 @@ export type MapCircle = {
   lon: number;
   plekken_vrij: number;
 };
-export type MapBuddy = { id: string; voornaam: string; lat: number; lon: number };
+export type MapBuddy = {
+  id: string;
+  voornaam: string;
+  avatar_path: string | null;
+  lat: number;
+  lon: number;
+};
 
 export function useMapCircles() {
   return useQuery({
@@ -29,7 +35,9 @@ export function useMapBuddies(enabled: boolean) {
     queryKey: ['map-buddies'],
     enabled,
     queryFn: async (): Promise<MapBuddy[]> => {
-      const { data, error } = await supabase.from('v_map_buddies').select('id, voornaam, lat, lon');
+      const { data, error } = await supabase
+        .from('v_map_buddies')
+        .select('id, voornaam, avatar_path, lat, lon');
       if (error) throw error;
       return data as MapBuddy[];
     },

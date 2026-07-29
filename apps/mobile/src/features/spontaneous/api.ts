@@ -4,13 +4,14 @@ import { useEffect } from 'react';
 import { useSession } from '@/features/onboarding/useAuth';
 import { supabase } from '@/lib/supabase';
 
-export type RequestType = 'boodschappen' | 'vervoer' | 'medicijnen' | 'gezelschap';
+export type RequestType = 'boodschappen' | 'vervoer' | 'medicijnen' | 'gezelschap' | 'anders';
 
 export type OpenRequest = {
   id: string;
   type: RequestType;
   status: 'open' | 'aanbod';
   created_at: string;
+  note: string | null;
   voornaam: string;
   lat: number | null;
   lon: number | null;
@@ -70,7 +71,7 @@ export function useOpenRequests() {
     queryFn: async (): Promise<OpenRequest[]> => {
       const { data, error } = await supabase
         .from('v_open_requests')
-        .select('id, type, status, created_at, voornaam, lat, lon');
+        .select('id, type, status, created_at, note, voornaam, lat, lon');
       if (error) throw error;
       return data as OpenRequest[];
     },

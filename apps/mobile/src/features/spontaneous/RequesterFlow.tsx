@@ -14,13 +14,14 @@ import { t } from '@/i18n';
 import { colors, radius, shadows, spacing } from '@/theme';
 import { Avatar, BottomSheet, Button, Chip, PulseDot, TextField, TvzText } from '@/ui';
 
-const TYPES: RequestType[] = ['boodschappen', 'vervoer', 'medicijnen', 'gezelschap'];
+const TYPES: RequestType[] = ['boodschappen', 'vervoer', 'medicijnen', 'gezelschap', 'anders'];
 
 export const REQUEST_TYPE_LABEL: Record<RequestType, string> = {
   boodschappen: 'directeHulp.typeBoodschappen',
   vervoer: 'directeHulp.typeVervoer',
   medicijnen: 'directeHulp.typeMedicijnen',
   gezelschap: 'directeHulp.typeGezelschap',
+  anders: 'directeHulp.typeAnders',
 };
 
 type Props = {
@@ -40,6 +41,7 @@ export function RequesterFlow({ ownLocation }: Props) {
 
   const [composeOpen, setComposeOpen] = useState(false);
   const [type, setType] = useState<RequestType>('boodschappen');
+  const [customNote, setCustomNote] = useState('');
   const [address, setAddress] = useState('');
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelMessage, setCancelMessage] = useState('');
@@ -79,6 +81,14 @@ export function RequesterFlow({ ownLocation }: Props) {
                 />
               ))}
             </View>
+            {type === 'anders' ? (
+              <TextField
+                label={t('directeHulp.andersLabel')}
+                placeholder={t('directeHulp.andersPlaceholder')}
+                value={customNote}
+                onChangeText={setCustomNote}
+              />
+            ) : null}
             <TextField
               label={t('directeHulp.adresLabel')}
               placeholder={t('directeHulp.adresPlaceholder')}
@@ -89,10 +99,14 @@ export function RequesterFlow({ ownLocation }: Props) {
               label={t('directeHulp.zetOpDeKaart')}
               variant="cta"
               size="lg"
-              disabled={actions.createRequest.isPending}
+              disabled={
+                actions.createRequest.isPending ||
+                (type === 'anders' && customNote.trim().length === 0)
+              }
               onPress={() =>
                 actions.createRequest.mutate({
                   type,
+                  note: type === 'anders' ? customNote.trim() : undefined,
                   address: address.trim() || undefined,
                   lat: ownLocation?.lat,
                   lon: ownLocation?.lon,

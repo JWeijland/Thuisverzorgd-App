@@ -173,6 +173,11 @@ export function VolunteerFlow({ selected, onCloseSelected, ownLocation }: Props)
             naam: selected.voornaam,
           })}
         </TvzText>
+        {selected.note ? (
+          <TvzText preset="secondary" style={styles.requestNote}>
+            “{selected.note}”
+          </TvzText>
+        ) : null}
         {verified ? (
           <>
             <TextField
@@ -235,6 +240,10 @@ const styles = StyleSheet.create({
   },
   requestType: {
     marginTop: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  requestNote: {
+    fontStyle: 'italic',
     marginBottom: spacing.xs,
   },
   greenDot: {

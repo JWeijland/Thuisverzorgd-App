@@ -5,7 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, Zap } from 'lucide-react-native';
 import type MapView from 'react-native-maps';
 
-import { useMapBuddies, useMapCircles } from '@/features/map/api';
+import { useAvatarUrl } from '@/features/avatars/api';
+import { useMapBuddies, useMapCircles, type MapBuddy } from '@/features/map/api';
 import { useUpdateProfile } from '@/features/subscription/api';
 import {
   BuddyMarker,
@@ -20,6 +21,7 @@ import { useOpenRequests, type OpenRequest } from '@/features/spontaneous/api';
 import { REQUEST_TYPE_LABEL, RequesterFlow } from '@/features/spontaneous/RequesterFlow';
 import { VolunteerFlow } from '@/features/spontaneous/VolunteerFlow';
 import { countInRegion, DEFAULT_REGION, formatDistance, haversineKm, type LatLng } from '@/lib/geo';
+import { useKeyboard } from '@/lib/keyboard';
 import { t } from '@/i18n';
 import { colors, radius, shadows, spacing } from '@/theme';
 import { BottomSheet, Chip, PulseDot, TvzText } from '@/ui';
@@ -33,7 +35,8 @@ export default function BuurtScreen() {
   const circles = useMapCircles();
   const requests = useOpenRequests();
   const update = useUpdateProfile();
-  const [showBuddies, setShowBuddies] = useState(false);
+  // Beheerders en hulpvragers zoeken vooral buddy's: die staan standaard aan.
+  const [showBuddies, setShowBuddies] = useState(true);
   const buddies = useMapBuddies(!isVolunteer && showBuddies);
 
   const mapRef = useRef<MapView>(null);
@@ -42,6 +45,7 @@ export default function BuurtScreen() {
   const [query, setQuery] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<OpenRequest | null>(null);
   const [listOpen, setListOpen] = useState(false);
+  const keyboard = useKeyboard();
 
   const available = profile.data?.spontaneous_available ?? true;
 
@@ -134,14 +138,7 @@ export default function BuurtScreen() {
           />
         ))}
         {!isVolunteer && showBuddies
-          ? (buddies.data ?? []).map((buddy) => (
-              <BuddyMarker
-                key={buddy.id}
-                lat={buddy.lat}
-                lon={buddy.lon}
-                voornaam={buddy.voornaam}
-              />
-            ))
+          ? (buddies.data ?? []).map((buddy) => <BuddyMetFoto key={buddy.id} buddy={buddy} />)
           : null}
         {requestList.map((request) => (
           <RequestMarker
@@ -231,14 +228,14 @@ export default function BuurtScreen() {
         ) : (
           <View style={styles.filterRow}>
             <Chip
-              label={t('buurt.chipKringen')}
-              selected={!showBuddies}
-              onPress={() => setShowBuddies(false)}
-            />
-            <Chip
               label={t('buurt.chipBuddys')}
               selected={showBuddies}
               onPress={() => setShowBuddies(true)}
+            />
+            <Chip
+              label={t('buurt.chipKringen')}
+              selected={!showBuddies}
+              onPress={() => setShowBuddies(false)}
             />
           </View>
         )}
@@ -324,7 +321,14 @@ export default function BuurtScreen() {
         </ScrollView>
       </BottomSheet>
 
-      <View pointerEvents="box-none" style={styles.bottomLayer}>
+      <View
+        pointerEvents="box-none"
+        style={[
+          styles.bottomLayer,
+          // Typebalken in de overlay (directe hulp) boven het toetsenbord houden.
+          keyboard.open && { bottom: keyboard.height + spacing.sm },
+        ]}
+      >
         {isVolunteer ? (
           <VolunteerFlow
             selected={selectedRequest}
@@ -336,6 +340,19 @@ export default function BuurtScreen() {
         ) : null}
       </View>
     </View>
+  );
+}
+
+/** Buddy-marker die zelf de profielfoto uit de privé-bucket ophaalt. */
+function BuddyMetFoto({ buddy }: { buddy: MapBuddy }) {
+  const url = useAvatarUrl(buddy.avatar_path);
+  return (
+    <BuddyMarker
+      lat={buddy.lat}
+      lon={buddy.lon}
+      voornaam={buddy.voornaam}
+      uri={url.data ?? undefined}
+    />
   );
 }
 

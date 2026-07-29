@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { colors, spacing } from '@/theme';
 import { TvzText } from '@/ui/TvzText';
@@ -11,25 +11,36 @@ type Props = {
   children: ReactNode;
 };
 
-/** Eenvoudige bottom sheet: wit vlak met ronde bovenhoeken en een handgreepje. */
+/**
+ * Eenvoudige bottom sheet: wit vlak met ronde bovenhoeken en een handgreepje.
+ * Schuift boven het toetsenbord uit zodra er in de sheet getypt wordt.
+ */
 export function BottomSheet({ visible, onClose, title, children }: Props) {
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable accessibilityLabel="Sluiten" style={styles.backdrop} onPress={onClose} />
-      <View style={styles.sheet}>
-        <View style={styles.handle} />
-        {title ? (
-          <TvzText preset="cardTitle" style={styles.title}>
-            {title}
-          </TvzText>
-        ) : null}
-        {children}
-      </View>
+      <KeyboardAvoidingView
+        style={styles.fill}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <Pressable accessibilityLabel="Sluiten" style={styles.backdrop} onPress={onClose} />
+        <View style={styles.sheet}>
+          <View style={styles.handle} />
+          {title ? (
+            <TvzText preset="cardTitle" style={styles.title}>
+              {title}
+            </TvzText>
+          ) : null}
+          {children}
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  fill: {
+    flex: 1,
+  },
   backdrop: {
     flex: 1,
     backgroundColor: 'rgba(17,38,64,0.45)',

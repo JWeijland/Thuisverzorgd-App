@@ -65,14 +65,16 @@ export default function RolkeuzeScreen() {
         </Pressable>
 
         <Pressable
-          accessibilityRole="link"
+          accessibilityRole="button"
+          disabled={busy}
           onPress={() => router.push('/koppelcode')}
-          style={styles.codeLink}
-          hitSlop={8}
+          style={({ pressed }) => [styles.card, shadows.card, pressed && styles.pressed]}
         >
-          <TvzText preset="secondary" style={styles.codeLinkText}>
-            {t('rolkeuze.koppelcodeLink')}
+          <View style={[styles.rolePill, { backgroundColor: colors.primaryDark }]} />
+          <TvzText preset="cardTitle" style={styles.cardTitle}>
+            {t('rolkeuze.hulpvragerTitel')}
           </TvzText>
+          <TvzText preset="secondary">{t('rolkeuze.hulpvragerUitleg')}</TvzText>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -109,13 +111,5 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     marginBottom: 4,
-  },
-  codeLink: {
-    marginTop: spacing.lg,
-    alignSelf: 'center',
-  },
-  codeLinkText: {
-    color: colors.primaryMid,
-    textDecorationLine: 'underline',
   },
 });

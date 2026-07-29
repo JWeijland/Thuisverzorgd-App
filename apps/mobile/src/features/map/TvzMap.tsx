@@ -1,5 +1,5 @@
-import { forwardRef, type ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { forwardRef, useState, type ReactNode } from 'react';
+import { Image, StyleSheet, View } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
 import Svg, {
   Circle as SvgCircle,
@@ -124,22 +124,32 @@ export function KringMarker({
   );
 }
 
-/** Buddy: navy cirkel Ø26 met initiaal. */
+/** Buddy: cirkel met profielfoto (of initiaal zolang er geen foto is). */
 export function BuddyMarker({
   lat,
   lon,
   voornaam,
+  uri,
 }: {
   lat: number;
   lon: number;
   voornaam: string;
+  /** Signed URL van de profielfoto. */
+  uri?: string;
 }) {
+  // De marker moet opnieuw renderen zodra de foto binnen is; daarna weer
+  // bevriezen voor de performance.
+  const [tracks, setTracks] = useState(true);
   return (
-    <Marker coordinate={{ latitude: lat, longitude: lon }} tracksViewChanges={false}>
+    <Marker coordinate={{ latitude: lat, longitude: lon }} tracksViewChanges={tracks}>
       <View style={styles.buddy}>
-        <TvzText preset="meta" style={styles.buddyInitial}>
-          {voornaam.charAt(0).toUpperCase()}
-        </TvzText>
+        {uri ? (
+          <Image source={{ uri }} style={styles.buddyFoto} onLoadEnd={() => setTracks(false)} />
+        ) : (
+          <TvzText preset="meta" style={styles.buddyInitial}>
+            {voornaam.charAt(0).toUpperCase()}
+          </TvzText>
+        )}
       </View>
     </Marker>
   );
@@ -203,18 +213,24 @@ export function OwnLocationMarker({ lat, lon }: { lat: number; lon: number }) {
 
 const styles = StyleSheet.create({
   buddy: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     backgroundColor: colors.primary,
     borderWidth: 2,
     borderColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  buddyFoto: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
   },
   buddyInitial: {
     color: colors.white,
-    fontSize: 11,
+    fontSize: 12,
   },
   own: {
     width: 16,

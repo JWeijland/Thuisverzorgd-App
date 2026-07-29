@@ -1,6 +1,13 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Linking,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import { useMyCircle } from '@/features/circles/api';
 import { InboxBell } from '@/features/notifications/InboxBell';
@@ -61,123 +68,131 @@ export function RoosterBeheerder() {
         subtitle={formatHumanDate(now)}
         right={<InboxBell />}
       />
-      <ScrollView contentContainerStyle={styles.container}>
-        {!circle.isLoading && !circle.data ? (
-          <Card style={styles.section}>
-            <EmptyState title={t('rooster.geenKring')} body={t('rooster.geenKringTekst')} />
-            <Button
-              label={t('tabs.kring')}
-              variant="cta"
-              onPress={() => router.navigate('/kring')}
-            />
-          </Card>
-        ) : null}
-
-        {todayTask?.claimer ? (
-          <Card style={styles.section}>
-            <View style={styles.todayRow}>
-              <Avatar name={todayTask.claimer.name} />
-              <View style={styles.todayInfo}>
-                <TvzText preset="cardTitle">{todayTask.claimer.name}</TvzText>
-                <TvzText preset="secondary">
-                  {t('rooster.komtVandaagOm', { tijd: formatTime(todayTask.time) })}
-                </TvzText>
-              </View>
-              <PulseDot size={8} />
-            </View>
-            <TvzText preset="secondary" style={styles.todayTask}>
-              {taskLabel(todayTask)} · {t('rooster.duurIndicatie')}
-            </TvzText>
-            {todayTask.claimer.phone ? (
+      <KeyboardAvoidingView
+        style={styles.fill}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+          {!circle.isLoading && !circle.data ? (
+            <Card style={styles.section}>
+              <EmptyState title={t('rooster.geenKring')} body={t('rooster.geenKringTekst')} />
               <Button
-                label={t('rooster.bel', {
-                  naam: todayTask.claimer.name.split(' ')[0]!,
-                  telefoon: todayTask.claimer.phone,
-                })}
-                variant="outline"
-                onPress={() => Linking.openURL(`tel:${todayTask.claimer!.phone}`)}
-                style={styles.callButton}
+                label={t('tabs.kring')}
+                variant="cta"
+                onPress={() => router.navigate('/kring')}
               />
-            ) : null}
-          </Card>
-        ) : null}
+            </Card>
+          ) : null}
 
-        {circle.data ? (
-          <>
-            <SectionHeader
-              title={t('rooster.weekTitel', { week: isoWeekNumber(now) })}
-              actionLabel={t('planner.heleWeek')}
-              onActionPress={() => router.push('/weekplanning')}
-            />
-            <Button
-              label={plannerOpen ? t('rooster.sluitTaakplanner') : t('rooster.taakInplannen')}
-              variant="cta"
-              size="lg"
-              onPress={() => setPlannerOpen((open) => !open)}
-            />
-            {plannerOpen ? (
-              <Card style={styles.plannerCard}>
-                <TaskPlanner
-                  anchor={now}
-                  submitLabel={t('planner.zetInRooster')}
-                  busy={createTask.isPending}
-                  onSubmit={(task) => {
-                    createTask.mutate(task, { onSuccess: () => setPlannerOpen(false) });
-                  }}
+          {todayTask?.claimer ? (
+            <Card style={styles.section}>
+              <View style={styles.todayRow}>
+                <Avatar name={todayTask.claimer.name} />
+                <View style={styles.todayInfo}>
+                  <TvzText preset="cardTitle">{todayTask.claimer.name}</TvzText>
+                  <TvzText preset="secondary">
+                    {t('rooster.komtVandaagOm', { tijd: formatTime(todayTask.time) })}
+                  </TvzText>
+                </View>
+                <PulseDot size={8} />
+              </View>
+              <TvzText preset="secondary" style={styles.todayTask}>
+                {taskLabel(todayTask)} · {t('rooster.duurIndicatie')}
+              </TvzText>
+              {todayTask.claimer.phone ? (
+                <Button
+                  label={t('rooster.bel', {
+                    naam: todayTask.claimer.name.split(' ')[0]!,
+                    telefoon: todayTask.claimer.phone,
+                  })}
+                  variant="outline"
+                  onPress={() => Linking.openURL(`tel:${todayTask.claimer!.phone}`)}
+                  style={styles.callButton}
                 />
-              </Card>
-            ) : null}
+              ) : null}
+            </Card>
+          ) : null}
 
-            <View style={styles.weekStrip}>
-              <WeekStrip
-                anchor={now}
-                tasks={tasks.data ?? []}
-                selected={selectedDay}
-                onSelectDay={(key) => setSelectedDay(key === selectedDay ? undefined : key)}
+          {circle.data ? (
+            <>
+              <SectionHeader
+                title={t('rooster.weekTitel', { week: isoWeekNumber(now) })}
+                actionLabel={t('planner.heleWeek')}
+                onActionPress={() => router.push('/weekplanning')}
               />
-            </View>
-
-            <View style={styles.list}>
-              {visibleTasks.map((task) => (
-                <TaskRow
-                  key={task.id}
-                  task={task}
-                  myId={profile.data?.id}
-                  isBeheerder
-                  onCancelTask={(item) => cancel.mutate(item.id)}
-                />
-              ))}
-              {!tasks.isLoading && visibleTasks.length === 0 ? (
-                <Card>
-                  <EmptyState title={t('rooster.geenTaken')} body={t('rooster.geenTakenTekst')} />
+              <Button
+                label={plannerOpen ? t('rooster.sluitTaakplanner') : t('rooster.taakInplannen')}
+                variant="cta"
+                size="lg"
+                onPress={() => setPlannerOpen((open) => !open)}
+              />
+              {plannerOpen ? (
+                <Card style={styles.plannerCard}>
+                  <TaskPlanner
+                    anchor={now}
+                    submitLabel={t('planner.zetInRooster')}
+                    busy={createTask.isPending}
+                    onSubmit={(task) => {
+                      createTask.mutate(task, { onSuccess: () => setPlannerOpen(false) });
+                    }}
+                  />
                 </Card>
               ) : null}
-            </View>
 
-            {(logs.data ?? []).length > 0 ? (
-              <>
-                <SectionHeader title={t('rooster.uitDeKring')} />
-                <View style={styles.list}>
-                  {(logs.data ?? []).map((log) => (
-                    <Card key={log.id} style={styles.logCard}>
-                      <TvzText preset="body" style={styles.logNote}>
-                        “{log.note}”
-                      </TvzText>
-                      <TvzText preset="secondary">{log.author?.name?.split(' ')[0] ?? ''}</TvzText>
-                    </Card>
-                  ))}
-                </View>
-              </>
-            ) : null}
-          </>
-        ) : null}
-      </ScrollView>
+              <View style={styles.weekStrip}>
+                <WeekStrip
+                  anchor={now}
+                  tasks={tasks.data ?? []}
+                  selected={selectedDay}
+                  onSelectDay={(key) => setSelectedDay(key === selectedDay ? undefined : key)}
+                />
+              </View>
+
+              <View style={styles.list}>
+                {visibleTasks.map((task) => (
+                  <TaskRow
+                    key={task.id}
+                    task={task}
+                    myId={profile.data?.id}
+                    isBeheerder
+                    onCancelTask={(item) => cancel.mutate(item.id)}
+                  />
+                ))}
+                {!tasks.isLoading && visibleTasks.length === 0 ? (
+                  <Card>
+                    <EmptyState title={t('rooster.geenTaken')} body={t('rooster.geenTakenTekst')} />
+                  </Card>
+                ) : null}
+              </View>
+
+              {(logs.data ?? []).length > 0 ? (
+                <>
+                  <SectionHeader title={t('rooster.uitDeKring')} />
+                  <View style={styles.list}>
+                    {(logs.data ?? []).map((log) => (
+                      <Card key={log.id} style={styles.logCard}>
+                        <TvzText preset="body" style={styles.logNote}>
+                          “{log.note}”
+                        </TvzText>
+                        <TvzText preset="secondary">
+                          {log.author?.name?.split(' ')[0] ?? ''}
+                        </TvzText>
+                      </Card>
+                    ))}
+                  </View>
+                </>
+              ) : null}
+            </>
+          ) : null}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
+  fill: { flex: 1 },
   container: {
     padding: spacing.screen,
     paddingBottom: 110,
