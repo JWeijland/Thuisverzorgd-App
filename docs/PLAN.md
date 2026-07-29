@@ -154,6 +154,11 @@
 - GradientHeader ook op planning- en profielpagina; weekstrip-dagen filteren het rooster; tabbalk met korte namen; rondleiding uitgebreid (5/4/3 stappen)
 - Beschikbaarheid: default alle dagen aan, per week instelbaar voor 4 weken (`availability_weeks`; het rooster-voorstel-algoritme leest die kolom nog niet, zie open punten)
 
+## Makelaarsprofielen 29-07-2026 ✅ (live via EAS-update)
+- Kaartendeck met makelaarfoto's rechts in de chat; tik = profiel-sheet (gradient-banner, bio, onderwerpen, online-status per makelaar via presence-ids)
+- Gesprek gericht aan één makelaar: `broker_chats.broker_id` + `ensure_broker_chat(p_broker)`; chatkop toont met wie je praat; console labelt "Vraag aan {naam}"
+- Drie demo-makelaars geseed met bio, onderwerpen en gegenereerde profielfoto's (`scripts/seed-makelaars.mjs`)
+
 ## Actuele stand (overdracht, 28-07-2026 einde dag)
 - App staat op TestFlight en werkt op het toestel van de opdrachtgever; login via 6-cijferige code uit de mail (magic link werkt ook). JS-fixes gaan via `eas update --channel production --environment production --platform ios`; native wijzigingen vergen een nieuwe build.
 - Productie-crashes opgelost: env vars in EAS (build + update-environments), robuuste magic-link callback, React Compiler UIT (evalueerde `x!.id` in handlers tijdens render), realtime-kanalen uniek per component, presence als singleton, storage-policies voor ID-upsert.
