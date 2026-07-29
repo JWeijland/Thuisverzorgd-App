@@ -16,7 +16,17 @@ import { supabase } from '@/lib/supabase';
 import { WEEKDAY_SHORT, isoWeekKey, isoWeekNumber } from '@/lib/dates';
 import { colors, gradient, radius, spacing, useTextScale } from '@/theme';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BottomSheet, Button, Card, Chip, GradientHeader, Pill, Toggle, TvzText } from '@/ui';
+import {
+  BottomSheet,
+  Button,
+  Card,
+  Chip,
+  GradientHeader,
+  Pill,
+  TextField,
+  Toggle,
+  TvzText,
+} from '@/ui';
 
 const ROLE_LABELS: Record<string, string> = {
   beheerder: 'Beheerder van de kring',
@@ -49,6 +59,35 @@ export default function ProfielScreen() {
   const [roleOpen, setRoleOpen] = useState(false);
   const [roleBusy, setRoleBusy] = useState(false);
   const [roleError, setRoleError] = useState(false);
+  const [passOpen, setPassOpen] = useState(false);
+  const [passNew, setPassNew] = useState('');
+  const [passRepeat, setPassRepeat] = useState('');
+  const [passBusy, setPassBusy] = useState(false);
+  const [passFeedback, setPassFeedback] = useState<'gelukt' | 'mislukt' | null>(null);
+  const [passError, setPassError] = useState<string | undefined>();
+
+  async function savePassword() {
+    if (passBusy) return;
+    if (passNew.length < 8) {
+      setPassError(t('profiel.wachtwoordTeKort'));
+      return;
+    }
+    if (passNew !== passRepeat) {
+      setPassError(t('profiel.wachtwoordOngelijk'));
+      return;
+    }
+    setPassError(undefined);
+    setPassBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: passNew });
+    setPassBusy(false);
+    if (error) {
+      setPassFeedback('mislukt');
+      return;
+    }
+    setPassNew('');
+    setPassRepeat('');
+    setPassFeedback('gelukt');
+  }
   const canChangeRole =
     p?.role === 'beheerder' || p?.role === 'vrijwilliger' || p?.role === 'hulpvrager';
 
@@ -279,6 +318,22 @@ export default function ProfielScreen() {
             <TvzText preset="cardTitle">{t('profiel.tvzId')}</TvzText>
             <TvzText preset="secondary">{p?.tvz_id ?? ''}</TvzText>
           </View>
+          <View style={[styles.row, styles.rowBorder]}>
+            <View style={styles.rowText}>
+              <TvzText preset="cardTitle">{t('profiel.wachtwoordTitel')}</TvzText>
+              <TvzText preset="secondary">{t('profiel.wachtwoordUitleg')}</TvzText>
+            </View>
+            <Button
+              label={t('profiel.wachtwoordKnop')}
+              variant="outline"
+              style={styles.smallButton}
+              onPress={() => {
+                setPassFeedback(null);
+                setPassError(undefined);
+                setPassOpen(true);
+              }}
+            />
+          </View>
           {canChangeRole ? (
             <View style={[styles.row, styles.rowBorder]}>
               <View style={styles.rowText}>
@@ -334,6 +389,63 @@ export default function ProfielScreen() {
           </TvzText>
         </Pressable>
       </ScrollView>
+
+      <BottomSheet
+        visible={passOpen}
+        onClose={() => setPassOpen(false)}
+        title={t('profiel.wachtwoordSheetTitel')}
+      >
+        {passFeedback === 'gelukt' ? (
+          <>
+            <TvzText preset="secondary" style={styles.passGelukt}>
+              {t('profiel.wachtwoordGelukt')}
+            </TvzText>
+            <Button
+              label={t('algemeen.sluiten')}
+              variant="outline"
+              style={styles.logout}
+              onPress={() => setPassOpen(false)}
+            />
+          </>
+        ) : (
+          <>
+            <TvzText preset="secondary" style={styles.passUitleg}>
+              {t('profiel.wachtwoordSheetUitleg')}
+            </TvzText>
+            <TextField
+              label={t('profiel.wachtwoordNieuw')}
+              placeholder="••••••••"
+              value={passNew}
+              onChangeText={setPassNew}
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="new-password"
+            />
+            <TextField
+              label={t('profiel.wachtwoordHerhaal')}
+              placeholder="••••••••"
+              value={passRepeat}
+              onChangeText={setPassRepeat}
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="new-password"
+              error={passError}
+            />
+            {passFeedback === 'mislukt' ? (
+              <TvzText preset="secondary" style={styles.deleteText}>
+                {t('profiel.wachtwoordMislukt')}
+              </TvzText>
+            ) : null}
+            <Button
+              label={passBusy ? t('algemeen.laden') : t('profiel.wachtwoordOpslaan')}
+              variant="primary"
+              size="lg"
+              disabled={passBusy}
+              onPress={savePassword}
+            />
+          </>
+        )}
+      </BottomSheet>
 
       <BottomSheet
         visible={roleOpen}
@@ -507,6 +619,12 @@ const styles = StyleSheet.create({
   },
   rolVink: {
     color: colors.primaryMid,
+  },
+  passUitleg: {
+    marginBottom: spacing.md,
+  },
+  passGelukt: {
+    color: colors.successText,
   },
   name: {
     fontSize: 22,

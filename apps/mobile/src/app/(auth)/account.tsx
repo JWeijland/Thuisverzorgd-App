@@ -13,23 +13,32 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, spacing } from '@/theme';
-import { Button, TextField, TvzText } from '@/ui';
+import { Button, Chip, TextField, TvzText } from '@/ui';
 
 const REDIRECT_URL = 'tvz://auth/callback';
 
-/** Account (screen 02): naam + e-mail, geen wachtwoord. */
+/** Account (screen 02): naam + e-mail; inloggen kan met mailcode of wachtwoord. */
 export default function AccountScreen() {
   const { modus } = useLocalSearchParams<{ modus?: string }>();
   const isLogin = modus === 'inloggen';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [errors, setErrors] = useState<{ name?: string; email?: string; general?: string }>({});
+  const [password, setPassword] = useState('');
+  const [method, setMethod] = useState<'code' | 'wachtwoord'>('code');
+  const withPassword = isLogin && method === 'wachtwoord';
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+    general?: string;
+  }>({});
   const [busy, setBusy] = useState(false);
 
   async function submit() {
     const next: typeof errors = {};
     if (!isLogin && name.trim().length < 2) next.name = t('account.naamVerplicht');
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) next.email = t('account.emailOngeldig');
+    if (withPassword && password.length === 0) next.password = t('account.wachtwoordVerplicht');
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
@@ -46,6 +55,20 @@ export default function AccountScreen() {
       setBusy(false);
       if (demoError) {
         setErrors({ general: `${t('algemeen.foutTitel')}. ${t('algemeen.foutOpnieuw')}.` });
+        return;
+      }
+      router.replace('/');
+      return;
+    }
+
+    if (withPassword) {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+      setBusy(false);
+      if (error) {
+        setErrors({ general: t('account.wachtwoordFout') });
         return;
       }
       router.replace('/');
@@ -81,8 +104,27 @@ export default function AccountScreen() {
             {isLogin ? t('account.titelInloggen') : t('account.titelNieuw')}
           </TvzText>
           <TvzText preset="secondary" style={styles.uitleg}>
-            {isLogin ? t('account.uitlegInloggen') : t('account.uitleg')}
+            {isLogin
+              ? withPassword
+                ? t('account.uitlegWachtwoord')
+                : t('account.uitlegInloggen')
+              : t('account.uitleg')}
           </TvzText>
+
+          {isLogin ? (
+            <View style={styles.methodRow}>
+              <Chip
+                label={t('account.metCode')}
+                selected={method === 'code'}
+                onPress={() => setMethod('code')}
+              />
+              <Chip
+                label={t('account.metWachtwoord')}
+                selected={method === 'wachtwoord'}
+                onPress={() => setMethod('wachtwoord')}
+              />
+            </View>
+          ) : null}
 
           {!isLogin ? (
             <TextField
@@ -104,6 +146,18 @@ export default function AccountScreen() {
             keyboardType="email-address"
             error={errors.email}
           />
+          {withPassword ? (
+            <TextField
+              label={t('account.wachtwoordLabel')}
+              placeholder={t('account.wachtwoordPlaceholder')}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="current-password"
+              error={errors.password}
+            />
+          ) : null}
           {errors.general ? (
             <TvzText preset="secondary" style={styles.generalError}>
               {errors.general}
@@ -115,7 +169,9 @@ export default function AccountScreen() {
             {t('account.voorwaarden')}
           </TvzText>
           <Button
-            label={busy ? t('algemeen.laden') : t('account.verstuur')}
+            label={
+              busy ? t('algemeen.laden') : withPassword ? t('account.logIn') : t('account.verstuur')
+            }
             variant="primary"
             size="lg"
             disabled={busy}
@@ -147,6 +203,11 @@ const styles = StyleSheet.create({
   },
   uitleg: {
     marginTop: spacing.xs,
+    marginBottom: spacing.lg,
+  },
+  methodRow: {
+    flexDirection: 'row',
+    gap: spacing.chipGap,
     marginBottom: spacing.xl,
   },
   generalError: {
