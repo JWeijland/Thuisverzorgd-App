@@ -10,6 +10,7 @@ import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { NotificationSettings } from '@/features/notifications/NotificationSettings';
 import { removePushToken } from '@/features/notifications/push';
 import { useProfile } from '@/features/onboarding/useAuth';
+import { STRAAL_OPTIES, dichtstbijzijndeStraal, straalLabel } from '@/features/onboarding/straal';
 import { useSubscription, useUpdateProfile } from '@/features/subscription/api';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
@@ -288,6 +289,41 @@ export default function ProfielScreen() {
                   onValueChange={(value) => update.mutate({ spontaneous_available: value })}
                   accessibilityLabel={t('profiel.spontaanTitel')}
                 />
+              </View>
+
+              {/* Hoe ver wil je gaan? Bepaalt welke hulpvragen en kringen je
+                  ziet, en voor welke kringen jij als buddy in beeld komt. */}
+              <View style={styles.straalBlok}>
+                <TvzText preset="cardTitle" style={styles.poolTitle}>
+                  {t('profiel.straalTitel')}
+                </TvzText>
+                <TvzText preset="secondary" style={styles.poolText}>
+                  {t('profiel.straalUitleg')}
+                </TvzText>
+                <View style={styles.straalChips}>
+                  {STRAAL_OPTIES.map((meters) => {
+                    const gekozen = dichtstbijzijndeStraal(p?.help_radius_m) === meters;
+                    return (
+                      <Pressable
+                        key={meters}
+                        accessibilityRole="radio"
+                        accessibilityState={{ checked: gekozen }}
+                        accessibilityLabel={t('profiel.straalKeuze', {
+                          afstand: straalLabel(meters),
+                        })}
+                        onPress={() => update.mutate({ help_radius_m: meters })}
+                        style={[styles.straalChip, gekozen && styles.straalChipActief]}
+                      >
+                        <TvzText
+                          preset="meta"
+                          style={gekozen ? styles.straalChipTekstActief : styles.straalChipTekst}
+                        >
+                          {straalLabel(meters)}
+                        </TvzText>
+                      </Pressable>
+                    );
+                  })}
+                </View>
               </View>
             </LinearGradient>
 
@@ -799,6 +835,38 @@ const styles = StyleSheet.create({
   poolText: {
     color: 'rgba(255,255,255,0.85)',
     marginTop: spacing.sm,
+  },
+  straalBlok: {
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.25)',
+  },
+  straalChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.chipGap,
+    marginTop: spacing.md,
+  },
+  straalChip: {
+    minHeight: 34,
+    borderRadius: radius.pill,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.45)',
+  },
+  straalChipActief: {
+    backgroundColor: colors.white,
+    borderColor: colors.white,
+  },
+  straalChipTekst: {
+    color: colors.white,
+  },
+  straalChipTekstActief: {
+    color: colors.primary,
   },
   poolRij: {
     flexDirection: 'row',

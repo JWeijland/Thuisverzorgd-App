@@ -207,19 +207,24 @@ export type BuddyCard = {
   helped_count: number;
   waardering: number | null;
   kringen: number;
+  avatar_path: string | null;
+  /** Afstand tot de kring in km; null als een van beide locaties ontbreekt. */
+  afstand_km: number | null;
 };
 
-export function useBestMatches() {
+/**
+ * Buddy's om uit te nodigen. Server-side gefilterd op hun eigen hulpstraal:
+ * wie alleen in de eigen straat wil helpen, komt niet in beeld bij een kring
+ * vijf kilometer verderop.
+ */
+export function useBestMatches(circleId: string | undefined) {
   return useQuery({
-    queryKey: ['best-matches'],
+    queryKey: ['best-matches', circleId],
+    enabled: !!circleId,
     queryFn: async (): Promise<BuddyCard[]> => {
-      const { data, error } = await supabase
-        .from('v_buddy_cards')
-        .select('id, voornaam, city, helped_count, waardering, kringen')
-        .order('helped_count', { ascending: false })
-        .limit(5);
+      const { data, error } = await supabase.rpc('buddys_voor_kring', { p_circle: circleId! });
       if (error) throw error;
-      return data as BuddyCard[];
+      return (data ?? []) as BuddyCard[];
     },
   });
 }

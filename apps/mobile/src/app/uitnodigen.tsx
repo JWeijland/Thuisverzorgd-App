@@ -3,16 +3,17 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useBestMatches, useInvite, useMyCircle } from '@/features/circles/api';
 import { t } from '@/i18n';
 import { colors, spacing } from '@/theme';
-import { Avatar, Button, Card, SectionHeader, TextField, TvzText } from '@/ui';
+import { Button, Card, SectionHeader, TextField, TvzText } from '@/ui';
 
 /** Vrijwilliger uitnodigen: e-mail/TVZ-ID + "Best matches in de buurt". */
 export default function UitnodigenScreen() {
   const circle = useMyCircle();
   const invite = useInvite(circle.data?.id);
-  const matches = useBestMatches();
+  const matches = useBestMatches(circle.data?.id);
   const [target, setTarget] = useState('');
   const [message, setMessage] = useState('');
   const [feedback, setFeedback] = useState<{ ok: boolean; text: string } | null>(null);
@@ -98,7 +99,7 @@ export default function UitnodigenScreen() {
               {(matches.data ?? []).map((match) => (
                 <Card key={match.id} style={styles.matchCard}>
                   <View style={styles.matchRow}>
-                    <Avatar name={match.voornaam} />
+                    <ProfileAvatar name={match.voornaam} avatarPath={match.avatar_path} />
                     <View style={styles.matchInfo}>
                       <TvzText preset="cardTitle">
                         {match.voornaam}
