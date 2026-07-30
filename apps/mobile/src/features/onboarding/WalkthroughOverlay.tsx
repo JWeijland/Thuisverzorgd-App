@@ -9,7 +9,7 @@ import {
   type WalkthroughRole,
 } from '@/features/onboarding/walkthrough';
 import { t } from '@/i18n';
-import { tabCenterX } from '@/ui/TabBar';
+import { tabCenterX, visibleTabs } from '@/ui/TabBar';
 import { Coachmark } from '@/ui';
 
 const seenKey = (uid: string) => `walkthrough-gezien-${uid}`;
@@ -62,7 +62,10 @@ export function WalkthroughOverlay({ uid, role }: Props) {
     AsyncStorage.setItem(seenKey(uid!), 'ja').catch(() => {});
   }
 
-  const arrowX = tabCenterX(current.tabIndex, width);
+  // Het pijltje wijst naar de tab zoals die er voor déze rol staat.
+  const tabs = visibleTabs(activeRole);
+  const tabIndex = Math.max(tabs.indexOf(current.tab), 0);
+  const arrowX = tabCenterX(tabIndex, width, tabs.length);
 
   return (
     <View pointerEvents="box-none" style={styles.overlay}>

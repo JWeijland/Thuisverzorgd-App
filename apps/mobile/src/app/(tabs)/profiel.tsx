@@ -240,6 +240,21 @@ export default function ProfielScreen() {
               <TvzText preset="secondary" style={styles.poolText}>
                 {t('profiel.poolUitleg')}
               </TvzText>
+              <View style={styles.poolRij}>
+                <View style={styles.rowText}>
+                  <TvzText preset="cardTitle" style={styles.poolTitle}>
+                    {t('profiel.spontaanTitel')}
+                  </TvzText>
+                  <TvzText preset="secondary" style={styles.poolText}>
+                    {t('profiel.spontaanUitleg')}
+                  </TvzText>
+                </View>
+                <Toggle
+                  value={p?.spontaneous_available ?? true}
+                  onValueChange={(value) => update.mutate({ spontaneous_available: value })}
+                  accessibilityLabel={t('profiel.spontaanTitel')}
+                />
+              </View>
             </LinearGradient>
 
             <Card style={styles.card}>
@@ -644,6 +659,14 @@ const styles = StyleSheet.create({
   poolText: {
     color: 'rgba(255,255,255,0.85)',
     marginTop: spacing.sm,
+  },
+  poolRij: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.25)',
   },
   row: {
     flexDirection: 'row',

@@ -5,17 +5,19 @@ import { WalkthroughOverlay } from '@/features/onboarding/WalkthroughOverlay';
 import { useProfile, useSession } from '@/features/onboarding/useAuth';
 import { TaskBanner } from '@/features/tasks/TaskBanner';
 import { t } from '@/i18n';
-import { TvzTabBar } from '@/ui/TabBar';
+import { TAB_ORDER, TvzTabBar, visibleTabs } from '@/ui/TabBar';
 
 export default function TabsLayout() {
   const { session } = useSession();
   const profile = useProfile();
   const role = profile.data?.role;
+  const zichtbaar = visibleTabs(role);
+  const verborgen = TAB_ORDER.filter((name) => !zichtbaar.includes(name));
 
   return (
     <View style={{ flex: 1 }}>
       <Tabs
-        tabBar={(props) => <TvzTabBar {...props} />}
+        tabBar={(props) => <TvzTabBar {...props} hidden={verborgen} />}
         screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: '#F5F8FC' } }}
       >
         <Tabs.Screen name="rooster" options={{ title: t('tabs.rooster') }} />

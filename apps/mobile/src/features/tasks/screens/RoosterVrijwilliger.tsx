@@ -1,8 +1,11 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { MessagesSquare } from 'lucide-react-native';
 
 import { useMyCircle } from '@/features/circles/api';
+import { KringBalk } from '@/features/circles/KringBalk';
 import { InboxBell } from '@/features/notifications/InboxBell';
 import { cancelTaskReminder, scheduleTaskReminder } from '@/features/notifications/push';
 import { useTaskRpc, useTasks, type Task } from '@/features/tasks/api';
@@ -18,6 +21,7 @@ import {
   Card,
   EmptyState,
   GradientHeader,
+  ProgressRing,
   SectionHeader,
   TvzText,
 } from '@/ui';
@@ -41,6 +45,14 @@ export function RoosterVrijwilliger() {
     (task) => !selectedDay || task.date === selectedDay,
   );
 
+  // Voortgangsring: hoeveel van jouw taken deze maand zijn al afgerond?
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const monthTasks = useTasks(circle.data?.id, monthStart, monthEnd);
+  const mine = (monthTasks.data ?? []).filter((task) => task.claimed_by === profile.data?.id);
+  const mineDone = mine.filter((task) => task.status === 'gedaan').length;
+  const ringValue = mine.length > 0 ? mineDone / mine.length : 0;
+
   function closeSheet() {
     setCompleting(null);
     setNote('');
@@ -51,17 +63,48 @@ export function RoosterVrijwilliger() {
       <GradientHeader
         title={`Hoi ${firstName}.`}
         subtitle={formatHumanDate(now)}
-        right={<InboxBell />}
-      />
+        wobbel
+        right={
+          <View style={styles.headerActies}>
+            {circle.data ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t('kring.berichtenTitel')}
+                onPress={() => router.push('/kringchat')}
+                style={styles.berichtenKnop}
+              >
+                <MessagesSquare color={colors.primary} size={20} strokeWidth={2.2} />
+              </Pressable>
+            ) : null}
+            <InboxBell />
+          </View>
+        }
+      >
+        {circle.data ? (
+          <View style={styles.kringBalkWrap}>
+            <KringBalk circleId={circle.data.id} name={circle.data.name} onDark />
+          </View>
+        ) : null}
+      </GradientHeader>
       <ScrollView contentContainerStyle={styles.container}>
         <LinearGradient {...gradient} style={styles.counter}>
           <TvzText preset="cardTitle" style={styles.counterTitle}>
-            {t('rooster.mensenGeholpen', { aantal: helped })}
+            {helped === 1
+              ? t('rooster.mensGeholpen')
+              : t('rooster.mensenGeholpen', { aantal: helped })}
           </TvzText>
-          <View style={styles.counterBar} />
-          <TvzText preset="secondary" style={styles.counterText}>
-            {t('rooster.goedBezig', { maand: MONTH_FULL[now.getMonth()]! })}
-          </TvzText>
+          <View style={styles.counterRij}>
+            <ProgressRing value={ringValue} label={`${mineDone}`} onDark />
+            <TvzText preset="secondary" style={styles.counterText}>
+              {mine.length > 0
+                ? t('rooster.maandVoortgang', {
+                    gedaan: mineDone,
+                    totaal: mine.length,
+                    maand: MONTH_FULL[now.getMonth()]!,
+                  })
+                : t('rooster.goedBezig', { maand: MONTH_FULL[now.getMonth()]! })}
+            </TvzText>
+          </View>
         </LinearGradient>
 
         {circle.data ? (
@@ -163,6 +206,23 @@ const styles = StyleSheet.create({
     padding: spacing.screen,
     paddingBottom: 110,
   },
+  headerActies: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  berichtenKnop: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  kringBalkWrap: {
+    marginTop: spacing.md,
+  },
+  // Vlakken bijna vierkant (brandbook): radius 12, ook voor deze tellerkaart.
   counter: {
     borderRadius: radius.card,
     padding: spacing.cardPadding,
@@ -170,14 +230,14 @@ const styles = StyleSheet.create({
   counterTitle: {
     color: colors.white,
   },
-  counterBar: {
-    width: 44,
-    height: 5,
-    borderRadius: radius.pill,
-    backgroundColor: colors.accent,
-    marginVertical: spacing.sm,
+  counterRij: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+    marginTop: spacing.md,
   },
   counterText: {
+    flex: 1,
     color: 'rgba(255,255,255,0.85)',
   },
   list: {
