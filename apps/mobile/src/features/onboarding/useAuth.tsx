@@ -10,6 +10,7 @@ export type Profile = {
   role: 'beheerder' | 'vrijwilliger' | 'hulpvrager' | 'admin' | 'makelaar' | null;
   name: string;
   email: string | null;
+  username: string | null;
   tvz_id: string;
   avatar_path: string | null;
   id_verified: boolean;
@@ -87,7 +88,7 @@ export function useProfile() {
       const { data, error } = await supabase
         .from('profiles')
         .select(
-          'id, role, name, email, tvz_id, avatar_path, id_verified, vacation_mode, pool_opt_in, spontaneous_available, platform_admin, large_text, helped_count, notification_prefs, availability, availability_weeks, calendar_sync',
+          'id, role, name, email, username, tvz_id, avatar_path, id_verified, vacation_mode, pool_opt_in, spontaneous_available, platform_admin, large_text, helped_count, notification_prefs, availability, availability_weeks, calendar_sync',
         )
         .eq('id', session!.user.id)
         .single();

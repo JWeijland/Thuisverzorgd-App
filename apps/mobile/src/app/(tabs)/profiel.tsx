@@ -65,6 +65,38 @@ export default function ProfielScreen() {
   const [passBusy, setPassBusy] = useState(false);
   const [passFeedback, setPassFeedback] = useState<'gelukt' | 'mislukt' | null>(null);
   const [passError, setPassError] = useState<string | undefined>();
+  const [mailOpen, setMailOpen] = useState(false);
+  const [mailNieuw, setMailNieuw] = useState('');
+  const [mailBusy, setMailBusy] = useState(false);
+  const [mailFeedback, setMailFeedback] = useState<'gelukt' | 'mislukt' | null>(null);
+  const [mailError, setMailError] = useState<string | undefined>();
+
+  /** E-mailadres toevoegen aan een gebruikersnaam-account (voor herstel). */
+  async function saveMail() {
+    if (mailBusy) return;
+    const adres = mailNieuw.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(adres)) {
+      setMailError(t('account.emailOngeldig'));
+      return;
+    }
+    setMailError(undefined);
+    setMailBusy(true);
+    const { error } = await supabase.auth.updateUser({ email: adres });
+    if (error) {
+      setMailBusy(false);
+      setMailFeedback('mislukt');
+      return;
+    }
+    // Ook in het profiel zetten: daar leest de app het adres (en uitnodigingen
+    // op e-mail zoeken erop).
+    if (p) {
+      await supabase.from('profiles').update({ email: adres }).eq('id', p.id);
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
+    }
+    setMailBusy(false);
+    setMailNieuw('');
+    setMailFeedback('gelukt');
+  }
 
   async function savePassword() {
     if (passBusy) return;
@@ -329,10 +361,34 @@ export default function ProfielScreen() {
               accessibilityLabel={t('profiel.agenda')}
             />
           </View>
+          {p?.username ? (
+            <View style={[styles.row, styles.rowBorder]}>
+              <TvzText preset="cardTitle">{t('profiel.gebruikersnaam')}</TvzText>
+              <TvzText preset="secondary">{p.username}</TvzText>
+            </View>
+          ) : null}
           <View style={[styles.row, styles.rowBorder]}>
             <TvzText preset="cardTitle">{t('profiel.tvzId')}</TvzText>
             <TvzText preset="secondary">{p?.tvz_id ?? ''}</TvzText>
           </View>
+          {!p?.email ? (
+            <View style={[styles.row, styles.rowBorder]}>
+              <View style={styles.rowText}>
+                <TvzText preset="cardTitle">{t('profiel.mailTitel')}</TvzText>
+                <TvzText preset="secondary">{t('profiel.mailUitleg')}</TvzText>
+              </View>
+              <Button
+                label={t('profiel.mailKnop')}
+                variant="outline"
+                style={styles.smallButton}
+                onPress={() => {
+                  setMailFeedback(null);
+                  setMailError(undefined);
+                  setMailOpen(true);
+                }}
+              />
+            </View>
+          ) : null}
           <View style={[styles.row, styles.rowBorder]}>
             <View style={styles.rowText}>
               <TvzText preset="cardTitle">{t('profiel.wachtwoordTitel')}</TvzText>
@@ -404,6 +460,54 @@ export default function ProfielScreen() {
           </TvzText>
         </Pressable>
       </ScrollView>
+
+      <BottomSheet
+        visible={mailOpen}
+        onClose={() => setMailOpen(false)}
+        title={t('profiel.mailSheetTitel')}
+      >
+        {mailFeedback === 'gelukt' ? (
+          <>
+            <TvzText preset="secondary" style={styles.passGelukt}>
+              {t('profiel.mailGelukt')}
+            </TvzText>
+            <Button
+              label={t('algemeen.sluiten')}
+              variant="outline"
+              style={styles.logout}
+              onPress={() => setMailOpen(false)}
+            />
+          </>
+        ) : (
+          <>
+            <TvzText preset="secondary" style={styles.passUitleg}>
+              {t('profiel.mailSheetUitleg')}
+            </TvzText>
+            <TextField
+              label={t('account.emailLabel')}
+              placeholder={t('account.emailPlaceholder')}
+              value={mailNieuw}
+              onChangeText={setMailNieuw}
+              autoCapitalize="none"
+              autoComplete="email"
+              keyboardType="email-address"
+              error={mailError}
+            />
+            {mailFeedback === 'mislukt' ? (
+              <TvzText preset="secondary" style={styles.deleteText}>
+                {t('profiel.mailMislukt')}
+              </TvzText>
+            ) : null}
+            <Button
+              label={mailBusy ? t('algemeen.laden') : t('profiel.mailOpslaan')}
+              variant="primary"
+              size="lg"
+              disabled={mailBusy}
+              onPress={saveMail}
+            />
+          </>
+        )}
+      </BottomSheet>
 
       <BottomSheet
         visible={passOpen}
