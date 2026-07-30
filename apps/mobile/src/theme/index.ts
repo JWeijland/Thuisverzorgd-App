@@ -8,6 +8,8 @@ export {
   hitTarget,
   chatTints,
   chatTintFor,
+  themaTints,
+  type ThemaTint,
 } from '@/theme/theme';
 export { fonts, text } from '@/theme/typography';
 export { shadows } from '@/theme/shadows';

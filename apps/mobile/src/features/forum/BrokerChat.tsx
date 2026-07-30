@@ -36,7 +36,7 @@ const DECK_TILT = ['-5deg', '4deg', '-3deg', '5deg', '-4deg', '3deg'];
  * Rechts hangt een kaartendeck met de makelaars; tik = profiel bekijken en
  * van daaruit een gesprek met die ene makelaar starten.
  */
-export function BrokerChat() {
+export function BrokerChat({ startVraag }: { startVraag?: string } = {}) {
   const { session } = useSession();
   const makelaars = useMakelaars();
   const onlineIds = useBrokerPresenceIds();
@@ -54,6 +54,15 @@ export function BrokerChat() {
   useEffect(() => {
     scrollRef.current?.scrollToEnd({ animated: true });
   }, [messages.data?.length]);
+
+  // Kom je vanuit de Wegwijzer, dan staat je vraag alvast in het tekstvak.
+  // Versturen doe je zelf, zodat je hem eerst kunt aanvullen. Bij een nieuwe
+  // vraag zetten we het veld opnieuw; typ je daarna verder, dan blijft dat staan.
+  const [vorigeStartVraag, setVorigeStartVraag] = useState(startVraag);
+  if (startVraag !== vorigeStartVraag) {
+    setVorigeStartVraag(startVraag);
+    if (startVraag) setDraft(startVraag);
+  }
 
   function submit(text?: string) {
     const body = (text ?? draft).trim();

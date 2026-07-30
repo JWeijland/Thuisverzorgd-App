@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -14,6 +14,8 @@ import { Send } from 'lucide-react-native';
 import { BrokerChat } from '@/features/forum/BrokerChat';
 import { useForumActions, usePosts, type ForumTag } from '@/features/forum/api';
 import { OpleidingenLijst } from '@/features/learning/OpleidingenLijst';
+import { useProfile } from '@/features/onboarding/useAuth';
+import { WegwijzerLijst } from '@/features/wegwijzer/WegwijzerLijst';
 import { t } from '@/i18n';
 import { useKeyboardOpen } from '@/lib/keyboard';
 import { colors, radius, spacing } from '@/theme';
@@ -34,8 +36,25 @@ export const TAG_LABEL: Record<ForumTag, string> = {
   overig: 'steun.tagOverig',
 };
 
-const SUBNAV = ['forum', 'makelaar', 'opleiding'] as const;
-type SubTab = (typeof SUBNAV)[number];
+const SUBNAV_LABEL = {
+  forum: 'steun.tabForum',
+  makelaar: 'steun.tabMakelaar',
+  wegwijzer: 'wegwijzer.tab',
+  opleiding: 'opleiding.tab',
+} as const;
+
+type SubTab = keyof typeof SUBNAV_LABEL;
+
+/**
+ * De derde plek in de subnav verschilt per rol: de vrijwilliger volgt
+ * opleidingen, de beheerder en de hulpvrager hebben de Wegwijzer met de
+ * wetten en regelingen rond mantelzorg.
+ */
+export function subnavVoor(role: string | null | undefined): SubTab[] {
+  if (role === 'vrijwilliger') return ['forum', 'makelaar', 'opleiding'];
+  if (role === 'beheerder' || role === 'hulpvrager') return ['forum', 'makelaar', 'wegwijzer'];
+  return ['forum', 'makelaar', 'wegwijzer', 'opleiding'];
+}
 
 function timeAgo(iso: string): string {
   const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
@@ -48,12 +67,27 @@ function timeAgo(iso: string): string {
 
 /** Steun & advies (screens 13/14): forum, chat met hulpmakelaars en opleidingen. */
 export default function SteunScreen() {
+  const params = useLocalSearchParams<{ tab?: string; vraag?: string }>();
   const [tab, setTab] = useState<SubTab>('forum');
   const [filter, setFilter] = useState<ForumTag | null>(null);
   const [quick, setQuick] = useState('');
   const keyboardOpen = useKeyboardOpen();
   const posts = usePosts(filter);
   const { createPost } = useForumActions();
+  const profile = useProfile();
+  const subnav = subnavVoor(profile.data?.role);
+
+  // Vanuit de Wegwijzer kom je hier binnen met ?tab=makelaar&vraag=...
+  // Zodra die parameter verandert springen we naar dat tabblad; daarna mag je
+  // gewoon zelf wisselen. (Geen effect: dit is state bijstellen bij een
+  // gewijzigde invoer, zoals React dat aanraadt.)
+  const [vorigeTabParam, setVorigeTabParam] = useState<string | undefined>(params.tab);
+  if (params.tab !== vorigeTabParam) {
+    setVorigeTabParam(params.tab);
+    if (params.tab && params.tab in SUBNAV_LABEL) {
+      setTab(params.tab as SubTab);
+    }
+  }
 
   // De vraag landt in de categorie die bovenin geselecteerd staat.
   function submitQuick() {
@@ -71,7 +105,7 @@ export default function SteunScreen() {
     <View style={styles.safeBg}>
       <GradientHeader title={t('steun.titel')} subtitle={t('steun.subtitel')} wobbel>
         <View style={styles.subnav}>
-          {SUBNAV.map((key) => (
+          {subnav.map((key) => (
             <Pressable
               key={key}
               accessibilityRole="tab"
@@ -83,13 +117,7 @@ export default function SteunScreen() {
                 preset="meta"
                 style={tab === key ? styles.subnavTextActive : styles.subnavText}
               >
-                {t(
-                  key === 'forum'
-                    ? 'steun.tabForum'
-                    : key === 'makelaar'
-                      ? 'steun.tabMakelaar'
-                      : 'opleiding.tab',
-                )}
+                {t(SUBNAV_LABEL[key])}
               </TvzText>
             </Pressable>
           ))}
@@ -97,7 +125,9 @@ export default function SteunScreen() {
       </GradientHeader>
 
       {tab === 'makelaar' ? (
-        <BrokerChat />
+        <BrokerChat startVraag={params.vraag} />
+      ) : tab === 'wegwijzer' ? (
+        <WegwijzerLijst />
       ) : tab === 'opleiding' ? (
         <OpleidingenLijst />
       ) : (

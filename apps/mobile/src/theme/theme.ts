@@ -58,6 +58,21 @@ export function chatTintFor(senderId: string): string {
   return chatTints[sum % chatTints.length]!;
 }
 
+/**
+ * Themakleuren van de Wegwijzer: elk kennisthema krijgt een eigen tint voor de
+ * iconentegel, zodat je thema's uit elkaar houdt zonder ze te hoeven lezen.
+ * Blauw, groen en oranje komen uit het merkpalet; paars is de enige extra tint
+ * (dezelfde als de lila chatbubbel) en wordt nergens anders voor gebruikt.
+ */
+export const themaTints = {
+  blauw: { vlak: colors.tintBlue, icoon: colors.primaryMid },
+  groen: { vlak: colors.successBg, icoon: colors.successText },
+  oranje: { vlak: colors.warnBg, icoon: colors.warnText },
+  paars: { vlak: '#EFE6F7', icoon: '#6B4E93' },
+} as const;
+
+export type ThemaTint = keyof typeof themaTints;
+
 /** Standaard-gradient (headers, welkom, videocall): 115deg primaryDark → primaryMid. */
 export const gradient = {
   colors: [colors.primaryDark, colors.primaryMid] as [string, string],
