@@ -16,6 +16,16 @@ export default function RolkeuzeScreen() {
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
 
+  /** Hulpvrager: rol vastzetten en daarna alleen de koppelcode invullen. */
+  async function chooseHulpvrager() {
+    if (!session || busy) return;
+    setBusy(true);
+    await supabase.rpc('change_role', { p_role: 'hulpvrager' });
+    await queryClient.invalidateQueries({ queryKey: ['profile'] });
+    setBusy(false);
+    router.replace('/koppelcode');
+  }
+
   async function chooseRole(role: 'beheerder' | 'vrijwilliger') {
     if (!session || busy) return;
     setBusy(true);
@@ -69,7 +79,7 @@ export default function RolkeuzeScreen() {
         <Pressable
           accessibilityRole="button"
           disabled={busy}
-          onPress={() => router.push('/koppelcode')}
+          onPress={chooseHulpvrager}
           style={({ pressed }) => [styles.card, shadows.card, pressed && styles.pressed]}
         >
           <View style={[styles.rolePill, { backgroundColor: colors.primaryDark }]} />

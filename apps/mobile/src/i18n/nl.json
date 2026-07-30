@@ -46,7 +46,11 @@
     "uitleg": "Je hebt een code gekregen van degene die de hulpkring beheert, bijvoorbeeld TVZ-4Q7B.",
     "placeholder": "TVZ-XXXX",
     "verstuur": "Koppel mij aan de kring",
-    "onbekend": "Deze code kennen we niet. Kijk of je hem goed hebt overgetikt."
+    "onbekend": "Deze code kennen we niet. Kijk of je hem goed hebt overgetikt.",
+    "later": "Ik heb nog geen code",
+    "nodigTitel": "Nog geen kring gekoppeld",
+    "nodigTekst": "Vul de koppelcode in die je van je beheerder kreeg. Daarna zie je hier wie er langskomt en wanneer.",
+    "invullen": "Koppelcode invullen"
   },
   "idFoto": {
     "titel": "Nog twee foto's.",
@@ -342,7 +346,9 @@
     "wachtwoordOpslaan": "Sla wachtwoord op",
     "wachtwoordTeKort": "Gebruik minimaal 8 tekens.",
     "wachtwoordOngelijk": "De wachtwoorden zijn niet gelijk.",
-    "wachtwoordGelukt": "Wachtwoord ingesteld! Voortaan kun je hiermee inloggen.",
+    "wachtwoordGeluktTitel": "Wachtwoord ingesteld",
+    "wachtwoordGelukt": "Voortaan log je in met je wachtwoord, zonder mailcode.",
+    "mailGeluktTitel": "E-mailadres toegevoegd",
     "wachtwoordMislukt": "Opslaan is niet gelukt. Probeer het opnieuw.",
     "adminTitel": "Thuisverzorgd Admin",
     "adminUitleg": "Kerncijfers van de pilot, geen persoonsgegevens.",

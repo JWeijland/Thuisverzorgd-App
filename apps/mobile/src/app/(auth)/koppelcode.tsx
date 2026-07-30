@@ -22,8 +22,7 @@ export default function KoppelcodeScreen() {
     if (!session || busy) return;
     setBusy(true);
     setError(undefined);
-    // Rol wordt hulpvrager; daarna koppelen aan de kring.
-    await supabase.from('profiles').update({ role: 'hulpvrager' }).eq('id', session.user.id);
+    // De RPC koppelt aan de kring én zet de rol op hulpvrager.
     const { error: rpcError } = await supabase.rpc('redeem_circle_code', {
       p_code: code.trim().toUpperCase(),
     });
@@ -32,7 +31,17 @@ export default function KoppelcodeScreen() {
       setError(t('koppelcode.onbekend'));
       return;
     }
+    await queryClient.invalidateQueries();
+    router.replace('/rooster');
+  }
+
+  /** Nog geen code? Dan alvast naar de app; de code kan later alsnog. */
+  async function later() {
+    if (!session || busy) return;
+    setBusy(true);
+    await supabase.rpc('change_role', { p_role: 'hulpvrager' });
     await queryClient.invalidateQueries({ queryKey: ['profile'] });
+    setBusy(false);
     router.replace('/rooster');
   }
 
@@ -65,6 +74,17 @@ export default function KoppelcodeScreen() {
           disabled={busy || code.trim().length < 4}
           onPress={redeem}
         />
+        <Pressable
+          accessibilityRole="button"
+          onPress={later}
+          disabled={busy}
+          hitSlop={8}
+          style={styles.laterLink}
+        >
+          <TvzText preset="secondary" style={styles.laterText}>
+            {t('koppelcode.later')}
+          </TvzText>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
@@ -99,5 +119,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 22,
     letterSpacing: 2,
+  },
+  laterLink: {
+    alignSelf: 'center',
+    marginTop: spacing.lg,
+    padding: spacing.sm,
+  },
+  laterText: {
+    color: colors.primaryMid,
+    textDecorationLine: 'underline',
   },
 });

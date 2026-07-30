@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 
 import { useCircleMembers, useMyCircle } from '@/features/circles/api';
@@ -7,7 +8,7 @@ import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { formatHumanDate, formatTime, greetingKey, isoWeekDays, toDateString } from '@/lib/dates';
 import { colors, radius, shadows, spacing } from '@/theme';
-import { Avatar, Card, EmptyState, GradientHeader, PulseDot, TvzText } from '@/ui';
+import { Avatar, Button, Card, EmptyState, GradientHeader, PulseDot, TvzText } from '@/ui';
 
 /**
  * Rooster · hulpvrager (screen 24): grote weergave. "Anna is nu bij je" met
@@ -78,9 +79,20 @@ export function RoosterHulpvrager() {
               </View>
             ) : null}
           </View>
-        ) : (
+        ) : circle.data ? (
           <Card style={styles.restCard}>
             <EmptyState title={t('rooster.rustigVandaag')} body={t('rooster.rustigTekst')} />
+          </Card>
+        ) : (
+          // Nog geen kring: alleen de koppelcode is nog nodig.
+          <Card style={styles.restCard}>
+            <EmptyState title={t('koppelcode.nodigTitel')} body={t('koppelcode.nodigTekst')} />
+            <Button
+              label={t('koppelcode.invullen')}
+              variant="cta"
+              size="lg"
+              onPress={() => router.push('/koppelcode')}
+            />
           </Card>
         )}
 

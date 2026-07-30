@@ -11,7 +11,7 @@ export type WalkthroughStep = {
 };
 
 /**
- * Rondleiding per rol: beheerder 5 stappen, vrijwilliger 4, hulpvrager 3.
+ * Rondleiding per rol: beheerder 5 stappen, vrijwilliger 4, hulpvrager 2.
  * Elk wolkje legt uit welke knop wat doet. Overslaan kan altijd (eis handoff).
  */
 export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
@@ -85,12 +85,6 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       textKey: 'rondleiding.hulpvrager2Tekst',
       tab: 'kring',
       route: '/kring',
-    },
-    {
-      titleKey: 'rondleiding.hulpvrager3Titel',
-      textKey: 'rondleiding.hulpvrager3Tekst',
-      tab: 'profiel',
-      route: '/profiel',
     },
   ],
 };

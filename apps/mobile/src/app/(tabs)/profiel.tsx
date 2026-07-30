@@ -3,8 +3,8 @@ import { decode } from 'base64-arraybuffer';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { Camera, Images } from 'lucide-react-native';
+import { Keyboard, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Camera, Check, Images } from 'lucide-react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { NotificationSettings } from '@/features/notifications/NotificationSettings';
@@ -110,6 +110,8 @@ export default function ProfielScreen() {
     }
     setPassError(undefined);
     setPassBusy(true);
+    // Toetsenbord weg, anders staat de bevestiging erachter.
+    Keyboard.dismiss();
     const { error } = await supabase.auth.updateUser({ password: passNew });
     setPassBusy(false);
     if (error) {
@@ -468,13 +470,21 @@ export default function ProfielScreen() {
       >
         {mailFeedback === 'gelukt' ? (
           <>
-            <TvzText preset="secondary" style={styles.passGelukt}>
-              {t('profiel.mailGelukt')}
-            </TvzText>
+            <View style={styles.geluktBlok}>
+              <View style={styles.geluktRing}>
+                <Check color={colors.white} size={30} strokeWidth={3} />
+              </View>
+              <TvzText preset="cardTitle" style={styles.geluktTitel}>
+                {t('profiel.mailGeluktTitel')}
+              </TvzText>
+              <TvzText preset="secondary" style={styles.geluktTekst}>
+                {t('profiel.mailGelukt')}
+              </TvzText>
+            </View>
             <Button
-              label={t('algemeen.sluiten')}
-              variant="outline"
-              style={styles.logout}
+              label={t('algemeen.klaar')}
+              variant="cta"
+              size="lg"
               onPress={() => setMailOpen(false)}
             />
           </>
@@ -516,13 +526,21 @@ export default function ProfielScreen() {
       >
         {passFeedback === 'gelukt' ? (
           <>
-            <TvzText preset="secondary" style={styles.passGelukt}>
-              {t('profiel.wachtwoordGelukt')}
-            </TvzText>
+            <View style={styles.geluktBlok}>
+              <View style={styles.geluktRing}>
+                <Check color={colors.white} size={30} strokeWidth={3} />
+              </View>
+              <TvzText preset="cardTitle" style={styles.geluktTitel}>
+                {t('profiel.wachtwoordGeluktTitel')}
+              </TvzText>
+              <TvzText preset="secondary" style={styles.geluktTekst}>
+                {t('profiel.wachtwoordGelukt')}
+              </TvzText>
+            </View>
             <Button
-              label={t('algemeen.sluiten')}
-              variant="outline"
-              style={styles.logout}
+              label={t('algemeen.klaar')}
+              variant="cta"
+              size="lg"
               onPress={() => setPassOpen(false)}
             />
           </>
@@ -742,8 +760,26 @@ const styles = StyleSheet.create({
   passUitleg: {
     marginBottom: spacing.md,
   },
-  passGelukt: {
+  // Onmiskenbare bevestiging: groene cirkel met vinkje.
+  geluktBlok: {
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+    gap: spacing.sm,
+  },
+  geluktRing: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.accentDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+  },
+  geluktTitel: {
     color: colors.successText,
+  },
+  geluktTekst: {
+    textAlign: 'center',
   },
   name: {
     fontSize: 22,

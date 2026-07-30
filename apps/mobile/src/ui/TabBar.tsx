@@ -31,6 +31,8 @@ export function visibleTabs(role: string | null | undefined): string[] {
   if (role === 'vrijwilliger' || role === 'beheerder') {
     return ['rooster', 'buurt', 'steun', 'profiel'];
   }
+  // Hulpvrager houdt het zo eenvoudig mogelijk: wie er komt en zijn kring.
+  if (role === 'hulpvrager') return ['rooster', 'kring'];
   return [...TAB_ORDER];
 }
 
