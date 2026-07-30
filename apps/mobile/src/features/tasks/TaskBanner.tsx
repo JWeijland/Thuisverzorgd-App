@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { create } from 'zustand';
 
 import { cancelTaskReminder, scheduleTaskReminder } from '@/features/notifications/push';
+import { useProfile } from '@/features/onboarding/useAuth';
 import { taskStart, useMyClaimedTasks, useTaskRpc, type Task } from '@/features/tasks/api';
 import { taskLabel } from '@/features/tasks/logic';
 import {
@@ -33,6 +34,7 @@ const useDismissed = create<{ ids: string[]; dismiss: (id: string) => void }>((s
  */
 export function TaskBanner() {
   const insets = useSafeAreaInsets();
+  const profile = useProfile();
   const tasks = useMyClaimedTasks();
   const { ids, dismiss } = useDismissed();
   const [expanded, setExpanded] = useState(false);
@@ -40,7 +42,13 @@ export function TaskBanner() {
   // Ververst elke halve minuut, zodat "Rond af" vanzelf actief wordt.
   const now = useNow();
 
-  const next = (tasks.data ?? []).find((task) => !ids.includes(task.id));
+  // "jij gaat" hoort bij wie de taak zelf uitvoert. Een hulpvrager voert geen
+  // taken uit; ziet hij hier toch iets, dan is dat een restant van een eerdere
+  // rol. Server-side wordt dat rechtgezet, hier tonen we het sowieso niet.
+  const doetZelfTaken = profile.data?.role !== 'hulpvrager';
+  const next = doetZelfTaken
+    ? (tasks.data ?? []).find((task) => !ids.includes(task.id))
+    : undefined;
   const shown = justCompleted ?? next;
   const start = shown ? taskStart(shown) : null;
   const canComplete = !!start && now >= start.getTime();
