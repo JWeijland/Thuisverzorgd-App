@@ -129,6 +129,7 @@ export default function BuurtScreen() {
             key={circle.id}
             lat={circle.lat}
             lon={circle.lon}
+            naam={circle.name}
             plekkenVrij={circle.plekken_vrij}
             onPress={() => {
               // Vrijwilliger: kaartje met de kring + aanmeldknop; anders alleen inzoomen.
@@ -408,9 +409,17 @@ function KringKaart({
               .join(' · ')}
           </TvzText>
         </View>
-        <TvzText preset="cardTitle" onPress={onClose} accessibilityRole="button">
-          ✕
-        </TvzText>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('algemeen.sluiten')}
+          onPress={onClose}
+          hitSlop={12}
+          style={styles.sluitKnop}
+        >
+          <TvzText preset="cardTitle" style={styles.sluitKruis}>
+            ✕
+          </TvzText>
+        </Pressable>
       </View>
 
       {lid ? (
@@ -602,6 +611,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   kringKopText: { flex: 1 },
+  // Tikdoel van minimaal 44pt: het losse kruisje was te klein om te raken.
+  sluitKnop: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sluitKruis: {
+    color: colors.inkSoft,
+  },
   kringMeta: {
     fontSize: 13,
   },

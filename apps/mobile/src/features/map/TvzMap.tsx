@@ -57,57 +57,78 @@ const PIN_PATH =
   'M26 2.75a20.75 20.75 0 0 1 14.67 35.42L26 52.84 11.33 38.17A20.75 20.75 0 0 1 26 2.75z';
 const PIN_W = 34;
 const PIN_H = 43;
+/** Hoogte van de labelpil onder de druppel (inclusief overlap). */
+const LABEL_H = 20;
 // De punt van de druppel (y 52.84 van 66) hoort op de coördinaat te staan.
 const PIN_ANCHOR_Y = 52.84 / 66;
 
-/** Hulpkring: witte druppel met navy rand en twee stipjes (blauw + groen). */
+/**
+ * Hulpkring: witte druppel met navy rand en twee stipjes (blauw + groen), met
+ * de kringnaam als labelpil eronder (ontwerp 1d).
+ */
 export function KringMarker({
   lat,
   lon,
+  naam,
   plekkenVrij = 0,
   onPress,
 }: {
   lat: number;
   lon: number;
+  naam?: string;
   plekkenVrij?: number;
   onPress?: () => void;
 }) {
+  // Met label is de marker hoger; de punt van de druppel moet op de coördinaat
+  // blijven staan, dus schuift het anker mee omhoog.
+  const hoogte = naam ? PIN_H + LABEL_H : PIN_H;
+  const ankerY = naam ? (PIN_H * PIN_ANCHOR_Y) / hoogte : PIN_ANCHOR_Y;
+
   return (
     <Marker
       coordinate={{ latitude: lat, longitude: lon }}
       onPress={onPress}
       tracksViewChanges={false}
-      anchor={{ x: 0.5, y: PIN_ANCHOR_Y }}
-      centerOffset={{ x: 0, y: (0.5 - PIN_ANCHOR_Y) * PIN_H }}
+      anchor={{ x: 0.5, y: ankerY }}
+      centerOffset={{ x: 0, y: (0.5 - ankerY) * hoogte }}
     >
-      <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
-        <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill="#112F50" opacity={0.15} />
-        <Path d={PIN_PATH} fill={colors.white} stroke={colors.primary} strokeWidth={4} />
-        <Rect x={13} y={20.5} width={11} height={8} rx={4} fill={colors.primaryMid} />
-        <Rect x={28} y={20.5} width={11} height={8} rx={4} fill={colors.accent} />
-        {plekkenVrij > 0 ? (
-          <G translate="30 0">
-            <Rect
-              width={22}
-              height={22}
-              rx={11}
-              fill="#8DC93F"
-              stroke={colors.white}
-              strokeWidth={2.5}
-            />
-            <SvgText
-              x={11}
-              y={15.7}
-              fontSize={12.5}
-              fontWeight="700"
-              fill="#112F50"
-              textAnchor="middle"
-            >
-              {`+${plekkenVrij}`}
-            </SvgText>
-          </G>
+      <View style={styles.kringWrap}>
+        <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
+          <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill="#112F50" opacity={0.15} />
+          <Path d={PIN_PATH} fill={colors.white} stroke={colors.primary} strokeWidth={4} />
+          <Rect x={13} y={20.5} width={11} height={8} rx={4} fill={colors.primaryMid} />
+          <Rect x={28} y={20.5} width={11} height={8} rx={4} fill={colors.accent} />
+          {plekkenVrij > 0 ? (
+            <G translate="30 0">
+              <Rect
+                width={22}
+                height={22}
+                rx={11}
+                fill="#8DC93F"
+                stroke={colors.white}
+                strokeWidth={2.5}
+              />
+              <SvgText
+                x={11}
+                y={15.7}
+                fontSize={12.5}
+                fontWeight="700"
+                fill="#112F50"
+                textAnchor="middle"
+              >
+                {`+${plekkenVrij}`}
+              </SvgText>
+            </G>
+          ) : null}
+        </Svg>
+        {naam ? (
+          <View style={styles.label}>
+            <TvzText preset="meta" numberOfLines={1} style={styles.labelText}>
+              {naam}
+            </TvzText>
+          </View>
         ) : null}
-      </Svg>
+      </View>
     </Marker>
   );
 }
@@ -181,6 +202,23 @@ export function OwnLocationMarker({ lat, lon }: { lat: number; lon: number }) {
 }
 
 const styles = StyleSheet.create({
+  kringWrap: {
+    alignItems: 'center',
+  },
+  label: {
+    marginTop: -4,
+    maxWidth: 130,
+    backgroundColor: colors.white,
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderWidth: 1.5,
+    borderColor: colors.line,
+  },
+  labelText: {
+    color: colors.primary,
+    fontSize: 11,
+  },
   buddy: {
     width: 34,
     height: 34,

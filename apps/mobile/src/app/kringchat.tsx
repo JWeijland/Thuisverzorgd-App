@@ -1,8 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import { useEffect } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useCircleMembers, useMyCircle } from '@/features/circles/api';
+import { markCircleChatRead, useCircleMembers, useMyCircle } from '@/features/circles/api';
 import { ChatView } from '@/features/circles/ChatView';
 import { t } from '@/i18n';
 import { colors, spacing } from '@/theme';
@@ -15,6 +17,18 @@ import { EmptyState, TvzText } from '@/ui';
 export default function KringChatScreen() {
   const circle = useMyCircle();
   const members = useCircleMembers(circle.data?.id);
+  const queryClient = useQueryClient();
+  const circleId = circle.data?.id;
+
+  // Bij het verlaten van de chat is alles gelezen; de badge verdwijnt dan.
+  useEffect(() => {
+    if (!circleId) return;
+    return () => {
+      markCircleChatRead(circleId).then(() =>
+        queryClient.invalidateQueries({ queryKey: ['messages-unread', circleId] }),
+      );
+    };
+  }, [circleId, queryClient]);
 
   const roleSuffix = (senderId: string) => {
     const member = (members.data ?? []).find((item) => item.profile_id === senderId);

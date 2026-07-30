@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Linking, Modal, StyleSheet, View } from 'react-native';
+import { Linking, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Zap } from 'lucide-react-native';
 
 import { useProfile } from '@/features/onboarding/useAuth';
@@ -160,9 +160,17 @@ export function VolunteerFlow({ selected, onCloseSelected, ownLocation }: Props)
               </TvzText>
             ) : null}
           </View>
-          <TvzText preset="cardTitle" onPress={onCloseSelected} accessibilityRole="button">
-            ✕
-          </TvzText>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('algemeen.sluiten')}
+            onPress={onCloseSelected}
+            hitSlop={12}
+            style={styles.sluitKnop}
+          >
+            <TvzText preset="cardTitle" style={styles.sluitKruis}>
+              ✕
+            </TvzText>
+          </Pressable>
         </View>
         <TvzText preset="body" style={styles.requestType}>
           <TvzText preset="body" style={styles.greenDot}>
@@ -235,6 +243,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   flexTitle: { flex: 1 },
+  // Tikdoel van minimaal 44pt: het losse kruisje was te klein om te raken.
+  sluitKnop: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sluitKruis: {
+    color: colors.inkSoft,
+  },
   uitleg: {
     marginTop: spacing.sm,
   },

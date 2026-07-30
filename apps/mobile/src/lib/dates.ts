@@ -76,6 +76,15 @@ export function formatShortDate(date: Date): string {
   return `${date.getDate()} ${MONTH_FULL[date.getMonth()]!.slice(0, 3)}`;
 }
 
+/** "dinsdag 5 augustus · 19:00" — voor bijeenkomsten met datum én tijd. */
+export function formatMoment(iso: string): string {
+  const d = new Date(iso);
+  const dag = WEEKDAY_FULL[(d.getDay() + 6) % 7]!;
+  const uur = `${d.getHours()}`.padStart(2, '0');
+  const min = `${d.getMinutes()}`.padStart(2, '0');
+  return `${dag.charAt(0).toUpperCase()}${dag.slice(1)} ${d.getDate()} ${MONTH_FULL[d.getMonth()]} · ${uur}:${min}`;
+}
+
 /** "14:00:00" (Postgres time) → "14:00". */
 export function formatTime(time: string): string {
   return time.slice(0, 5);

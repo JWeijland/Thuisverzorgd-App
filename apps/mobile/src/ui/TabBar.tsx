@@ -27,7 +27,10 @@ export const TAB_ORDER = ['rooster', 'buurt', 'kring', 'steun', 'profiel'] as co
  * kring (leden + berichten) zit in de kop van de planning-tab (feedback 30-07).
  */
 export function visibleTabs(role: string | null | undefined): string[] {
-  if (role === 'vrijwilliger') return ['rooster', 'buurt', 'steun', 'profiel'];
+  // Vrijwilliger én beheerder hebben hun kring in de kop van de planning-tab.
+  if (role === 'vrijwilliger' || role === 'beheerder') {
+    return ['rooster', 'buurt', 'steun', 'profiel'];
+  }
   return [...TAB_ORDER];
 }
 

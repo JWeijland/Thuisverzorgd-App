@@ -10,9 +10,11 @@ import {
 } from 'react-native';
 
 import { useMyCircle } from '@/features/circles/api';
+import { KringBalk } from '@/features/circles/KringBalk';
+import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
 import { InboxBell } from '@/features/notifications/InboxBell';
 import { useCreateTask, useTaskLogs, useTaskRpc, useTasks } from '@/features/tasks/api';
-import { taskLabel } from '@/features/tasks/logic';
+import { computeWorkload, taskLabel } from '@/features/tasks/logic';
 import { TaskPlanner } from '@/features/tasks/TaskPlanner';
 import { TaskRow } from '@/features/tasks/TaskRow';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
@@ -26,7 +28,7 @@ import {
   isoWeekNumber,
   toDateString,
 } from '@/lib/dates';
-import { colors, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 import {
   Avatar,
   Button,
@@ -61,13 +63,38 @@ export function RoosterBeheerder() {
     (task) => !selectedDay || task.date === selectedDay,
   );
 
+  // Belastingverdeling van deze maand (stond eerder op de kring-tab).
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const monthTasks = useTasks(circle.data?.id, monthStart, monthEnd);
+  const workload = computeWorkload(monthTasks.data ?? [], now);
+  const maxCount = workload[0]?.count ?? 0;
+
   return (
     <View style={styles.safe}>
       <GradientHeader
         title={t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
         subtitle={formatHumanDate(now)}
-        right={<InboxBell />}
-      />
+        wobbel
+        right={
+          <View style={styles.headerActies}>
+            {circle.data ? <KringBerichtenKnop circleId={circle.data.id} /> : null}
+            <InboxBell />
+          </View>
+        }
+      >
+        {circle.data ? (
+          <View style={styles.kringBalkWrap}>
+            <KringBalk
+              circleId={circle.data.id}
+              name={circle.data.name}
+              linkCode={circle.data.link_code}
+              isBeheerder
+              onDark
+            />
+          </View>
+        ) : null}
+      </GradientHeader>
       <KeyboardAvoidingView
         style={styles.fill}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -77,7 +104,7 @@ export function RoosterBeheerder() {
             <Card style={styles.section}>
               <EmptyState title={t('rooster.geenKring')} body={t('rooster.geenKringTekst')} />
               <Button
-                label={t('tabs.kring')}
+                label={t('kring.maakKnop')}
                 variant="cta"
                 onPress={() => router.navigate('/kring')}
               />
@@ -165,6 +192,43 @@ export function RoosterBeheerder() {
                 ) : null}
               </View>
 
+              {workload.length > 0 ? (
+                <>
+                  <SectionHeader title={t('kring.wieDoetWat')} />
+                  <Card style={styles.workloadCard}>
+                    {workload.map((row) => (
+                      <View key={row.profileId} style={styles.workloadRow}>
+                        <TvzText preset="secondary" style={styles.workloadName}>
+                          {row.name}
+                        </TvzText>
+                        <View style={styles.workloadTrack}>
+                          <View
+                            style={[
+                              styles.workloadBar,
+                              {
+                                width: `${Math.max(8, (row.count / Math.max(maxCount, 1)) * 100)}%`,
+                                backgroundColor:
+                                  row.count === maxCount ? colors.primary : colors.accent,
+                              },
+                            ]}
+                          />
+                        </View>
+                        <TvzText preset="meta" style={styles.workloadCount}>
+                          {row.count === 1
+                            ? t('kring.taak1')
+                            : t('kring.taken', { aantal: row.count })}
+                        </TvzText>
+                      </View>
+                    ))}
+                    {workload.length > 1 ? (
+                      <TvzText preset="secondary" style={styles.advies}>
+                        {t('kring.spreidAdvies', { naam: workload[0]!.name })}
+                      </TvzText>
+                    ) : null}
+                  </Card>
+                </>
+              ) : null}
+
               {(logs.data ?? []).length > 0 ? (
                 <>
                   <SectionHeader title={t('rooster.uitDeKring')} />
@@ -199,6 +263,44 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: spacing.lg,
+  },
+  headerActies: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  kringBalkWrap: {
+    marginTop: spacing.md,
+  },
+  workloadCard: {
+    gap: spacing.sm,
+  },
+  workloadRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  workloadName: {
+    width: 56,
+  },
+  workloadTrack: {
+    flex: 1,
+    height: 8,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surfaceAlt,
+    overflow: 'hidden',
+  },
+  workloadBar: {
+    height: 8,
+    borderRadius: radius.pill,
+  },
+  workloadCount: {
+    width: 64,
+    textAlign: 'right',
+  },
+  advies: {
+    marginTop: spacing.sm,
+    fontStyle: 'italic',
   },
   todayRow: {
     flexDirection: 'row',

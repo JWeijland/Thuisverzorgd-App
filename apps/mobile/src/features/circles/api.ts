@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
@@ -126,6 +127,61 @@ export function useMessages(circleId: string | undefined) {
       return data as unknown as ChatMessage[];
     },
   });
+}
+
+const gelezenKey = (circleId: string) => `kringchat-gelezen-${circleId}`;
+
+/** Kringchat als gelezen markeren (tijdstempel lokaal per kring). */
+export async function markCircleChatRead(circleId: string) {
+  await AsyncStorage.setItem(gelezenKey(circleId), new Date().toISOString()).catch(() => {});
+}
+
+/**
+ * Hoeveel berichten van anderen kwamen er ná je laatste bezoek aan de kringchat?
+ * Het "gelezen tot"-moment staat op het toestel; de teller komt van de server.
+ */
+export function useUnreadCircleMessages(circleId: string | undefined) {
+  const { session } = useSession();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!circleId) return;
+    const channel = supabase
+      .channel(`unread-${circleId}-${Math.random().toString(36).slice(2)}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `circle_id=eq.${circleId}`,
+        },
+        () => queryClient.invalidateQueries({ queryKey: ['messages-unread', circleId] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [circleId, queryClient]);
+
+  const query = useQuery({
+    queryKey: ['messages-unread', circleId, session?.user.id],
+    enabled: !!circleId && !!session,
+    queryFn: async (): Promise<number> => {
+      const sinds = await AsyncStorage.getItem(gelezenKey(circleId!));
+      let request = supabase
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('circle_id', circleId!)
+        .neq('sender_id', session!.user.id);
+      if (sinds) request = request.gt('created_at', sinds);
+      const { count, error } = await request;
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+
+  return query.data ?? 0;
 }
 
 export function useSendMessage(circleId: string | undefined) {

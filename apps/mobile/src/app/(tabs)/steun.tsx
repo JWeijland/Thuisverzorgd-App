@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -10,15 +9,15 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Send } from 'lucide-react-native';
 
 import { BrokerChat } from '@/features/forum/BrokerChat';
 import { useForumActions, usePosts, type ForumTag } from '@/features/forum/api';
+import { OpleidingenLijst } from '@/features/learning/OpleidingenLijst';
 import { t } from '@/i18n';
 import { useKeyboardOpen } from '@/lib/keyboard';
-import { colors, gradient, radius, spacing } from '@/theme';
-import { BottomSheet, Button, Card, Chip, EmptyState, Pill, TextField, TvzText } from '@/ui';
+import { colors, radius, spacing } from '@/theme';
+import { Card, Chip, EmptyState, GradientHeader, Pill, TvzText } from '@/ui';
 
 const TAGS: { key: ForumTag; labelKey: string }[] = [
   { key: 'wonen', labelKey: 'steun.tagWonen' },
@@ -35,6 +34,9 @@ export const TAG_LABEL: Record<ForumTag, string> = {
   overig: 'steun.tagOverig',
 };
 
+const SUBNAV = ['forum', 'makelaar', 'opleiding'] as const;
+type SubTab = (typeof SUBNAV)[number];
+
 function timeAgo(iso: string): string {
   const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
   if (minutes < 60) return `${Math.max(minutes, 1)} min`;
@@ -44,14 +46,10 @@ function timeAgo(iso: string): string {
   return `${Math.floor(hours / 24)} d`;
 }
 
-/** Steun & advies (screens 13/14): forum + live chat met hulpmakelaars. */
+/** Steun & advies (screens 13/14): forum, chat met hulpmakelaars en opleidingen. */
 export default function SteunScreen() {
-  const [tab, setTab] = useState<'forum' | 'makelaar'>('forum');
+  const [tab, setTab] = useState<SubTab>('forum');
   const [filter, setFilter] = useState<ForumTag | null>(null);
-  const [composerOpen, setComposerOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
-  const [composeTag, setComposeTag] = useState<ForumTag>('overig');
   const [quick, setQuick] = useState('');
   const keyboardOpen = useKeyboardOpen();
   const posts = usePosts(filter);
@@ -59,59 +57,55 @@ export default function SteunScreen() {
 
   // De vraag landt in de categorie die bovenin geselecteerd staat.
   function submitQuick() {
-    const quickTitle = quick.trim();
-    if (quickTitle.length < 8 || createPost.isPending) return;
+    const titel = quick.trim();
+    if (titel.length < 8 || createPost.isPending) return;
     createPost.mutate(
-      { title: quickTitle, body: '', tag: filter ?? 'overig' },
-      { onSuccess: () => setQuick('') },
+      { title: titel, body: '', tag: filter ?? 'overig' },
+      {
+        onSuccess: () => setQuick(''),
+      },
     );
-  }
-
-  function openComposer() {
-    setComposeTag(filter ?? 'overig');
-    setComposerOpen(true);
   }
 
   return (
     <View style={styles.safeBg}>
-      <LinearGradient {...gradient} style={styles.header}>
-        <SafeAreaView edges={['top']}>
-          <TvzText preset="screenTitle" style={styles.headerTitle}>
-            {t('steun.titel')}
-          </TvzText>
-          <TvzText preset="secondary" style={styles.headerSub}>
-            {t('steun.subtitel')}
-          </TvzText>
-          <View style={styles.subnav}>
-            {(['forum', 'makelaar'] as const).map((key) => (
-              <Pressable
-                key={key}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: tab === key }}
-                onPress={() => setTab(key)}
-                style={[styles.subnavPill, tab === key && styles.subnavActive]}
+      <GradientHeader title={t('steun.titel')} subtitle={t('steun.subtitel')} wobbel>
+        <View style={styles.subnav}>
+          {SUBNAV.map((key) => (
+            <Pressable
+              key={key}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: tab === key }}
+              onPress={() => setTab(key)}
+              style={[styles.subnavPill, tab === key && styles.subnavActive]}
+            >
+              <TvzText
+                preset="meta"
+                style={tab === key ? styles.subnavTextActive : styles.subnavText}
               >
-                <TvzText
-                  preset="meta"
-                  style={tab === key ? styles.subnavTextActive : styles.subnavText}
-                >
-                  {t(key === 'forum' ? 'steun.tabForum' : 'steun.tabMakelaar')}
-                </TvzText>
-              </Pressable>
-            ))}
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
+                {t(
+                  key === 'forum'
+                    ? 'steun.tabForum'
+                    : key === 'makelaar'
+                      ? 'steun.tabMakelaar'
+                      : 'opleiding.tab',
+                )}
+              </TvzText>
+            </Pressable>
+          ))}
+        </View>
+      </GradientHeader>
 
       {tab === 'makelaar' ? (
         <BrokerChat />
+      ) : tab === 'opleiding' ? (
+        <OpleidingenLijst />
       ) : (
         <KeyboardAvoidingView
           style={styles.fill}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <ScrollView contentContainerStyle={styles.list}>
-            <Button label={t('steun.stelVraag')} variant="cta" size="lg" onPress={openComposer} />
             <View style={styles.chips}>
               <Chip
                 label={t('steun.tagAlles')}
@@ -161,23 +155,14 @@ export default function SteunScreen() {
               </Pressable>
             ))}
           </ScrollView>
-          {filter ? (
-            <View style={styles.categorieRij}>
-              <View style={styles.categorieDot} />
-              <TvzText preset="meta" style={styles.categorieText}>
-                {t('steun.plaatsInCategorie', { categorie: t(TAG_LABEL[filter]) })}
-              </TvzText>
-            </View>
-          ) : null}
+
+          {/* Typebalk: de gekozen categorie staat als pil vóór het veld. */}
           <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
+            {filter ? <Pill label={t(TAG_LABEL[filter])} /> : null}
             <TextInput
               value={quick}
               onChangeText={setQuick}
-              placeholder={
-                filter
-                  ? t('steun.forumSnelPlaceholderTag', { categorie: t(TAG_LABEL[filter]) })
-                  : t('steun.forumSnelPlaceholder')
-              }
+              placeholder={t('steun.forumSnelPlaceholder')}
               placeholderTextColor={colors.inkFaint}
               style={styles.input}
               onSubmitEditing={submitQuick}
@@ -194,54 +179,6 @@ export default function SteunScreen() {
           </View>
         </KeyboardAvoidingView>
       )}
-
-      <BottomSheet
-        visible={composerOpen}
-        onClose={() => setComposerOpen(false)}
-        title={t('steun.stelVraag')}
-      >
-        <TextField
-          label={t('steun.vraagTitelLabel')}
-          placeholder={t('steun.vraagTitelPlaceholder')}
-          value={title}
-          onChangeText={setTitle}
-        />
-        <TextField
-          label={t('steun.vraagTekstLabel')}
-          placeholder={t('steun.vraagTekstPlaceholder')}
-          value={body}
-          onChangeText={setBody}
-          multiline
-        />
-        <View style={styles.chips}>
-          {[...TAGS, { key: 'overig' as ForumTag, labelKey: 'steun.tagOverig' }].map((tag) => (
-            <Chip
-              key={tag.key}
-              label={t(tag.labelKey)}
-              selected={composeTag === tag.key}
-              onPress={() => setComposeTag(tag.key)}
-            />
-          ))}
-        </View>
-        <Button
-          label={t('steun.plaatsVraag')}
-          variant="cta"
-          size="lg"
-          disabled={createPost.isPending || title.trim().length < 8}
-          onPress={() =>
-            createPost.mutate(
-              { title: title.trim(), body: body.trim(), tag: composeTag },
-              {
-                onSuccess: () => {
-                  setComposerOpen(false);
-                  setTitle('');
-                  setBody('');
-                },
-              },
-            )
-          }
-        />
-      </BottomSheet>
     </View>
   );
 }
@@ -251,22 +188,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
-  header: {
-    paddingHorizontal: spacing.screen,
-    paddingBottom: spacing.lg,
-  },
-  headerTitle: {
-    color: colors.white,
-    fontSize: 24,
-    marginTop: spacing.sm,
-  },
-  headerSub: {
-    color: 'rgba(255,255,255,0.8)',
-    marginBottom: spacing.md,
-  },
   subnav: {
     flexDirection: 'row',
     gap: spacing.sm,
+    marginTop: spacing.md,
   },
   subnavPill: {
     borderRadius: radius.pill,
@@ -289,21 +214,26 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
     gap: spacing.cardGap,
   },
-  categorieRij: {
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.chipGap,
+    marginBottom: spacing.xs,
+  },
+  postCard: {
+    paddingVertical: spacing.md,
+  },
+  postMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.screen,
-    paddingBottom: spacing.xs,
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
-  categorieDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: colors.primaryMid,
+  metaText: {
+    color: colors.inkFaint,
   },
-  categorieText: {
-    color: colors.primaryMid,
+  postTitle: {
+    marginBottom: 2,
   },
   inputRow: {
     flexDirection: 'row',
@@ -336,26 +266,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  chips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.chipGap,
-    marginVertical: spacing.sm,
-  },
-  postCard: {
-    paddingVertical: spacing.md,
-  },
-  postMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  metaText: {
-    color: colors.inkFaint,
-  },
-  postTitle: {
-    marginBottom: 2,
   },
 });

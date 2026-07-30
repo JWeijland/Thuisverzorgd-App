@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Users } from 'lucide-react-native';
@@ -6,7 +7,7 @@ import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useCircleMembers, type Member } from '@/features/circles/api';
 import { t } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
-import { BottomSheet, StatusPill, TvzText } from '@/ui';
+import { BottomSheet, Button, Card, StatusPill, TvzText } from '@/ui';
 
 const STATUS_MAP: Record<Member['status'], { key: string; kind: 'success' | 'warn' | 'info' }> = {
   actief: { key: 'kring.statusActief', kind: 'success' },
@@ -20,6 +21,9 @@ type Props = {
   name: string;
   /** Op donkere achtergrond (in de gradient-header) of op de lichte pagina. */
   onDark?: boolean;
+  /** Beheerder: uitnodigen en de koppelcode staan mee in de ledenlijst. */
+  isBeheerder?: boolean;
+  linkCode?: string;
 };
 
 /**
@@ -27,11 +31,20 @@ type Props = {
  * aantal leden. Tikken opent de ledenlijst. (Feedback 30-07: de vrijwilliger
  * heeft geen aparte kring-tab meer.)
  */
-export function KringBalk({ circleId, name, onDark = false }: Props) {
+export function KringBalk({
+  circleId,
+  name,
+  onDark = false,
+  isBeheerder = false,
+  linkCode,
+}: Props) {
   const members = useCircleMembers(circleId);
   const [open, setOpen] = useState(false);
 
   const list = members.data ?? [];
+  const actieveVrijwilligers = list.filter(
+    (member) => member.member_role === 'vrijwilliger' && member.status === 'actief',
+  ).length;
   // De foto van de hulpvrager staat voorop: dat is het gezicht van de kring.
   const hulpvrager = list.find((member) => member.member_role === 'hulpvrager');
   const gezicht = hulpvrager ?? list.find((member) => member.member_role === 'beheerder');
@@ -101,6 +114,35 @@ export function KringBalk({ circleId, name, onDark = false }: Props) {
               </View>
             );
           })}
+
+          {isBeheerder ? (
+            <View style={styles.beheer}>
+              <Button
+                label={t('kring.uitnodigen')}
+                variant="outline"
+                size="lg"
+                onPress={() => {
+                  setOpen(false);
+                  router.push('/uitnodigen');
+                }}
+              />
+              {actieveVrijwilligers >= 2 ? (
+                <TvzText preset="secondary" style={styles.limiet}>
+                  {t('kring.gratisLimiet')}
+                </TvzText>
+              ) : null}
+              {linkCode ? (
+                <Card dashed style={styles.codeKaart}>
+                  <TvzText preset="meta" style={styles.codeLabel}>
+                    {t('kring.koppelTitel')}
+                  </TvzText>
+                  <TvzText preset="cardTitle" style={styles.code}>
+                    {linkCode}
+                  </TvzText>
+                </Card>
+              ) : null}
+            </View>
+          ) : null}
         </ScrollView>
       </BottomSheet>
     </>
@@ -152,5 +194,25 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
     minHeight: 60,
+  },
+  beheer: {
+    marginTop: spacing.lg,
+  },
+  limiet: {
+    textAlign: 'center',
+    marginTop: spacing.sm,
+    color: colors.inkFaint,
+  },
+  codeKaart: {
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+    marginTop: spacing.md,
+  },
+  codeLabel: {
+    color: colors.primaryMid,
+  },
+  code: {
+    letterSpacing: 2,
+    marginTop: 4,
   },
 });
