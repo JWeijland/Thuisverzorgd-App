@@ -1,6 +1,8 @@
 import { router } from 'expo-router';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
+import { UitlogKnop } from '@/features/onboarding/UitlogKnop';
 import { useCircleMembers, useMyCircle } from '@/features/circles/api';
 import { useTasks } from '@/features/tasks/api';
 import { taskLabel } from '@/features/tasks/logic';
@@ -8,7 +10,7 @@ import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { formatHumanDate, formatTime, greetingKey, isoWeekDays, toDateString } from '@/lib/dates';
 import { colors, radius, shadows, spacing } from '@/theme';
-import { Avatar, Button, Card, EmptyState, GradientHeader, PulseDot, TvzText } from '@/ui';
+import { Button, Card, EmptyState, GradientHeader, PulseDot, TvzText } from '@/ui';
 
 /**
  * Rooster · hulpvrager (screen 24): grote weergave. "Anna is nu bij je" met
@@ -49,15 +51,24 @@ export function RoosterHulpvrager() {
 
   return (
     <View style={styles.safe}>
+      {/* Zelfde kop als bij de vrijwilliger en de beheerder: golvende onderrand
+          en het groene streepje. De uitlogknop hangt hier, want dit scherm
+          heeft bewust geen profieltab. */}
       <GradientHeader
         title={t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
         subtitle={formatHumanDate(now)}
+        wobbel
+        right={<UitlogKnop />}
       />
       <ScrollView contentContainerStyle={styles.container}>
         {current?.claimer ? (
           <View style={[styles.nowCard, shadows.card]}>
             <View style={styles.nowRow}>
-              <Avatar name={current.claimer.name} size={52} />
+              <ProfileAvatar
+                name={current.claimer.name}
+                avatarPath={current.claimer.avatar_path}
+                size={52}
+              />
               <View style={styles.nowInfo}>
                 <TvzText preset="cardTitle" style={styles.nowTitle}>
                   {t('rooster.isNuBijJe', { naam: current.claimer.name.split(' ')[0]! })}
@@ -103,7 +114,11 @@ export function RoosterHulpvrager() {
             </TvzText>
             <Card>
               <View style={styles.nowRow}>
-                <Avatar name={nextTask.claimer.name} size={44} />
+                <ProfileAvatar
+                  name={nextTask.claimer.name}
+                  avatarPath={nextTask.claimer.avatar_path}
+                  size={44}
+                />
                 <View style={styles.nowInfo}>
                   <TvzText preset="cardTitle">
                     {t('rooster.komtOm', {

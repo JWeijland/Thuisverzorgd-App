@@ -357,7 +357,10 @@
     "adminUitleg": "Kerncijfers van de pilot, geen persoonsgegevens.",
     "adminOpenen": "Openen",
     "fotoWijzigen": "Profielfoto wijzigen",
-    "uitloggen": "Uitloggen"
+    "uitloggen": "Uitloggen",
+    "uitloggenTitel": "Wil je uitloggen?",
+    "uitloggenUitleg": "Je komt dan terug op het startscherm. Om weer binnen te komen heb je je e-mailadres of gebruikersnaam nodig.",
+    "blijfIngelogd": "Nee, ik blijf"
   },
   "admin": {
     "titel": "Thuisverzorgd Admin",
