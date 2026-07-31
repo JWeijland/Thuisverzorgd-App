@@ -7,6 +7,7 @@ import { useActivateSubscription, useSubscription } from '@/features/subscriptio
 import { t } from '@/i18n';
 import { colors, gradient, radius, spacing } from '@/theme';
 import { Button, Card, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 const VOORDELEN = [
   'abonnement.voordeel1',
@@ -17,6 +18,7 @@ const VOORDELEN = [
 
 /** Abonnement (screen 12): €4,99-kaart met vier voordelen; pilot-stub activeert de proefmaand. */
 export default function AbonnementScreen() {
+  useStatusBalk('donker');
   const subscription = useSubscription();
   const activate = useActivateSubscription();
   const active = subscription.data?.status === 'proef' || subscription.data?.status === 'actief';

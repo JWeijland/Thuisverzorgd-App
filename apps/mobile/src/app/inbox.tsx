@@ -7,9 +7,11 @@ import { deeplinkToPath } from '@/features/notifications/push';
 import { t } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
 import { Card, EmptyState, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Inbox (screen 15): meldingen uit de notifications-tabel, klikbaar naar hun doel. */
 export default function InboxScreen() {
+  useStatusBalk('donker');
   const notifications = useNotifications();
   const { markRead, markAllRead, remove } = useNotificationActions();
   const items = notifications.data ?? [];

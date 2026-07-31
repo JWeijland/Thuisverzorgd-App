@@ -201,6 +201,8 @@ export function BrokerChat({ startVraag }: { startVraag?: string } = {}) {
 
       <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
         <TextInput
+          textContentType="none"
+          autoComplete="off"
           value={draft}
           onChangeText={setDraft}
           placeholder={

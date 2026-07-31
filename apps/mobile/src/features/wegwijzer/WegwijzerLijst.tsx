@@ -1,22 +1,7 @@
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import {
-  Bookmark,
-  Brain,
-  Briefcase,
-  ChevronRight,
-  Compass,
-  HeartHandshake,
-  HeartPulse,
-  House,
-  MessagesSquare,
-  Scale,
-  Search,
-  Wallet,
-  X,
-  type LucideIcon,
-} from 'lucide-react-native';
+import { Bookmark, ChevronRight, MessagesSquare, Search, X } from 'lucide-react-native';
 
 import {
   useDebounced,
@@ -29,32 +14,11 @@ import {
   type ThemaKleur,
   type Zoektreffer,
 } from '@/features/wegwijzer/api';
+import { ThemaIcoon } from '@/features/wegwijzer/ThemaIcoon';
 import { filterLokaal, magZoeken, splitsTreffer } from '@/features/wegwijzer/zoekterm';
 import { t } from '@/i18n';
 import { colors, radius, spacing, themaTints } from '@/theme';
 import { Card, Chip, EmptyState, Pill, SectionHeader, TvzText } from '@/ui';
-
-/** De iconen die de thema's in de database bij naam noemen. */
-const THEMA_ICONEN: Record<string, LucideIcon> = {
-  Compass,
-  Wallet,
-  House,
-  Briefcase,
-  Brain,
-  Scale,
-  HeartHandshake,
-  HeartPulse,
-};
-
-/**
- * Geeft het icoon van een thema als kant-en-klaar element terug. Bewust geen
- * component die tijdens het renderen wordt opgezocht: dat zou bij elke render
- * een "nieuw" componenttype opleveren.
- */
-export function themaIcoon(naam: string, kleur: string, size = 18) {
-  const Icoon: LucideIcon = THEMA_ICONEN[naam] ?? Compass;
-  return <Icoon color={kleur} size={size} strokeWidth={2.2} />;
-}
 
 export function themaTint(kleur: ThemaKleur) {
   return themaTints[kleur] ?? themaTints.blauw;
@@ -124,6 +88,8 @@ export function WegwijzerLijst() {
       <View style={styles.zoekbalk}>
         <Search color={colors.inkFaint} size={19} strokeWidth={2.2} />
         <TextInput
+          textContentType="none"
+          autoComplete="off"
           value={term}
           onChangeText={setTerm}
           placeholder={t('wegwijzer.zoekPlaceholder')}
@@ -255,7 +221,7 @@ export function WegwijzerLijst() {
                   >
                     <Card style={styles.tegel}>
                       <View style={[styles.tegelIcoon, { backgroundColor: tint.vlak }]}>
-                        {themaIcoon(rij.icoon, tint.icoon, 21)}
+                        <ThemaIcoon thema={rij.slug} size={24} />
                       </View>
                       <TvzText preset="cardTitle" style={styles.tegelTitel}>
                         {rij.titel}
@@ -354,7 +320,7 @@ export function ModuleKaart({
       <Card style={styles.kaart}>
         <View style={styles.moduleKop}>
           <View style={[styles.moduleIcoon, { backgroundColor: tint.vlak }]}>
-            {themaIcoon(module.thema_icoon, tint.icoon)}
+            <ThemaIcoon thema={module.thema_slug} size={20} />
           </View>
           <View style={styles.fill}>
             <TvzText preset="cardTitle" style={styles.kaartTitel}>

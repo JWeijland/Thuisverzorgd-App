@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -17,7 +18,19 @@ import { computeWorkload } from '@/features/tasks/logic';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { colors, gradient, radius, spacing } from '@/theme';
-import { Button, Card, EmptyState, StatusPill, TextField, TvzText } from '@/ui';
+import {
+  Button,
+  Card,
+  EmptyState,
+  GradientHeader,
+  SectionHeader,
+  StatusPill,
+  TextField,
+  TvzText,
+} from '@/ui';
+import { tvzIn } from '@/ui/animations';
+import { KringMotief } from '@/features/circles/KringMotief';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 const STATUS_MAP: Record<Member['status'], { key: string; kind: 'success' | 'warn' | 'info' }> = {
   actief: { key: 'kring.statusActief', kind: 'success' },
@@ -28,6 +41,7 @@ const STATUS_MAP: Record<Member['status'], { key: string; kind: 'success' | 'war
 
 /** Kring-tab (screens 10/11): gradient-header, subnav Leden/Berichten, of de aanmaakflow. */
 export function KringScreen() {
+  useStatusBalk('donker');
   const profile = useProfile();
   const circle = useMyCircle();
   const isBeheerder = profile.data?.role === 'beheerder';
@@ -63,65 +77,96 @@ function KringLeeg() {
   );
 }
 
-/** Aanmaakflow: formulier → koppelcode in gestippelde kaart → kringpagina. */
+/**
+ * Aanmaakflow. Het beeld is het merkmotief uit het brandbook: buddy's rondom
+ * één hulpvrager. Zodra de kring er is draait die kring een slag rond, en
+ * schuift de koppelcode eronder in beeld.
+ */
 function KringAanmaken() {
   const createCircle = useCreateCircle();
   const [name, setName] = useState('');
   const [created, setCreated] = useState<{ name: string; code: string } | null>(null);
 
-  if (created) {
-    return (
-      <SafeAreaView style={styles.safeBg} edges={['top']}>
-        <View style={styles.leegWrap}>
-          <TvzText preset="screenTitle">{created.name}</TvzText>
-          <Card dashed style={styles.codeCard}>
-            <TvzText preset="meta" style={styles.codeLabel}>
-              {t('kring.koppelTitel')}
-            </TvzText>
-            <TvzText preset="screenTitle" style={styles.code}>
-              {created.code}
-            </TvzText>
-            <TvzText preset="secondary" style={styles.codeUitleg}>
-              {t('kring.koppelUitleg')}
-            </TvzText>
-          </Card>
-          <Button
-            label={t('kring.naarKring')}
-            variant="cta"
-            size="lg"
-            onPress={() => setCreated(null)}
-          />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView style={styles.safeBg} edges={['top']}>
-      <View style={styles.leegWrap}>
-        <TvzText preset="screenTitle">{t('kring.maakTitel')}</TvzText>
-        <TvzText preset="secondary" style={styles.maakUitleg}>
-          {t('kring.maakUitleg')}
-        </TvzText>
-        <TextField
-          label={t('kring.naamLabel')}
-          placeholder={t('kring.naamPlaceholder')}
-          value={name}
-          onChangeText={setName}
-        />
-        <Button
-          label={createCircle.isPending ? t('algemeen.laden') : t('kring.maakKnop')}
-          variant="cta"
-          size="lg"
-          disabled={createCircle.isPending || name.trim().length < 3}
-          onPress={() =>
-            createCircle.mutate(name.trim(), {
-              onSuccess: (result) => setCreated({ name: result.name, code: result.link_code }),
-            })
-          }
-        />
-      </View>
-    </SafeAreaView>
+    <View style={styles.safeBg}>
+      <GradientHeader
+        title={t(created ? 'kring.gemaaktTitel' : 'kring.maakTitel')}
+        subtitle={t(created ? 'kring.gemaaktTekst' : 'kring.maakUitleg')}
+        wobbel
+      />
+
+      <ScrollView contentContainerStyle={styles.maakLijst} keyboardShouldPersistTaps="handled">
+        <View style={styles.motief}>
+          <KringMotief gevierd={!!created} />
+        </View>
+
+        {created ? (
+          <Animated.View entering={tvzIn} style={styles.maakBlok}>
+            <TvzText preset="screenTitle" style={styles.gemaaktNaam}>
+              {created.name}
+            </TvzText>
+            <Card dashed style={styles.codeCard}>
+              <TvzText preset="meta" style={styles.codeLabel}>
+                {t('kring.koppelTitel')}
+              </TvzText>
+              <TvzText preset="screenTitle" style={styles.code}>
+                {created.code}
+              </TvzText>
+              <TvzText preset="secondary" style={styles.codeUitleg}>
+                {t('kring.koppelUitleg')}
+              </TvzText>
+            </Card>
+            <Button
+              label={t('kring.naarKring')}
+              variant="cta"
+              size="lg"
+              onPress={() => setCreated(null)}
+            />
+          </Animated.View>
+        ) : (
+          <Animated.View entering={tvzIn} style={styles.maakBlok}>
+            <Card style={styles.maakKaart}>
+              <TextField
+                label={t('kring.naamLabel')}
+                placeholder={t('kring.naamPlaceholder')}
+                value={name}
+                onChangeText={setName}
+                returnKeyType="done"
+              />
+              <Button
+                label={createCircle.isPending ? t('algemeen.laden') : t('kring.maakKnop')}
+                variant="cta"
+                size="lg"
+                disabled={createCircle.isPending || name.trim().length < 3}
+                onPress={() =>
+                  createCircle.mutate(name.trim(), {
+                    onSuccess: (result) =>
+                      setCreated({ name: result.name, code: result.link_code }),
+                  })
+                }
+              />
+            </Card>
+
+            <SectionHeader title={t('kring.zoWerktTitel')} />
+            {[1, 2, 3].map((nummer) => (
+              <Card key={nummer} style={styles.stapKaart}>
+                <View style={styles.stapNr}>
+                  <TvzText preset="meta" style={styles.stapNrTekst}>
+                    {nummer}
+                  </TvzText>
+                </View>
+                <View style={styles.stapTekst}>
+                  <TvzText preset="cardTitle" style={styles.stapTitel}>
+                    {t(`kring.stap${nummer}Titel`)}
+                  </TvzText>
+                  <TvzText preset="secondary">{t(`kring.stap${nummer}Tekst`)}</TvzText>
+                </View>
+              </Card>
+            ))}
+          </Animated.View>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -299,6 +344,48 @@ const styles = StyleSheet.create({
   maakUitleg: {
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
+  },
+  maakLijst: {
+    padding: spacing.screen,
+    paddingBottom: 120,
+  },
+  motief: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.xl,
+  },
+  maakBlok: {
+    gap: spacing.cardGap,
+  },
+  maakKaart: {
+    paddingVertical: spacing.lg,
+  },
+  gemaaktNaam: {
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  stapKaart: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  stapNr: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.tintBlue,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stapNrTekst: {
+    color: colors.primary,
+  },
+  stapTekst: {
+    flex: 1,
+  },
+  stapTitel: {
+    fontSize: 15.5,
+    marginBottom: 2,
   },
   codeCard: {
     alignItems: 'center',

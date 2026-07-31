@@ -24,6 +24,7 @@ import { useProfile, useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
 import { Avatar, Button, Card, EmptyState, SectionHeader, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /**
  * Hulpmakelaar-console (besluit #11): eenvoudige web/app-route voor de rol
@@ -31,6 +32,7 @@ import { Avatar, Button, Card, EmptyState, SectionHeader, TvzText } from '@/ui';
  * De console zet ook de presence-status ("x online") aan via useBrokerPresence.
  */
 export default function MakelaarConsole() {
+  useStatusBalk('donker');
   const profile = useProfile();
   const [openChat, setOpenChat] = useState<{ id: string; voornaam: string } | null>(null);
   const isBroker = profile.data?.role === 'makelaar';
@@ -193,6 +195,8 @@ function ChatDetail({
         </ScrollView>
         <View style={styles.inputRow}>
           <TextInput
+            textContentType="none"
+            autoComplete="off"
             value={draft}
             onChangeText={setDraft}
             placeholder={t('steun.chatPlaceholder')}

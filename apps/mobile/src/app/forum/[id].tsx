@@ -18,9 +18,11 @@ import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
 import { BottomSheet, Button, Card, Pill, TextField, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Thread-detail (screen 13): vraag + antwoorden; makelaars groen met badge; melden/blokkeren. */
 export default function ForumThreadScreen() {
+  useStatusBalk('donker');
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session } = useSession();
   const post = usePost(id);
@@ -136,6 +138,8 @@ export default function ForumThreadScreen() {
 
         <View style={styles.composer}>
           <TextInput
+            textContentType="none"
+            autoComplete="off"
             value={draft}
             onChangeText={setDraft}
             placeholder={t('steun.reageerPlaceholder')}

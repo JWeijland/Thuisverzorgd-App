@@ -42,8 +42,8 @@ describe('dayDots', () => {
 
 describe('computeWorkload', () => {
   it('telt per vrijwilliger binnen de maand en sorteert aflopend', () => {
-    const anna = { id: 'a', name: 'Anna de Wit', phone: null };
-    const tim = { id: 't', name: 'Tim Bakker', phone: null };
+    const anna = { id: 'a', name: 'Anna de Wit', phone: null, avatar_path: null };
+    const tim = { id: 't', name: 'Tim Bakker', phone: null, avatar_path: null };
     const tasks = [
       task({ claimed_by: 'a', claimer: anna, status: 'gedaan', date: '2026-07-01' }),
       task({ claimed_by: 'a', claimer: anna, status: 'ingepland', date: '2026-07-20' }),

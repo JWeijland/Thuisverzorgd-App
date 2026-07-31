@@ -133,32 +133,49 @@ export function KringMarker({
   );
 }
 
-/** Buddy: cirkel met profielfoto (of initiaal zolang er geen foto is). */
+/**
+ * Buddy: cirkel met profielfoto (of initiaal zolang er geen foto is), met de
+ * voornaam als labelpil eronder zodat je op de kaart ziet wie er woont.
+ */
 export function BuddyMarker({
   lat,
   lon,
   voornaam,
   uri,
+  onPress,
 }: {
   lat: number;
   lon: number;
   voornaam: string;
   /** Signed URL van de profielfoto. */
   uri?: string;
+  onPress?: () => void;
 }) {
   // De marker moet opnieuw renderen zodra de foto binnen is; daarna weer
   // bevriezen voor de performance.
   const [tracks, setTracks] = useState(true);
   return (
-    <Marker coordinate={{ latitude: lat, longitude: lon }} tracksViewChanges={tracks}>
-      <View style={styles.buddy}>
-        {uri ? (
-          <Image source={{ uri }} style={styles.buddyFoto} onLoadEnd={() => setTracks(false)} />
-        ) : (
-          <TvzText preset="meta" style={styles.buddyInitial}>
-            {voornaam.charAt(0).toUpperCase()}
+    <Marker
+      coordinate={{ latitude: lat, longitude: lon }}
+      onPress={onPress}
+      tracksViewChanges={tracks}
+      anchor={{ x: 0.5, y: 0.5 }}
+    >
+      <View style={styles.buddyWrap}>
+        <View style={styles.buddy}>
+          {uri ? (
+            <Image source={{ uri }} style={styles.buddyFoto} onLoadEnd={() => setTracks(false)} />
+          ) : (
+            <TvzText preset="meta" style={styles.buddyInitial}>
+              {voornaam.charAt(0).toUpperCase()}
+            </TvzText>
+          )}
+        </View>
+        <View style={styles.label}>
+          <TvzText preset="meta" numberOfLines={1} style={styles.labelText}>
+            {voornaam}
           </TvzText>
-        )}
+        </View>
       </View>
     </Marker>
   );
@@ -168,26 +185,41 @@ export function BuddyMarker({
 export function RequestMarker({
   lat,
   lon,
+  label,
   onPress,
 }: {
   lat: number;
   lon: number;
+  /** Waar de hulpvraag over gaat, bijv. "Boodschappen". */
+  label?: string;
   onPress?: () => void;
 }) {
+  const hoogte = label ? PIN_H + LABEL_H : PIN_H;
+  const ankerY = label ? (PIN_H * PIN_ANCHOR_Y) / hoogte : PIN_ANCHOR_Y;
+
   return (
     <Marker
       coordinate={{ latitude: lat, longitude: lon }}
       onPress={onPress}
       tracksViewChanges={false}
-      anchor={{ x: 0.5, y: PIN_ANCHOR_Y }}
-      centerOffset={{ x: 0, y: (0.5 - PIN_ANCHOR_Y) * PIN_H }}
+      anchor={{ x: 0.5, y: ankerY }}
+      centerOffset={{ x: 0, y: (0.5 - ankerY) * hoogte }}
     >
-      <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
-        <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill="#112F50" opacity={0.15} />
-        <SvgCircle cx={26} cy={24} r={22} fill="#8DC93F" opacity={0.18} />
-        <Path d={PIN_PATH} fill="#112F50" stroke={colors.white} strokeWidth={3.5} />
-        <Path d="M29.5 10.5 L17.5 27.5 h6.5 L22.5 39 L34.5 22.5 h-6.5 Z" fill={colors.accent} />
-      </Svg>
+      <View style={styles.kringWrap}>
+        <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
+          <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill="#112F50" opacity={0.15} />
+          <SvgCircle cx={26} cy={24} r={22} fill="#8DC93F" opacity={0.18} />
+          <Path d={PIN_PATH} fill="#112F50" stroke={colors.white} strokeWidth={3.5} />
+          <Path d="M29.5 10.5 L17.5 27.5 h6.5 L22.5 39 L34.5 22.5 h-6.5 Z" fill={colors.accent} />
+        </Svg>
+        {label ? (
+          <View style={[styles.label, styles.labelHulpvraag]}>
+            <TvzText preset="meta" numberOfLines={1} style={styles.labelText}>
+              {label}
+            </TvzText>
+          </View>
+        ) : null}
+      </View>
     </Marker>
   );
 }
@@ -218,6 +250,12 @@ const styles = StyleSheet.create({
   labelText: {
     color: colors.primary,
     fontSize: 11,
+  },
+  buddyWrap: {
+    alignItems: 'center',
+  },
+  labelHulpvraag: {
+    borderColor: colors.primaryDark,
   },
   buddy: {
     width: 34,

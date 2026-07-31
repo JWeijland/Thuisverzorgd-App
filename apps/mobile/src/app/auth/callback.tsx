@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { colors, spacing } from '@/theme';
 import { Button, TvzText } from '@/ui';
 import { TvzLoader } from '@/ui/TvzLoader';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /**
  * Vangt de magic-link deep link (tvz://auth/callback) op en zet de sessie.
@@ -44,6 +45,7 @@ async function sessionFromUrl(url: string): Promise<'ok' | 'geen' | 'fout'> {
 }
 
 export default function AuthCallbackScreen() {
+  useStatusBalk('licht');
   const hookUrl = Linking.useURL();
   const [failed, setFailed] = useState(false);
   const done = useRef(false);

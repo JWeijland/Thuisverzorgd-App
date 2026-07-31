@@ -9,10 +9,11 @@ import {
   useSpontaneousActions,
   type RequestType,
 } from '@/features/spontaneous/api';
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useMyCircle } from '@/features/circles/api';
 import { t } from '@/i18n';
 import { colors, radius, shadows, spacing } from '@/theme';
-import { Avatar, BottomSheet, Button, Chip, PulseDot, TextField, TvzText } from '@/ui';
+import { BottomSheet, Button, Chip, PulseDot, TextField, TvzText } from '@/ui';
 
 const TYPES: RequestType[] = ['boodschappen', 'vervoer', 'medicijnen', 'gezelschap', 'anders'];
 
@@ -139,7 +140,11 @@ export function RequesterFlow({ ownLocation }: Props) {
         {request.status === 'onderweg' ? (
           <>
             <View style={styles.titleRow}>
-              <Avatar name={contact.data?.naam ?? 'B'} size={40} />
+              <ProfileAvatar
+                name={contact.data?.naam ?? 'B'}
+                avatarPath={contact.data?.avatar_path}
+                size={40}
+              />
               <View style={styles.flexInfo}>
                 <TvzText preset="cardTitle">
                   {t('directeHulp.onderwegTitel', {
@@ -178,7 +183,11 @@ export function RequesterFlow({ ownLocation }: Props) {
         ) : firstOffer ? (
           <>
             <View style={styles.titleRow}>
-              <Avatar name={firstOffer.voornaam} size={40} />
+              <ProfileAvatar
+                name={firstOffer.voornaam}
+                avatarPath={firstOffer.avatar_path}
+                size={40}
+              />
               <View style={styles.flexInfo}>
                 <TvzText preset="cardTitle">
                   {t('directeHulp.aanbodTitel', { naam: firstOffer.voornaam })}

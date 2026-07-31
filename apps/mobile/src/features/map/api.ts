@@ -7,7 +7,10 @@ export type MapCircle = {
   name: string;
   lat: number;
   lon: number;
+  /** Open taken die nog opgepakt kunnen worden. */
   plekken_vrij: number;
+  /** Actieve leden: de beheerder plus de buddy's. */
+  leden: number;
 };
 export type MapBuddy = {
   id: string;
@@ -23,7 +26,7 @@ export function useMapCircles() {
     queryFn: async (): Promise<MapCircle[]> => {
       const { data, error } = await supabase
         .from('v_map_circles')
-        .select('id, name, lat, lon, plekken_vrij');
+        .select('id, name, lat, lon, plekken_vrij, leden');
       if (error) throw error;
       return data as MapCircle[];
     },

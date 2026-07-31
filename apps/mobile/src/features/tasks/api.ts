@@ -15,7 +15,12 @@ export type Task = {
   recurrence: 'eenmalig' | 'wekelijks';
   status: 'open' | 'ingepland' | 'gedaan' | 'geannuleerd';
   claimed_by: string | null;
-  claimer: { id: string; name: string; phone: string | null } | null;
+  claimer: {
+    id: string;
+    name: string;
+    phone: string | null;
+    avatar_path: string | null;
+  } | null;
   circle: { name: string } | null;
 };
 
@@ -37,7 +42,7 @@ export type TaskLog = {
 };
 
 const TASK_SELECT =
-  'id, circle_id, type, custom_label, date, time, recurrence, status, claimed_by, claimer:profiles!tasks_claimed_by_fkey (id, name, phone), circle:circles (name)';
+  'id, circle_id, type, custom_label, date, time, recurrence, status, claimed_by, claimer:profiles!tasks_claimed_by_fkey (id, name, phone, avatar_path), circle:circles (name)';
 
 /** Taken van een kring in een datumbereik, realtime bijgewerkt. */
 export function useTasks(circleId: string | undefined, from: Date, to: Date) {

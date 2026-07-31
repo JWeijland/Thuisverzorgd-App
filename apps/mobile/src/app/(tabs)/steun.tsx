@@ -190,6 +190,8 @@ export default function SteunScreen() {
           <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
             {filter ? <Pill label={t(TAG_LABEL[filter])} /> : null}
             <TextInput
+              textContentType="none"
+              autoComplete="off"
               value={quick}
               onChangeText={setQuick}
               placeholder={t('steun.forumSnelPlaceholder')}

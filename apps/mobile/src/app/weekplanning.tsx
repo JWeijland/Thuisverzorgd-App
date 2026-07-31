@@ -25,6 +25,7 @@ import {
 } from '@/lib/dates';
 import { colors, spacing } from '@/theme';
 import { Button, Card, SectionHeader, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 const PERIODS = [
   { key: 'periode1w', weeks: 1 },
@@ -38,6 +39,7 @@ const PERIODS = [
  * niets tot "Publiceren"; daarna staat alles in één keer live.
  */
 export default function WeekplanningScreen() {
+  useStatusBalk('donker');
   const circle = useMyCircle();
   const drafts = useDrafts(circle.data?.id);
   const { add, remove, publish } = useDraftMutations(circle.data?.id);

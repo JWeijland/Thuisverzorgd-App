@@ -9,6 +9,7 @@ import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, gradient, radius, spacing } from '@/theme';
 import { Button, Card, EmptyState, Pill, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 type Kerncijfers = {
   actieve_hulpkringen: number;
@@ -22,6 +23,7 @@ type Kerncijfers = {
  * uit de v_admin_*-views — de admin-rol heeft nergens tabeltoegang.
  */
 export default function AdminScreen() {
+  useStatusBalk('donker');
   const profile = useProfile();
   const isAdmin = profile.data?.role === 'admin' || profile.data?.platform_admin === true;
 

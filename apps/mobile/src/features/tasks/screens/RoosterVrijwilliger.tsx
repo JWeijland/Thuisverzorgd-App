@@ -112,6 +112,8 @@ export function RoosterVrijwilliger() {
       <BottomSheet visible={!!completing} onClose={closeSheet} title={t('rooster.logboekTitel')}>
         <TvzText preset="secondary">{t('rooster.logboekUitleg')}</TvzText>
         <TextInput
+          textContentType="none"
+          autoComplete="off"
           value={note}
           onChangeText={setNote}
           placeholder={t('rooster.logboekPlaceholder')}

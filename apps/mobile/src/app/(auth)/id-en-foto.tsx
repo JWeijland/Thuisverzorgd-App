@@ -13,6 +13,7 @@ import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, dashedBorder, radius, spacing } from '@/theme';
 import { BottomSheet, Button, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 type Slot = 'id' | 'foto';
 type Picked = { uri: string; base64: string };
@@ -29,6 +30,7 @@ const PICKER_OPTIONS = {
  * Alleen de bevestiging wordt bewaard; het ID-document is kortlopend (ADR-0005).
  */
 export default function IdEnFotoScreen() {
+  useStatusBalk('donker');
   const { session } = useSession();
   const queryClient = useQueryClient();
   const [picked, setPicked] = useState<{ id?: Picked; foto?: Picked }>({});

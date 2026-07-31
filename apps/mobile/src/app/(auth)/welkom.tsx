@@ -6,9 +6,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { t } from '@/i18n';
 import { colors, gradient, radius, spacing } from '@/theme';
 import { Button, TvzBounce, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Welkom (screen 01): navy gradient, logo met stuiterende balkjes, twee knoppen. */
 export default function WelkomScreen() {
+  useStatusBalk('licht');
   return (
     <LinearGradient {...gradient} style={styles.fill}>
       <SafeAreaView style={styles.safe}>

@@ -6,6 +6,7 @@ import { MapPin, Search, Zap } from 'lucide-react-native';
 import type MapView from 'react-native-maps';
 
 import { useAvatarUrl } from '@/features/avatars/api';
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import {
   useMapBuddies,
   useMapCircles,
@@ -22,6 +23,7 @@ import {
   TvzMap,
   type Region,
 } from '@/features/map/TvzMap';
+import { useInvite, useMyCircle } from '@/features/circles/api';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { useOpenRequests, type OpenRequest } from '@/features/spontaneous/api';
 import { REQUEST_TYPE_LABEL, RequesterFlow } from '@/features/spontaneous/RequesterFlow';
@@ -31,9 +33,11 @@ import { useKeyboard } from '@/lib/keyboard';
 import { t } from '@/i18n';
 import { colors, radius, shadows, spacing } from '@/theme';
 import { BottomSheet, Button, Chip, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Buurt (screens 08/20/21): kaart met kringen, buddy's en directe hulpvragen. */
 export default function BuurtScreen() {
+  useStatusBalk('donker');
   const profile = useProfile();
   const role = profile.data?.role;
   const isVolunteer = role === 'vrijwilliger';
@@ -43,6 +47,7 @@ export default function BuurtScreen() {
   // Beheerders en hulpvragers zoeken vooral buddy's: die staan standaard aan.
   const [showBuddies, setShowBuddies] = useState(true);
   const buddies = useMapBuddies(!isVolunteer && showBuddies);
+  const eigenKring = useMyCircle();
 
   const mapRef = useRef<MapView>(null);
   const [region, setRegion] = useState<Region>(DEFAULT_REGION);
@@ -50,6 +55,7 @@ export default function BuurtScreen() {
   const [query, setQuery] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<OpenRequest | null>(null);
   const [selectedCircle, setSelectedCircle] = useState<MapCircle | null>(null);
+  const [selectedBuddy, setSelectedBuddy] = useState<MapBuddy | null>(null);
   const [listOpen, setListOpen] = useState(false);
   const keyboard = useKeyboard();
 
@@ -132,11 +138,11 @@ export default function BuurtScreen() {
             naam={circle.name}
             plekkenVrij={circle.plekken_vrij}
             onPress={() => {
-              // Vrijwilliger: kaartje met de kring + aanmeldknop; anders alleen inzoomen.
-              if (isVolunteer) {
-                setSelectedRequest(null);
-                setSelectedCircle(circle);
-              }
+              // Iedereen ziet het kaartje met naam, leden en open taken; alleen
+              // de vrijwilliger krijgt er de aanmeldknop bij.
+              setSelectedRequest(null);
+              setSelectedBuddy(null);
+              setSelectedCircle(circle);
               mapRef.current?.animateToRegion(
                 {
                   latitude: circle.lat,
@@ -150,16 +156,27 @@ export default function BuurtScreen() {
           />
         ))}
         {!isVolunteer && showBuddies
-          ? (buddies.data ?? []).map((buddy) => <BuddyMetFoto key={buddy.id} buddy={buddy} />)
+          ? (buddies.data ?? []).map((buddy) => (
+              <BuddyMetFoto
+                key={buddy.id}
+                buddy={buddy}
+                onPress={() => {
+                  setSelectedCircle(null);
+                  setSelectedRequest(null);
+                  setSelectedBuddy(buddy);
+                }}
+              />
+            ))
           : null}
         {requestList.map((request) => (
           <RequestMarker
             key={request.id}
             lat={request.lat!}
             lon={request.lon!}
+            label={t(REQUEST_TYPE_LABEL[request.type])}
             onPress={() => {
-              if (!isVolunteer) return;
               setSelectedCircle(null);
+              setSelectedBuddy(null);
               setSelectedRequest(request);
             }}
           />
@@ -171,6 +188,8 @@ export default function BuurtScreen() {
         <View style={[styles.search, shadows.card]}>
           <Search color={colors.inkFaint} size={18} strokeWidth={2.2} />
           <TextInput
+            textContentType="none"
+            autoComplete="off"
             value={query}
             onChangeText={setQuery}
             placeholder={t('buurt.zoekPlaceholder')}
@@ -342,7 +361,37 @@ export default function BuurtScreen() {
           keyboard.open && { bottom: keyboard.height + spacing.sm },
         ]}
       >
-        {isVolunteer && selectedCircle && !selectedRequest ? (
+        {selectedBuddy ? (
+          <BuddyKaart
+            buddy={selectedBuddy}
+            afstand={
+              ownLocation
+                ? formatDistance(
+                    haversineKm(ownLocation, { lat: selectedBuddy.lat, lon: selectedBuddy.lon }),
+                  )
+                : null
+            }
+            kringId={role === 'beheerder' ? (eigenKring.data?.id ?? null) : null}
+            onClose={() => setSelectedBuddy(null)}
+          />
+        ) : null}
+        {!isVolunteer && selectedRequest ? (
+          <HulpvraagKaart
+            request={selectedRequest}
+            afstand={
+              ownLocation && selectedRequest.lat != null && selectedRequest.lon != null
+                ? formatDistance(
+                    haversineKm(ownLocation, {
+                      lat: selectedRequest.lat,
+                      lon: selectedRequest.lon,
+                    }),
+                  )
+                : null
+            }
+            onClose={() => setSelectedRequest(null)}
+          />
+        ) : null}
+        {selectedCircle && !selectedRequest && !selectedBuddy ? (
           <KringKaart
             circle={selectedCircle}
             afstand={
@@ -353,6 +402,7 @@ export default function BuurtScreen() {
                 : null
             }
             idVerified={profile.data?.id_verified ?? false}
+            magAanmelden={isVolunteer}
             onClose={() => setSelectedCircle(null)}
           />
         ) : null}
@@ -378,11 +428,14 @@ function KringKaart({
   circle,
   afstand,
   idVerified,
+  magAanmelden,
   onClose,
 }: {
   circle: MapCircle;
   afstand: string | null;
   idVerified: boolean;
+  /** Alleen een vrijwilliger kan zich bij een kring aanmelden. */
+  magAanmelden: boolean;
   onClose: () => void;
 }) {
   const status = useMyCircleStatus(circle.id);
@@ -401,6 +454,9 @@ function KringKaart({
           <TvzText preset="secondary" style={styles.kringMeta}>
             {[
               afstand ? t('buurt.afstandVanJou', { afstand }) : null,
+              circle.leden === 1
+                ? t('buurt.lid1')
+                : t('buurt.leden', { aantal: circle.leden ?? 0 }),
               circle.plekken_vrij > 0
                 ? t('buurt.plekkenVrij', { aantal: circle.plekken_vrij })
                 : t('buurt.geenOpenTaken'),
@@ -422,7 +478,7 @@ function KringKaart({
         </Pressable>
       </View>
 
-      {lid ? (
+      {!magAanmelden ? null : lid ? (
         <TvzText preset="secondary" style={styles.kringNote}>
           {t('buurt.alLid')}
         </TvzText>
@@ -455,14 +511,150 @@ function KringKaart({
   );
 }
 
+/**
+ * Kaartje bij een aangetikte buddy: wie het is, hoe ver weg, en voor de
+ * beheerder de knop om hem uit te nodigen voor de eigen hulpkring. Er staat
+ * alleen een voornaam en een vervaagde locatie; de rest komt pas als hij de
+ * uitnodiging aanneemt.
+ */
+function BuddyKaart({
+  buddy,
+  afstand,
+  kringId,
+  onClose,
+}: {
+  buddy: MapBuddy;
+  afstand: string | null;
+  /** De kring waarvoor uitgenodigd mag worden, of null als die er niet is. */
+  kringId: string | null;
+  onClose: () => void;
+}) {
+  const invite = useInvite(kringId ?? undefined);
+  const [fout, setFout] = useState<string | null>(null);
+
+  return (
+    <View style={[styles.kringKaart, shadows.card]}>
+      <View style={styles.kringKop}>
+        <ProfileAvatar name={buddy.voornaam} avatarPath={buddy.avatar_path} size={40} />
+        <View style={styles.kringKopText}>
+          <TvzText preset="cardTitle">{buddy.voornaam}</TvzText>
+          <TvzText preset="secondary" style={styles.kringMeta}>
+            {[t('buurt.buddyLabel'), afstand ? t('buurt.afstandVanJou', { afstand }) : null]
+              .filter(Boolean)
+              .join(' · ')}
+          </TvzText>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('algemeen.sluiten')}
+          onPress={onClose}
+          hitSlop={12}
+          style={styles.sluitKnop}
+        >
+          <TvzText preset="cardTitle" style={styles.sluitKruis}>
+            ✕
+          </TvzText>
+        </Pressable>
+      </View>
+
+      {kringId ? (
+        invite.isSuccess ? (
+          <View style={styles.kringGoed}>
+            <TvzText preset="secondary" style={styles.kringGoedText}>
+              {t('buurt.buddyUitgenodigd', { naam: buddy.voornaam })}
+            </TvzText>
+          </View>
+        ) : (
+          <>
+            <Button
+              label={t('buurt.buddyUitnodigen')}
+              variant="cta"
+              size="lg"
+              disabled={invite.isPending}
+              style={styles.kringKnop}
+              onPress={() => {
+                setFout(null);
+                invite.mutate(
+                  { target: buddy.id },
+                  {
+                    onError: (error) =>
+                      setFout(
+                        (error as Error).message.includes('al_lid')
+                          ? t('buurt.buddyAlLid')
+                          : t('algemeen.foutOpnieuw'),
+                      ),
+                  },
+                );
+              }}
+            />
+            <TvzText preset="secondary" style={fout ? styles.kringFout : styles.kringNote}>
+              {fout ?? t('buurt.buddyUitleg')}
+            </TvzText>
+          </>
+        )
+      ) : (
+        <TvzText preset="secondary" style={styles.kringNote}>
+          {t('buurt.buddyGeenKring')}
+        </TvzText>
+      )}
+    </View>
+  );
+}
+
+/** Kaartje bij een aangetikte hulpvraag, voor wie er zelf niet op kan reageren. */
+function HulpvraagKaart({
+  request,
+  afstand,
+  onClose,
+}: {
+  request: OpenRequest;
+  afstand: string | null;
+  onClose: () => void;
+}) {
+  return (
+    <View style={[styles.kringKaart, shadows.card]}>
+      <View style={styles.kringKop}>
+        <View style={styles.sheetZap}>
+          <Zap color={colors.primaryDark} size={15} strokeWidth={2.2} fill={colors.accent} />
+        </View>
+        <View style={styles.kringKopText}>
+          <TvzText preset="cardTitle">{t(REQUEST_TYPE_LABEL[request.type])}</TvzText>
+          <TvzText preset="secondary" style={styles.kringMeta}>
+            {[request.voornaam, afstand ? t('buurt.afstandVanJou', { afstand }) : null]
+              .filter(Boolean)
+              .join(' · ')}
+          </TvzText>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('algemeen.sluiten')}
+          onPress={onClose}
+          hitSlop={12}
+          style={styles.sluitKnop}
+        >
+          <TvzText preset="cardTitle" style={styles.sluitKruis}>
+            ✕
+          </TvzText>
+        </Pressable>
+      </View>
+      {request.note ? (
+        <TvzText preset="secondary" style={styles.kringNote}>
+          {request.note}
+        </TvzText>
+      ) : null}
+    </View>
+  );
+}
+
 /** Buddy-marker die zelf de profielfoto uit de privé-bucket ophaalt. */
-function BuddyMetFoto({ buddy }: { buddy: MapBuddy }) {
+function BuddyMetFoto({ buddy, onPress }: { buddy: MapBuddy; onPress: () => void }) {
   const url = useAvatarUrl(buddy.avatar_path);
   return (
     <BuddyMarker
       lat={buddy.lat}
       lon={buddy.lon}
       voornaam={buddy.voornaam}
+      onPress={onPress}
       uri={url.data ?? undefined}
     />
   );
@@ -626,6 +818,11 @@ const styles = StyleSheet.create({
   },
   kringKnop: {
     marginTop: spacing.md,
+  },
+  kringFout: {
+    color: colors.error,
+    marginTop: spacing.sm,
+    textAlign: 'center',
   },
   kringNote: {
     marginTop: spacing.sm,

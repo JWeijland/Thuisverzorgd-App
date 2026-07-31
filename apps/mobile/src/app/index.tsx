@@ -5,9 +5,11 @@ import { getStartRoute } from '@/features/onboarding/startRoute';
 import { useProfile, useSession } from '@/features/onboarding/useAuth';
 import { colors } from '@/theme';
 import { TvzLoader } from '@/ui/TvzLoader';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Startpunt: stuurt door naar welkom, rolkeuze, ID-check of de app zelf. */
 export default function Index() {
+  useStatusBalk('licht');
   const { session, loading } = useSession();
   const profile = useProfile();
 

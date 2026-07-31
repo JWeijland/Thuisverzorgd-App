@@ -9,12 +9,14 @@ import { ChatView } from '@/features/circles/ChatView';
 import { t } from '@/i18n';
 import { colors, spacing } from '@/theme';
 import { EmptyState, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /**
  * Kringberichten als eigen pagina (feedback 30-07): de vrijwilliger opent dit
  * via het berichten-icoon rechtsboven op de planning-tab.
  */
 export default function KringChatScreen() {
+  useStatusBalk('donker');
   const circle = useMyCircle();
   const members = useCircleMembers(circle.data?.id);
   const queryClient = useQueryClient();

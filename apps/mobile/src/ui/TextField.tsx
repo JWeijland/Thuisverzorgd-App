@@ -19,6 +19,12 @@ export function TextField({ label, error, style, ...rest }: Props) {
       </TvzText>
       <TextInput
         placeholderTextColor={colors.inkFaint}
+        // iOS denkt bij veel velden een gebruikersnaam of wachtwoord te kunnen
+        // invullen en zet er dan een gele achtergrond en brede letterafstand
+        // op. Standaard uit; een veld dat het wél wil (e-mail) zet het zelf
+        // terug via de props hieronder.
+        textContentType="none"
+        autoComplete="off"
         style={[
           styles.input,
           scaleText({ fontFamily: fonts.body, fontSize: 15.5 }, factor),

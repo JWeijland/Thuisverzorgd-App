@@ -3,11 +3,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, radius, spacing } from '@/theme';
-import { Avatar, Button, Card, Pill, TvzText } from '@/ui';
+import { Button, Card, Pill, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 type InvitationDetail = {
   id: string;
@@ -25,6 +27,7 @@ type InvitationDetail = {
   id_verified: boolean | null;
   waardering: number | null;
   kringen: number | null;
+  avatar_path: string | null;
 };
 
 /**
@@ -33,6 +36,7 @@ type InvitationDetail = {
  * (De echte videocall via Daily.co volgt; zie docs/PLAN.md · Open punten.)
  */
 export default function AanvraagScreen() {
+  useStatusBalk('donker');
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session } = useSession();
   const queryClient = useQueryClient();
@@ -96,7 +100,11 @@ export default function AanvraagScreen() {
           <>
             <Card style={styles.profileCard}>
               <View style={styles.profileRow}>
-                <Avatar name={item.voornaam ?? '?'} size={48} />
+                <ProfileAvatar
+                  name={item.voornaam ?? '?'}
+                  avatarPath={item.avatar_path}
+                  size={48}
+                />
                 <View style={styles.profileInfo}>
                   <TvzText preset="cardTitle">
                     {item.voornaam ?? t('aanvraag.onbekendeVrijwilliger')}

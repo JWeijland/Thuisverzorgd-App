@@ -9,9 +9,11 @@ import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, spacing } from '@/theme';
 import { Button, Card, TextField, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Koppelcode: de hulpvrager koppelt zich aan een bestaande kring ("kijkt mee"). */
 export default function KoppelcodeScreen() {
+  useStatusBalk('donker');
   const { session } = useSession();
   const queryClient = useQueryClient();
   const [code, setCode] = useState('');

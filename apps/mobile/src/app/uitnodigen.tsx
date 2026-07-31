@@ -8,9 +8,11 @@ import { useBestMatches, useInvite, useMyCircle } from '@/features/circles/api';
 import { t } from '@/i18n';
 import { colors, spacing } from '@/theme';
 import { Button, Card, SectionHeader, TextField, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Vrijwilliger uitnodigen: e-mail/TVZ-ID + "Best matches in de buurt". */
 export default function UitnodigenScreen() {
+  useStatusBalk('donker');
   const circle = useMyCircle();
   const invite = useInvite(circle.data?.id);
   const matches = useBestMatches(circle.data?.id);

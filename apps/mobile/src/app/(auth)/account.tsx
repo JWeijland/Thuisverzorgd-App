@@ -20,6 +20,7 @@ import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, radius, spacing } from '@/theme';
 import { Button, Chip, TextField, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 const REDIRECT_URL = 'tvz://auth/callback';
 const MIN_WACHTWOORD = 8;
@@ -31,6 +32,7 @@ const MIN_WACHTWOORD = 8;
  * invullen.
  */
 export default function AccountScreen() {
+  useStatusBalk('donker');
   const { modus } = useLocalSearchParams<{ modus?: string }>();
   const isLogin = modus === 'inloggen';
 

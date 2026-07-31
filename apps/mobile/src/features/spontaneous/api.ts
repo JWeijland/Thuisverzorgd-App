@@ -102,7 +102,7 @@ export function useRequestOffers(requestId: string | undefined) {
   return useQuery({
     queryKey: ['request-offers', requestId],
     enabled: !!requestId,
-    queryFn: async (): Promise<(Offer & { voornaam: string })[]> => {
+    queryFn: async (): Promise<(Offer & { voornaam: string; avatar_path: string | null })[]> => {
       const { data, error } = await supabase
         .from('request_offers')
         .select('id, request_id, volunteer_id, message, status')
@@ -110,19 +110,26 @@ export function useRequestOffers(requestId: string | undefined) {
         .eq('status', 'aangeboden');
       if (error) throw error;
       const offers = data as Offer[];
-      // Voornamen via de publieke buddy-view (profielen van vreemden zijn niet leesbaar).
+      // Voornaam en foto via de publieke buddy-view (profielen van vreemden zijn
+      // niet leesbaar).
       const ids = offers.map((offer) => offer.volunteer_id);
-      let names = new Map<string, string>();
+      let cards = new Map<string, { voornaam: string; avatar_path: string | null }>();
       if (ids.length > 0) {
-        const { data: cards } = await supabase
+        const { data: rows } = await supabase
           .from('v_buddy_cards')
-          .select('id, voornaam')
+          .select('id, voornaam, avatar_path')
           .in('id', ids);
-        names = new Map((cards ?? []).map((card) => [card.id as string, card.voornaam as string]));
+        cards = new Map(
+          (rows ?? []).map((row) => [
+            row.id as string,
+            { voornaam: row.voornaam as string, avatar_path: row.avatar_path as string | null },
+          ]),
+        );
       }
       return offers.map((offer) => ({
         ...offer,
-        voornaam: names.get(offer.volunteer_id) ?? 'Buddy',
+        voornaam: cards.get(offer.volunteer_id)?.voornaam ?? 'Buddy',
+        avatar_path: cards.get(offer.volunteer_id)?.avatar_path ?? null,
       }));
     },
   });
@@ -253,12 +260,18 @@ export function useRequestContact(requestId: string | undefined, enabled: boolea
   return useQuery({
     queryKey: ['request-contact', requestId],
     enabled: !!requestId && enabled,
-    queryFn: async (): Promise<{ naam: string; telefoon: string | null } | null> => {
+    queryFn: async (): Promise<{
+      naam: string;
+      telefoon: string | null;
+      avatar_path: string | null;
+    } | null> => {
       const { data, error } = await supabase.rpc('get_request_contact', {
         p_request: requestId!,
       });
       if (error) return null;
-      const row = (data as { naam: string; telefoon: string | null }[])?.[0];
+      const row = (
+        data as { naam: string; telefoon: string | null; avatar_path: string | null }[]
+      )?.[0];
       return row ?? null;
     },
   });

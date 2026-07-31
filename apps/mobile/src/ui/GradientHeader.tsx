@@ -4,6 +4,7 @@ import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
+import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, gradient, spacing } from '@/theme';
 import { TvzText } from '@/ui/TvzText';
 
@@ -27,6 +28,9 @@ const WAVE_HEIGHT = 18;
  */
 export function GradientHeader({ title, subtitle, right, children, wobbel = false }: Props) {
   const { width } = useWindowDimensions();
+  // Op de blauwe kop moeten klok, wifi en batterij wit zijn. Elk scherm met
+  // deze kop regelt dat zo vanzelf.
+  useStatusBalk('licht');
 
   return (
     <LinearGradient {...gradient} style={[styles.header, wobbel && styles.headerWobbel]}>

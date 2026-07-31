@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useMyCircle } from '@/features/circles/api';
 import { KringBalk } from '@/features/circles/KringBalk';
 import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
@@ -29,16 +30,7 @@ import {
   toDateString,
 } from '@/lib/dates';
 import { colors, radius, spacing } from '@/theme';
-import {
-  Avatar,
-  Button,
-  Card,
-  EmptyState,
-  GradientHeader,
-  PulseDot,
-  SectionHeader,
-  TvzText,
-} from '@/ui';
+import { Button, Card, EmptyState, GradientHeader, PulseDot, SectionHeader, TvzText } from '@/ui';
 
 /** Rooster · beheerder (screen 05/06): begroeting, taak van vandaag, planner, weekstrip, lijst, Uit de kring. */
 export function RoosterBeheerder() {
@@ -114,7 +106,10 @@ export function RoosterBeheerder() {
           {todayTask?.claimer ? (
             <Card style={styles.section}>
               <View style={styles.todayRow}>
-                <Avatar name={todayTask.claimer.name} />
+                <ProfileAvatar
+                  name={todayTask.claimer.name}
+                  avatarPath={todayTask.claimer.avatar_path}
+                />
                 <View style={styles.todayInfo}>
                   <TvzText preset="cardTitle">{todayTask.claimer.name}</TvzText>
                   <TvzText preset="secondary">

@@ -9,9 +9,11 @@ import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, radius, shadows, spacing } from '@/theme';
 import { TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Rolkeuze (screen 03): twee grote kaarten + koppelcode-link voor de hulpvrager. */
 export default function RolkeuzeScreen() {
+  useStatusBalk('donker');
   const { session } = useSession();
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);

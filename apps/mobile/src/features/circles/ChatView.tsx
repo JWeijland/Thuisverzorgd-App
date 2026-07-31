@@ -75,6 +75,8 @@ export function ChatView({ circleId, roleSuffix }: Props) {
       </ScrollView>
       <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
         <TextInput
+          textContentType="none"
+          autoComplete="off"
           value={draft}
           onChangeText={setDraft}
           placeholder={t('kring.chatPlaceholder')}

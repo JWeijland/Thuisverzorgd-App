@@ -7,6 +7,7 @@ import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { colors, spacing } from '@/theme';
 import { Button, Card, EmptyState, TextField, TvzText } from '@/ui';
+import { useStatusBalk } from '@/lib/statusbalk';
 
 /**
  * Kijk in je mail (screen 02b): magic-link bevestiging + invoer van de
@@ -14,6 +15,7 @@ import { Button, Card, EmptyState, TextField, TvzText } from '@/ui';
  * of verlopen-link-gedoe, en werkt ook als de mail op een ander apparaat staat).
  */
 export default function CheckMailScreen() {
+  useStatusBalk('donker');
   const { email } = useLocalSearchParams<{ email: string }>();
   const [resent, setResent] = useState(false);
   const [code, setCode] = useState('');
