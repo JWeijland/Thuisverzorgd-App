@@ -15,6 +15,7 @@ export type ForumPost = {
   created_at: string;
   author_id: string;
   voornaam: string;
+  avatar_path: string | null;
   antwoorden: number;
 };
 
@@ -26,6 +27,7 @@ export type ForumReply = {
   created_at: string;
   author_id: string;
   voornaam: string;
+  avatar_path: string | null;
 };
 
 export function usePosts(tag: ForumTag | null) {

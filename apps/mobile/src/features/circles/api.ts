@@ -27,7 +27,7 @@ export type ChatMessage = {
   sender_id: string;
   body: string;
   created_at: string;
-  sender: { name: string } | null;
+  sender: { name: string; avatar_path: string | null } | null;
 };
 
 /** De (eerste) kring waar de gebruiker lid van is; v1 gaat uit van één kring in de UI. */
@@ -119,7 +119,7 @@ export function useMessages(circleId: string | undefined) {
     queryFn: async (): Promise<ChatMessage[]> => {
       const { data, error } = await supabase
         .from('messages')
-        .select('id, circle_id, sender_id, body, created_at, sender:profiles (name)')
+        .select('id, circle_id, sender_id, body, created_at, sender:profiles (name, avatar_path)')
         .eq('circle_id', circleId!)
         .order('created_at', { ascending: true })
         .limit(200);

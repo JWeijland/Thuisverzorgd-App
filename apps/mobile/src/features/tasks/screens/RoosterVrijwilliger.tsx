@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useMyCircle } from '@/features/circles/api';
 import { KringBalk } from '@/features/circles/KringBalk';
 import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
+import { EigenFotoKnop } from '@/features/avatars/EigenFotoKnop';
 import { InboxBell } from '@/features/notifications/InboxBell';
 import { cancelTaskReminder, scheduleTaskReminder } from '@/features/notifications/push';
 import { useTaskRpc, useTasks, type Task } from '@/features/tasks/api';
@@ -56,6 +57,7 @@ export function RoosterVrijwilliger() {
           <View style={styles.headerActies}>
             {circle.data ? <KringBerichtenKnop circleId={circle.data.id} /> : null}
             <InboxBell />
+            <EigenFotoKnop />
           </View>
         }
       >

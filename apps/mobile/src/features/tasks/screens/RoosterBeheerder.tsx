@@ -13,6 +13,7 @@ import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useMyCircle } from '@/features/circles/api';
 import { KringBalk } from '@/features/circles/KringBalk';
 import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
+import { EigenFotoKnop } from '@/features/avatars/EigenFotoKnop';
 import { InboxBell } from '@/features/notifications/InboxBell';
 import { useCreateTask, useTaskLogs, useTaskRpc, useTasks } from '@/features/tasks/api';
 import { computeWorkload, taskLabel } from '@/features/tasks/logic';
@@ -72,6 +73,7 @@ export function RoosterBeheerder() {
           <View style={styles.headerActies}>
             {circle.data ? <KringBerichtenKnop circleId={circle.data.id} /> : null}
             <InboxBell />
+            <EigenFotoKnop />
           </View>
         }
       >

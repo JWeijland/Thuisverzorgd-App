@@ -14,6 +14,7 @@ import { useMessages, useSendMessage } from '@/features/circles/api';
 import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { useKeyboardOpen } from '@/lib/keyboard';
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { chatTintFor, colors, radius, spacing } from '@/theme';
 import { TvzText } from '@/ui';
 
@@ -53,22 +54,32 @@ export function ChatView({ circleId, roleSuffix }: Props) {
           const own = message.sender_id === session?.user.id;
           const name = message.sender?.name.split(' ')[0] ?? '';
           return (
-            <View
-              key={message.id}
-              style={[
-                styles.bubble,
-                own ? styles.own : styles.other,
-                // Per kringgenoot een vaste eigen tint, zodat je afzenders kunt onderscheiden.
-                !own && { backgroundColor: chatTintFor(message.sender_id) },
-              ]}
-            >
-              <TvzText preset="meta" style={styles.sender}>
-                {name}
-                {roleSuffix ? roleSuffix(message.sender_id) : ''}
-              </TvzText>
-              <TvzText preset="body" style={styles.body}>
-                {message.body}
-              </TvzText>
+            // Gezicht naast de bubbel van een ander: "gezichten, geen nummers".
+            // Bij je eigen bericht niet, je weet zelf wel wie je bent.
+            <View key={message.id} style={[styles.rij, own ? styles.rijEigen : styles.rijAnder]}>
+              {!own ? (
+                <ProfileAvatar
+                  name={message.sender?.name ?? name}
+                  avatarPath={message.sender?.avatar_path ?? null}
+                  size={30}
+                />
+              ) : null}
+              <View
+                style={[
+                  styles.bubble,
+                  own ? styles.own : styles.other,
+                  // Per kringgenoot een vaste eigen tint, zodat je afzenders kunt onderscheiden.
+                  !own && { backgroundColor: chatTintFor(message.sender_id) },
+                ]}
+              >
+                <TvzText preset="meta" style={styles.sender}>
+                  {name}
+                  {roleSuffix ? roleSuffix(message.sender_id) : ''}
+                </TvzText>
+                <TvzText preset="body" style={styles.body}>
+                  {message.body}
+                </TvzText>
+              </View>
             </View>
           );
         })}
@@ -105,7 +116,21 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingBottom: spacing.md,
   },
+  rij: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: spacing.sm,
+  },
+  rijEigen: {
+    justifyContent: 'flex-end',
+  },
+  rijAnder: {
+    justifyContent: 'flex-start',
+  },
   bubble: {
+    // De bubbel zit nu in een rij naast het gezicht; krimpen mag, uitdijen
+    // tot over de hele breedte niet.
+    flexShrink: 1,
     maxWidth: '82%',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Send } from 'lucide-react-native';
 
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { BrokerChat } from '@/features/forum/BrokerChat';
 import { useForumActions, usePosts, type ForumTag } from '@/features/forum/api';
 import { OpleidingenLijst } from '@/features/learning/OpleidingenLijst';
@@ -164,23 +165,28 @@ export default function SteunScreen() {
                 onPress={() => router.push({ pathname: '/forum/[id]', params: { id: post.id } })}
               >
                 <Card style={styles.postCard}>
-                  <View style={styles.postMeta}>
-                    <TvzText preset="meta" style={styles.metaText}>
-                      {post.voornaam}
-                      {post.city ? ` · ${post.city}` : ''} · {timeAgo(post.created_at)}
-                    </TvzText>
-                    <Pill label={t(TAG_LABEL[post.tag])} />
+                  <View style={styles.postKop}>
+                    <ProfileAvatar name={post.voornaam} avatarPath={post.avatar_path} size={36} />
+                    <View style={styles.postKopText}>
+                      <View style={styles.postMeta}>
+                        <TvzText preset="meta" style={styles.metaText}>
+                          {post.voornaam}
+                          {post.city ? ` · ${post.city}` : ''} · {timeAgo(post.created_at)}
+                        </TvzText>
+                        <Pill label={t(TAG_LABEL[post.tag])} />
+                      </View>
+                      <TvzText preset="cardTitle" style={styles.postTitle}>
+                        {post.title}
+                      </TvzText>
+                      <TvzText preset="secondary">
+                        {post.antwoorden === 0
+                          ? t('steun.nogGeen')
+                          : post.antwoorden === 1
+                            ? t('steun.antwoord1')
+                            : t('steun.antwoorden', { aantal: post.antwoorden })}
+                      </TvzText>
+                    </View>
                   </View>
-                  <TvzText preset="cardTitle" style={styles.postTitle}>
-                    {post.title}
-                  </TvzText>
-                  <TvzText preset="secondary">
-                    {post.antwoorden === 0
-                      ? t('steun.nogGeen')
-                      : post.antwoorden === 1
-                        ? t('steun.antwoord1')
-                        : t('steun.antwoorden', { aantal: post.antwoorden })}
-                  </TvzText>
                 </Card>
               </Pressable>
             ))}
@@ -254,6 +260,14 @@ const styles = StyleSheet.create({
   },
   postCard: {
     paddingVertical: spacing.md,
+  },
+  postKop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  postKopText: {
+    flex: 1,
   },
   postMeta: {
     flexDirection: 'row',

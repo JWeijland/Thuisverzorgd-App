@@ -114,7 +114,8 @@ const COURSES = [
           '"Daar gaan we morgen naartoe."',
         ],
         correct_index: 1,
-        uitleg: 'Reageer op het gevoel. Corrigeren geeft schrik, liegen geeft later teleurstelling.',
+        uitleg:
+          'Reageer op het gevoel. Corrigeren geeft schrik, liegen geeft later teleurstelling.',
       },
       {
         question: 'Wat blijft bij iemand met dementie het langst bewaard?',
@@ -206,7 +207,7 @@ const COURSES = [
       },
       {
         question: 'Bij wie kun je in deze app terecht met vragen over regelingen?',
-        options: ['De hulpmakelaar', 'De beheerder van de kring', 'De andere buddy\'s'],
+        options: ['De hulpmakelaar', 'De beheerder van de kring', "De andere buddy's"],
         correct_index: 0,
         uitleg: 'Hulpmakelaars kennen de regelingen en verwijzen je door.',
       },

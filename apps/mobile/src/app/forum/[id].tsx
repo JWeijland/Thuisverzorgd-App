@@ -15,6 +15,7 @@ import { Send } from 'lucide-react-native';
 import { useForumActions, usePost, useReplies } from '@/features/forum/api';
 import { TAG_LABEL } from '@/app/(tabs)/steun';
 import { useSession } from '@/features/onboarding/useAuth';
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { t } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
 import { BottomSheet, Button, Card, Pill, TextField, TvzText } from '@/ui';
@@ -60,10 +61,13 @@ export default function ForumThreadScreen() {
           {item ? (
             <Card>
               <View style={styles.postMeta}>
-                <TvzText preset="meta" style={styles.metaText}>
-                  {item.voornaam}
-                  {item.city ? ` · ${item.city}` : ''}
-                </TvzText>
+                <View style={styles.wie}>
+                  <ProfileAvatar name={item.voornaam} avatarPath={item.avatar_path} size={30} />
+                  <TvzText preset="meta" style={styles.metaText}>
+                    {item.voornaam}
+                    {item.city ? ` · ${item.city}` : ''}
+                  </TvzText>
+                </View>
                 <View style={styles.metaRight}>
                   <Pill label={t(TAG_LABEL[item.tag])} />
                   {item.author_id !== session?.user.id ? (
@@ -95,9 +99,12 @@ export default function ForumThreadScreen() {
               style={[styles.reply, reply.is_broker ? styles.brokerReply : null]}
             >
               <View style={styles.postMeta}>
-                <TvzText preset="meta" style={styles.metaText}>
-                  {reply.voornaam}
-                </TvzText>
+                <View style={styles.wie}>
+                  <ProfileAvatar name={reply.voornaam} avatarPath={reply.avatar_path} size={26} />
+                  <TvzText preset="meta" style={styles.metaText}>
+                    {reply.voornaam}
+                  </TvzText>
+                </View>
                 <View style={styles.metaRight}>
                   {reply.is_broker ? (
                     <Pill
@@ -231,6 +238,12 @@ const styles = StyleSheet.create({
   list: {
     padding: spacing.screen,
     gap: spacing.cardGap,
+  },
+  wie: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    flexShrink: 1,
   },
   postMeta: {
     flexDirection: 'row',

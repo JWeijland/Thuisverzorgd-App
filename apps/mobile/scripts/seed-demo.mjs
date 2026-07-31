@@ -34,7 +34,10 @@ async function upsertUser(email, name, role, extra = {}) {
     if (error) throw new Error(`${email}: ${error.message}`);
     id = data.user.id;
   }
-  await admin.from('profiles').update({ role, name, ...extra }).eq('id', id);
+  await admin
+    .from('profiles')
+    .update({ role, name, ...extra })
+    .eq('id', id);
   console.log(`✓ ${name} (${role})`);
   return id;
 }
@@ -120,20 +123,39 @@ const { count } = await admin
 if ((count ?? 0) === 0) {
   await admin.from('tasks').insert([
     {
-      circle_id: circle.id, created_by: jelle, type: 'boodschappen',
-      date: nextDate(0), time: '14:00', status: 'ingepland', claimed_by: anna,
+      circle_id: circle.id,
+      created_by: jelle,
+      type: 'boodschappen',
+      date: nextDate(0),
+      time: '14:00',
+      status: 'ingepland',
+      claimed_by: anna,
     },
     {
-      circle_id: circle.id, created_by: jelle, type: 'wandelen',
-      date: nextDate(1), time: '10:30', status: 'ingepland', claimed_by: tim,
+      circle_id: circle.id,
+      created_by: jelle,
+      type: 'wandelen',
+      date: nextDate(1),
+      time: '10:30',
+      status: 'ingepland',
+      claimed_by: tim,
     },
     {
-      circle_id: circle.id, created_by: jelle, type: 'vervoer', custom_label: null,
-      date: nextDate(2), time: '09:15', status: 'open',
+      circle_id: circle.id,
+      created_by: jelle,
+      type: 'vervoer',
+      custom_label: null,
+      date: nextDate(2),
+      time: '09:15',
+      status: 'open',
     },
     {
-      circle_id: circle.id, created_by: jelle, type: 'gezelschap',
-      date: nextDate(3), time: '15:00', status: 'open',
+      circle_id: circle.id,
+      created_by: jelle,
+      type: 'gezelschap',
+      date: nextDate(3),
+      time: '15:00',
+      status: 'open',
     },
   ]);
   console.log('✓ 4 taken in het rooster');
@@ -141,11 +163,14 @@ if ((count ?? 0) === 0) {
 
 // Kringchat + forum
 await admin.from('messages').insert({
-  circle_id: circle.id, sender_id: jelle,
+  circle_id: circle.id,
+  sender_id: jelle,
   body: 'Zou iemand donderdag de boodschappen kunnen doen?',
 });
 await admin.from('messages').insert({
-  circle_id: circle.id, sender_id: anna, body: 'Ik kom eraan! 😊',
+  circle_id: circle.id,
+  sender_id: anna,
+  body: 'Ik kom eraan! 😊',
 });
 
 const { count: postCount } = await admin
@@ -155,14 +180,17 @@ if ((postCount ?? 0) === 0) {
   const { data: post } = await admin
     .from('forum_posts')
     .insert({
-      author_id: jelle, tag: 'wonen', city: 'Amsterdam',
+      author_id: jelle,
+      tag: 'wonen',
+      city: 'Amsterdam',
       title: 'Kan ik mijn moeder zomaar bij ons in huis nemen?',
       body: 'Ze woont nu nog zelfstandig maar het gaat steeds moeilijker. Waar moet ik aan denken?',
     })
     .select('id')
     .single();
   await admin.from('forum_replies').insert({
-    post_id: post.id, author_id: sanne,
+    post_id: post.id,
+    author_id: sanne,
     body: 'Goede vraag! Denk aan de kostendelersnorm en een eventuele mantelzorgwoning. Bel gerust even met de chat, dan lopen we jouw situatie samen door.',
   });
   console.log('✓ Forumvraag + makelaar-antwoord');

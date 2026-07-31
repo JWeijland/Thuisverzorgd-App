@@ -152,11 +152,33 @@ export function BrokerChat({ startVraag }: { startVraag?: string } = {}) {
           </View>
           {(messages.data ?? []).map((message) => {
             const own = message.sender_id === session?.user.id;
+            // Wie het niet zelf is, is een hulpmakelaar: naam en gezicht erbij,
+            // zodat je ziet met wie je praat.
+            const afzender = (makelaars.data ?? []).find(
+              (makelaar) => makelaar.id === message.sender_id,
+            );
             return (
-              <View key={message.id} style={[styles.bubble, own ? styles.own : styles.other]}>
-                <TvzText preset="body" style={styles.bubbleText}>
-                  {message.body}
-                </TvzText>
+              <View
+                key={message.id}
+                style={[styles.berichtRij, own ? styles.berichtEigen : styles.berichtAnder]}
+              >
+                {!own ? (
+                  <ProfileAvatar
+                    name={afzender?.voornaam ?? t('steun.makelaarBadge')}
+                    avatarPath={afzender?.avatar_path ?? null}
+                    size={30}
+                  />
+                ) : null}
+                <View style={[styles.bubble, own ? styles.own : styles.other]}>
+                  {!own ? (
+                    <TvzText preset="meta" style={styles.bubbleNaam}>
+                      {afzender?.voornaam ?? t('steun.makelaarBadge')}
+                    </TvzText>
+                  ) : null}
+                  <TvzText preset="body" style={styles.bubbleText}>
+                    {message.body}
+                  </TvzText>
+                </View>
               </View>
             );
           })}
@@ -359,7 +381,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 13,
   },
+  berichtRij: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: spacing.sm,
+  },
+  berichtEigen: {
+    justifyContent: 'flex-end',
+  },
+  berichtAnder: {
+    justifyContent: 'flex-start',
+  },
+  bubbleNaam: {
+    color: colors.primary,
+    fontSize: 11,
+    marginBottom: 1,
+  },
   bubble: {
+    flexShrink: 1,
     maxWidth: '82%',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,

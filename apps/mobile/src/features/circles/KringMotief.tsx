@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -8,6 +8,7 @@ import Animated, {
   withSequence,
   withSpring,
   withTiming,
+  type SharedValue,
 } from 'react-native-reanimated';
 
 import { colors, shadows } from '@/theme';
@@ -22,10 +23,24 @@ import { colors, shadows } from '@/theme';
  * klein feestje, zonder confetti-geweld.
  */
 
-const BUDDIES = 6;
+/**
+ * De gezichten in de kring. Demo-portretten onder de Pexels-licentie (gratis,
+ * ook commercieel, zonder naamsvermelding); ze staan hier als illustratie van
+ * "een kring van mensen om je heen", niet als echte gebruikers.
+ */
+const GEZICHTEN = [
+  require('../../../assets/images/buddies/30004322.jpg'),
+  require('../../../assets/images/buddies/2421934.jpg'),
+  require('../../../assets/images/buddies/10347162.jpg'),
+  require('../../../assets/images/buddies/8450208.jpg'),
+  require('../../../assets/images/buddies/12644996.jpg'),
+  require('../../../assets/images/buddies/30450838.jpg'),
+];
+
+const BUDDIES = GEZICHTEN.length;
 /** Afstand van het midden tot de buddy-stippen. */
-const STRAAL = 54;
-const STIP = 20;
+const STRAAL = 58;
+const STIP = 34;
 const VLAK = (STRAAL + STIP / 2) * 2 + 8;
 
 export function KringMotief({ gevierd = false }: { gevierd?: boolean }) {
@@ -50,7 +65,7 @@ export function KringMotief({ gevierd = false }: { gevierd?: boolean }) {
     <View style={styles.vlak}>
       <Animated.View style={[styles.ring, ringStyle]}>
         {Array.from({ length: BUDDIES }, (_, i) => (
-          <Buddy key={i} index={i} />
+          <Buddy key={i} index={i} draai={draai} />
         ))}
       </Animated.View>
 
@@ -67,7 +82,7 @@ export function KringMotief({ gevierd = false }: { gevierd?: boolean }) {
 }
 
 /** Eén buddy: komt met een veer op zijn plek in de kring. */
-function Buddy({ index }: { index: number }) {
+function Buddy({ index, draai }: { index: number; draai: SharedValue<number> }) {
   const groei = useSharedValue(0);
   const hoek = (index / BUDDIES) * Math.PI * 2 - Math.PI / 2;
   const x = Math.cos(hoek) * STRAAL;
@@ -83,14 +98,22 @@ function Buddy({ index }: { index: number }) {
       { translateX: x * groei.value },
       { translateY: y * groei.value },
       { scale: groei.value },
+      // Tegen de draai van de ring in, zodat de gezichten rechtop blijven
+      // terwijl ze om het beeldmerk heen draaien.
+      { rotate: `${-draai.value * 360}deg` },
     ],
     opacity: groei.value,
   }));
 
-  // Om en om blauw en groen, zoals het motief in het brandbook.
-  const kleur = index % 2 === 0 ? colors.primaryMid : colors.accent;
+  // De rand om en om blauw en groen, zoals het motief in het brandbook; in het
+  // rondje zelf een gezicht, want dit gaat over mensen.
+  const rand = index % 2 === 0 ? colors.primaryMid : colors.accent;
 
-  return <Animated.View style={[styles.buddy, { backgroundColor: kleur }, style]} />;
+  return (
+    <Animated.View style={[styles.buddy, { borderColor: rand }, style]}>
+      <Image source={GEZICHTEN[index]} style={styles.gezicht} />
+    </Animated.View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -115,6 +138,13 @@ const styles = StyleSheet.create({
     width: STIP,
     height: STIP,
     borderRadius: STIP / 2,
+    borderWidth: 2.5,
+    backgroundColor: colors.white,
+    overflow: 'hidden',
+  },
+  gezicht: {
+    width: '100%',
+    height: '100%',
   },
   midden: {
     width: 54,

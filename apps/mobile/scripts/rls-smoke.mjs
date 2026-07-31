@@ -74,26 +74,41 @@ try {
   if (ce) throw new Error(`kring aanmaken: ${ce.message}`);
 
   await A.client.from('circle_members').insert({
-    circle_id: circle.id, profile_id: A.id, member_role: 'beheerder', status: 'actief',
+    circle_id: circle.id,
+    profile_id: A.id,
+    member_role: 'beheerder',
+    status: 'actief',
   });
   const { error: me } = await A.client.from('circle_members').insert({
-    circle_id: circle.id, profile_id: C.id, member_role: 'vrijwilliger', status: 'actief',
+    circle_id: circle.id,
+    profile_id: C.id,
+    member_role: 'vrijwilliger',
+    status: 'actief',
   });
   check('beheerder voegt vrijwilliger 1 toe', !me, me?.message);
 
   const { data: task } = await A.client
     .from('tasks')
     .insert({
-      circle_id: circle.id, type: 'boodschappen', date: '2026-07-31', time: '14:00',
+      circle_id: circle.id,
+      type: 'boodschappen',
+      date: '2026-07-31',
+      time: '14:00',
       created_by: A.id,
     })
     .select()
     .single();
   await A.client.from('messages').insert({
-    circle_id: circle.id, sender_id: A.id, body: 'Zou iemand donderdag kunnen helpen?',
+    circle_id: circle.id,
+    sender_id: A.id,
+    body: 'Zou iemand donderdag kunnen helpen?',
   });
   await A.client.from('task_drafts').insert({
-    circle_id: circle.id, type: 'wandelen', date: '2026-08-03', time: '10:30', created_by: A.id,
+    circle_id: circle.id,
+    type: 'wandelen',
+    date: '2026-08-03',
+    time: '10:30',
+    created_by: A.id,
   });
 
   // 1. NIET-LID (B) mag niets van de kring zien
@@ -130,16 +145,25 @@ try {
 
   // 3. Gratis limiet: 2e vrijwilliger mag, 3e niet zonder abonnement
   const d1 = await A.client.from('circle_members').insert({
-    circle_id: circle.id, profile_id: D.id, member_role: 'vrijwilliger', status: 'actief',
+    circle_id: circle.id,
+    profile_id: D.id,
+    member_role: 'vrijwilliger',
+    status: 'actief',
   });
   check('vrijwilliger 2 mag erbij (gratis)', !d1.error, d1.error?.message);
   const e1 = await A.client.from('circle_members').insert({
-    circle_id: circle.id, profile_id: E.id, member_role: 'vrijwilliger', status: 'actief',
+    circle_id: circle.id,
+    profile_id: E.id,
+    member_role: 'vrijwilliger',
+    status: 'actief',
   });
   check('vrijwilliger 3 geweigerd zonder abonnement', Boolean(e1.error), e1.error?.message);
   await A.client.rpc('activate_subscription_stub');
   const e2 = await A.client.from('circle_members').insert({
-    circle_id: circle.id, profile_id: E.id, member_role: 'vrijwilliger', status: 'actief',
+    circle_id: circle.id,
+    profile_id: E.id,
+    member_role: 'vrijwilliger',
+    status: 'actief',
   });
   check('vrijwilliger 3 mag erbij mét abonnement', !e2.error, e2.error?.message);
 
@@ -147,14 +171,18 @@ try {
   const { data: req } = await A.client
     .from('spontaneous_requests')
     .insert({
-      requester_id: A.id, type: 'vervoer', address: 'Geheime Straat 12',
+      requester_id: A.id,
+      type: 'vervoer',
+      address: 'Geheime Straat 12',
       note: 'Vervoer naar de apotheek',
     })
     .select()
     .single();
   const v1 = await B.client.from('v_open_requests').select('*').eq('id', req.id);
-  check('vrijwilliger ziet open aanvraag (zonder adres)', (v1.data ?? []).length === 1
-    && !('address' in (v1.data?.[0] ?? {})));
+  check(
+    'vrijwilliger ziet open aanvraag (zonder adres)',
+    (v1.data ?? []).length === 1 && !('address' in (v1.data?.[0] ?? {})),
+  );
   const g1 = await B.client.rpc('get_request_address', { p_request: req.id });
   check('adres geweigerd vóór acceptatie', Boolean(g1.error));
   const { data: offer, error: oe } = await B.client
@@ -170,8 +198,11 @@ try {
 
   // 5. Rol wijzigen mag niet
   const r1 = await B.client.from('profiles').update({ role: 'admin' }).eq('id', B.id).select();
-  check('eigen rol wijzigen geweigerd', Boolean(r1.error) || (r1.data ?? []).length === 0,
-    r1.error?.message);
+  check(
+    'eigen rol wijzigen geweigerd',
+    Boolean(r1.error) || (r1.data ?? []).length === 0,
+    r1.error?.message,
+  );
 } catch (err) {
   console.error('❌ Testrun brak af:', err.message);
   failures += 1;
