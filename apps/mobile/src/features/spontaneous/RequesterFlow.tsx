@@ -1,3 +1,4 @@
+import * as Location from 'expo-location';
 import { useState } from 'react';
 import { Linking, StyleSheet, View } from 'react-native';
 import { Zap } from 'lucide-react-native';
@@ -11,6 +12,8 @@ import {
 } from '@/features/spontaneous/api';
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useMyCircle } from '@/features/circles/api';
+import { useProfile } from '@/features/onboarding/useAuth';
+import { useUpdateProfile } from '@/features/profile/api';
 import { t } from '@/i18n';
 import { colors, radius, shadows, spacing } from '@/theme';
 import { BottomSheet, Button, Chip, PulseDot, TextField, TvzText } from '@/ui';
@@ -35,6 +38,8 @@ type Props = {
  */
 export function RequesterFlow({ ownLocation }: Props) {
   const circle = useMyCircle();
+  const profile = useProfile();
+  const updateProfile = useUpdateProfile();
   const myRequest = useMyRequest();
   const offers = useRequestOffers(myRequest.data?.id);
   const contact = useRequestContact(myRequest.data?.id, myRequest.data?.status === 'onderweg');
@@ -44,10 +49,50 @@ export function RequesterFlow({ ownLocation }: Props) {
   const [type, setType] = useState<RequestType>('boodschappen');
   const [customNote, setCustomNote] = useState('');
   const [address, setAddress] = useState('');
+  const [bezig, setBezig] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelMessage, setCancelMessage] = useState('');
 
   const request = myRequest.data;
+
+  /**
+   * De oproep hoort op het ingevulde adres te staan, niet op waar de telefoon
+   * nu is (feedback 05-08): het adres wordt eerst omgezet naar een coördinaat
+   * en pas als dat mislukt valt de kaart terug op de eigen locatie. Het adres
+   * wordt op het profiel bewaard, zodat het de volgende keer al klaarstaat.
+   */
+  async function plaatsOproep() {
+    if (bezig || actions.createRequest.isPending) return;
+    setBezig(true);
+    const adres = address.trim();
+    let lat = ownLocation?.lat;
+    let lon = ownLocation?.lon;
+    if (adres) {
+      try {
+        const gevonden = (await Location.geocodeAsync(adres))[0];
+        if (gevonden) {
+          lat = gevonden.latitude;
+          lon = gevonden.longitude;
+        }
+      } catch {
+        // geocoderen is best effort; de eigen locatie is het vangnet
+      }
+      if (adres !== (profile.data?.street_address ?? '')) {
+        updateProfile.mutate({ street_address: adres });
+      }
+    }
+    actions.createRequest.mutate(
+      {
+        type,
+        note: type === 'anders' ? customNote.trim() : undefined,
+        address: adres || undefined,
+        lat,
+        lon,
+        circleId: circle.data?.id,
+      },
+      { onSettled: () => setBezig(false) },
+    );
+  }
 
   if (!request) {
     return (
@@ -97,23 +142,15 @@ export function RequesterFlow({ ownLocation }: Props) {
               onChangeText={setAddress}
             />
             <Button
-              label={t('directeHulp.zetOpDeKaart')}
+              label={bezig ? t('algemeen.laden') : t('directeHulp.zetOpDeKaart')}
               variant="cta"
               size="lg"
               disabled={
+                bezig ||
                 actions.createRequest.isPending ||
                 (type === 'anders' && customNote.trim().length === 0)
               }
-              onPress={() =>
-                actions.createRequest.mutate({
-                  type,
-                  note: type === 'anders' ? customNote.trim() : undefined,
-                  address: address.trim() || undefined,
-                  lat: ownLocation?.lat,
-                  lon: ownLocation?.lon,
-                  circleId: circle.data?.id,
-                })
-              }
+              onPress={plaatsOproep}
             />
             <TvzText preset="secondary" style={styles.note}>
               {t('directeHulp.adresNote')}
@@ -124,7 +161,11 @@ export function RequesterFlow({ ownLocation }: Props) {
             label={t('directeHulp.titel')}
             variant="cta"
             size="lg"
-            onPress={() => setComposeOpen(true)}
+            onPress={() => {
+              // Het bewaarde adres staat alvast klaar; aanpassen mag altijd.
+              setAddress(profile.data?.street_address ?? '');
+              setComposeOpen(true);
+            }}
             style={styles.cta}
           />
         )}
