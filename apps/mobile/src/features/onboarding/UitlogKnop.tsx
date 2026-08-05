@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { LogOut } from 'lucide-react-native';
 
-import { removePushToken } from '@/features/notifications/push';
+import { logUit } from '@/features/onboarding/uitloggen';
 import { t } from '@/i18n';
-import { supabase } from '@/lib/supabase';
 import { colors, hitTarget, spacing } from '@/theme';
 import { BottomSheet, Button, TvzText } from '@/ui';
 
@@ -23,8 +22,11 @@ export function UitlogKnop() {
   async function uitloggen() {
     if (bezig) return;
     setBezig(true);
-    await removePushToken();
-    await supabase.auth.signOut();
+    await logUit();
+    // Navigatie regelt de auth-listener; als dit scherm toch blijft staan,
+    // moet de knop weer bruikbaar zijn.
+    setBezig(false);
+    setOpen(false);
   }
 
   return (

@@ -8,8 +8,8 @@ import { Camera, Check, Images } from 'lucide-react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { NotificationSettings } from '@/features/notifications/NotificationSettings';
-import { removePushToken } from '@/features/notifications/push';
 import { useProfile } from '@/features/onboarding/useAuth';
+import { logUit } from '@/features/onboarding/uitloggen';
 import { STRAAL_OPTIES, dichtstbijzijndeStraal, straalLabel } from '@/features/onboarding/straal';
 import { useUpdateProfile } from '@/features/profile/api';
 import { t } from '@/i18n';
@@ -455,10 +455,7 @@ export default function ProfielScreen() {
           label={t('profiel.uitloggen')}
           variant="danger"
           style={styles.logout}
-          onPress={async () => {
-            await removePushToken();
-            supabase.auth.signOut();
-          }}
+          onPress={logUit}
         />
         <Pressable
           accessibilityRole="button"
@@ -692,8 +689,7 @@ export default function ProfielScreen() {
               setDeleteError(true);
               return;
             }
-            await removePushToken();
-            supabase.auth.signOut();
+            await logUit();
           }}
         />
         <Button
