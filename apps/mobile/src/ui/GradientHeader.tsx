@@ -6,6 +6,7 @@ import Svg, { Path } from 'react-native-svg';
 
 import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, gradient, spacing } from '@/theme';
+import { BoPeek } from '@/ui/Bo';
 import { TvzText } from '@/ui/TvzText';
 
 type Props = {
@@ -17,6 +18,8 @@ type Props = {
   children?: ReactNode;
   /** Golvende onderrand + groene streep onder de titel (ontwerp 1a). */
   wobbel?: boolean;
+  /** Mascotte Bo piept rechtsonder over de rand van de header. */
+  bo?: boolean;
 };
 
 const WAVE_HEIGHT = 18;
@@ -26,7 +29,7 @@ const WAVE_HEIGHT = 18;
  * dezelfde afmetingen (schermpadding, titel 24, subtitel). Met `wobbel` krijgt
  * hij de getekende onderrand en het groene streepje uit ontwerp 1a.
  */
-export function GradientHeader({ title, subtitle, right, children, wobbel = false }: Props) {
+export function GradientHeader({ title, subtitle, right, children, wobbel = false, bo }: Props) {
   const { width } = useWindowDimensions();
   // Op de blauwe kop moeten klok, wifi en batterij wit zijn. Elk scherm met
   // deze kop regelt dat zo vanzelf.
@@ -61,6 +64,14 @@ export function GradientHeader({ title, subtitle, right, children, wobbel = fals
         ) : null}
         {children}
       </SafeAreaView>
+
+      {bo ? (
+        // Vóór de golf getekend: de golf (in de achtergrondkleur) valt over
+        // Bo's onderrand, zodat hij echt over de rand lijkt te piepen.
+        <View pointerEvents="none" style={styles.boPeek}>
+          <BoPeek width={86} />
+        </View>
+      ) : null}
 
       {wobbel ? (
         <Svg
@@ -114,5 +125,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: -1,
+  },
+  boPeek: {
+    position: 'absolute',
+    right: 18,
+    bottom: 4,
   },
 });

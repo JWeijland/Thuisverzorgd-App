@@ -1,24 +1,34 @@
 import { StyleSheet, View } from 'react-native';
 
 import { colors, radius, spacing } from '@/theme';
+import { Bo } from '@/ui/Bo';
 import { TvzText } from '@/ui/TvzText';
 
 type Props = {
   title: string;
   body?: string;
+  /** Mascotte Bo in plaats van de pillen (max één Bo per scherm!). */
+  bo?: boolean;
 };
 
 /**
  * Lege staat volgens het brandbook: de losse pillen als vriendelijke illustratie
- * ("de pillen zoeken elkaar nog even"), nooit sombere iconen.
+ * ("de pillen zoeken elkaar nog even"), nooit sombere iconen. Op een paar
+ * plekken uit de handoff staat mascotte Bo er in plaats van de pillen.
  */
-export function EmptyState({ title, body }: Props) {
+export function EmptyState({ title, body, bo }: Props) {
   return (
     <View style={styles.container}>
-      <View style={styles.pills}>
-        <View style={[styles.pill, { backgroundColor: colors.primaryMid }]} />
-        <View style={[styles.pill, { backgroundColor: colors.accent, marginLeft: 14 }]} />
-      </View>
+      {bo ? (
+        <View style={styles.boWrap}>
+          <Bo width={96} />
+        </View>
+      ) : (
+        <View style={styles.pills}>
+          <View style={[styles.pill, { backgroundColor: colors.primaryMid }]} />
+          <View style={[styles.pill, { backgroundColor: colors.accent, marginLeft: 14 }]} />
+        </View>
+      )}
       <TvzText preset="cardTitle" style={styles.title}>
         {title}
       </TvzText>
@@ -39,6 +49,9 @@ const styles = StyleSheet.create({
   },
   pills: {
     flexDirection: 'row',
+    marginBottom: spacing.lg,
+  },
+  boWrap: {
     marginBottom: spacing.lg,
   },
   pill: {

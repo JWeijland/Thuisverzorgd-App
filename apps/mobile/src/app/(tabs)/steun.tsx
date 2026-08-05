@@ -104,7 +104,7 @@ export default function SteunScreen() {
 
   return (
     <View style={styles.safeBg}>
-      <GradientHeader title={t('steun.titel')} subtitle={t('steun.subtitel')} wobbel>
+      <GradientHeader title={t('steun.titel')} subtitle={t('steun.subtitel')} wobbel bo>
         <View style={styles.subnav}>
           {subnav.map((key) => (
             <Pressable

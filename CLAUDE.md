@@ -21,6 +21,7 @@ Expo SDK 57 + expo-router (file-based), TypeScript strict. Supabase (Postgres/Au
 - Alle UI-copy uit `src/i18n/nl.json`, geen hardcoded strings; alleen Nederlands, geen em-dashes in gebruikerscopy.
 - Het woord "mantelzorger" nooit in de UI: het heet "beheerder". Geen VOG, geen levels/gamification, geen check-in/check-out.
 - Vormregel: vlakken bijna vierkant (radius 8/10/12), alles wat een actie of status is een pill (radius 999). Groen (#8DC93F) is schaars: max één groene CTA per scherm, nooit witte tekst op groen.
+- Mascotte Bo (`src/ui/Bo.tsx`, eigen warm palet uit de handoff): max één Bo per scherm, nooit uitrekken, nooit op betaal- of juridische schermen.
 - Tapdoelen ≥44pt, body ≥17pt, ouderen-modus schaalt 1,3×.
 - RLS op elke tabel; kringdata alleen voor leden; exacte locatie pas na toestemming (daarvoor ~1 km vervaagd); nooit ID-documenten in de database.
 - Commits in het Nederlands, klein en per subtaak. Na elke fase: lint + typecheck + test.

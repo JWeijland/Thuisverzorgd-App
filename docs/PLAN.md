@@ -119,12 +119,12 @@
 - [x] Tests 29 groen; lint + typecheck groen
 - **Open punt:** moderatie-e-mail (besluit #12) loopt nu via pushmeldingen naar makelaars; een e-mailkanaal kan er later bij (Resend) zodra er een moderatie-adres is
 
-### Fase 9 — Abonnement (stub, ADR-0002) ✅ (2026-07-28)
+### Fase 9 — Abonnement (stub, ADR-0002) ✅ (2026-07-28) → **verwijderd 05-08-2026** (handoff voorzieningen, zie hieronder)
 - [x] Abonnementsscherm (screen 12): €4,99-gradient-kaart met de vier voordelen, groene CTA, incasso-tekst, "Later misschien", bevestiging na activeren + pilot-notitie ("eerste maand gratis, er wordt nog niets afgeschreven")
 - [x] Stub-activatie via `activate_subscription_stub` (proefmaand); gratis limiet was al server-side afgedwongen; entitlement geldt per account voor alle kringen
 - [x] Profiel beheerder: abonnementsregel (Gratis · max 2 vrijwilligers / Proefmaand actief) met Upgraden/Beheren
 - [x] Profiel volledig afgemaakt: buddy-pool-toggle (gradient-kaart), "Mijn beschikbaarheid" met dagchips, "Even afwezig" (vakantiemodus, amber melding), agenda-koppeling-toggle, TVZ-ID
-- [ ] (Vóór publieke release) RevenueCat + Apple IAP + webhook — zie Open punten
+- ~~(Vóór publieke release) RevenueCat + Apple IAP + webhook~~ — vervallen per 05-08-2026, abonnement bestaat niet meer
 
 ### Fase 10 — Admin-inzichten ✅ (2026-07-28)
 - [x] Dashboard op route `/admin` (rol-guard, werkt ook als web-route): vier kerncijfer-tegels, staafgrafiek groei per maand, taken per type met percentages, gemiddelde tijd tot match — uitsluitend uit de geaggregeerde `v_admin_*`-views (admin heeft geen tabeltoegang)
@@ -142,7 +142,7 @@
 
 ## Open punten voor ná de pilot-build
 - Videokennismaking via Daily.co (API-key nodig) — screen 22
-- RevenueCat + Apple IAP (ADR-0002)
+- Stripe voor boekingen (het abonnement en RevenueCat/IAP zijn per 05-08-2026 vervallen)
 - Agenda-koppeling (EventKit), Maestro e2e-flows, typ-indicator makelaar-chat, echte brand-app-iconen
 
 ## Feedbackronde 29-07-2026 ✅ (12 punten, live via EAS-update)
@@ -173,6 +173,21 @@ Waar de vrijwilliger opleidingen volgt, krijgt de beheerder (en de hulpvrager) d
 - **Vrijwilligersmeldingen bij de verkeerde rol.** `change_role` en `redeem_circle_code` wijzigden alleen `profiles.role`; `circle_members.member_role` en aangenomen taken bleven staan. Wie van vrijwilliger naar hulpvrager ging, bleef "vrijwilliger" in de kring: hij kreeg "Nieuwe taak in je kring" en de banner "... jij gaat" van zijn oude taken. Gevonden in de database: 3 taken op naam van een hulpvrager, 2 onterechte meldingen. Nu: `sync_member_roles()` bij elke rolwissel (taken terug naar open, lidmaatschap elders wordt "kijkt mee", in je eigen kring blijf je beheerder), de meldingstrigger toetst óók de profielrol, `claim_task` weigert een hulpvrager, en de banner verschijnt niet bij een hulpvrager. Bestaande scheefstand opgeruimd.
 - **Hulpstraal** (`profiles.help_radius_m`, standaard **300 m**, keuzes 300 m tot 25 km in het profiel). Bepaalt welke spontane hulpvragen en kringen een vrijwilliger ziet (`v_open_requests`, `v_map_circles`) en voor welke kringen hij als buddy in beeld komt (`buddys_voor_kring()` vervangt de ongefilterde `v_buddy_cards`-query). Rekent server-side met `location_rounded`; omdat die ~1 km vervaagd is telt een marge van 1200 m mee (`hulpstraal_marge_m()`, gespiegeld in `straal.ts`), anders mis je bij 300 m je buurvrouw door de afronding. Eigen aanvraag en eigen kringen blijven altijd zichtbaar. **Let op:** met 300 m ziet een vrijwilliger in de testdata 0 van de 3 open hulpvragen, met 25 km alle 3. Dat is de bedoeling, maar het betekent wel dat nieuwe vrijwilligers hun straal actief moeten verruimen.
 
+## Voorzieningen & mascotte Bo 05-08-2026 ✅ (migraties gepusht, alles lokaal groen)
+Bron: `handoff-voorzieningen/CONCEPT.md` + de Bo-SVG's. Afgesproken met Jelle: Steun, Rooster en Wegwijzer blijven zoals ze waren; Voorzieningen komt er als extra tab bij; het abonnement gaat er wél uit; betalen is nog zonder echte afschrijving (Stripe volgt).
+
+- **Abonnement volledig verwijderd**: scherm, Upgraden-kaart in Profiel, gratis-limiet-melding, `useSubscription`. Database (migratie `20260805100000`): trigger `circle_members_free_limit`, `enforce_free_limit`, `has_active_subscription`, `activate_subscription_stub`, tabel `subscriptions` en het enum weg; `handle_new_user` opnieuw zonder subscriptions-insert. Uitnodigen is onbeperkt. Verdienmodel wordt transactiefee op boekingen.
+- **Voorzien-tab** (marktplaats, alleen zorg-rollen): beheerder `rooster · voorzien · buurt · steun · profiel`, hulpvrager `rooster · voorzien · kring`; vrijwilliger ongewijzigd. Grid met uitgelichte gratis Buddy-gradient-tegel + 9 betaalde diensten uit de database, zoekbalk filtert live.
+- **Datamodel** (migratie `20260805100100`): `providers` (voornaam, bedrijf, Caveat-notitie, demoafstand), `services` (prijs in centen, eenheid bezoek/uur, rating), `bookings` (prijs vastgelegd op boekmoment, `payment_status` 'na_bezoek' = capture-later). RLS: catalogus alleen ingelogd, boekingen alleen je eigen; schrijven uitsluitend via RPC's `create_booking` (maakt ook een 'boeking'-melding via `notify()`) en `cancel_booking` (weigert binnen 24 u, `annuleren_te_laat`). Grants expliciet ingetrokken van PUBLIC/anon (les uit de Wegwijzer).
+- **Dienst-detail** volgens het redesign: lichtblauw hero-vlak (`colors.heroBlue`, onderhoeken 28), grote avatar met witte rand, "met Samira · 1,2 km", sterren + beoordelingen, handgeschreven notitie (Caveat), "Wat kun je verwachten", tijdsloten als radio-lijst met hairlines (eerste = "snelst", géén chips), zwevende prijskaart met "Boek di 10:00" (label volgt het gekozen slot).
+- **Boeken**: afrekenen (overzicht, Apple Pay/iDEAL als keuze-UI, "bedrag pas afgeschreven ná bezoek") → `create_booking` → bevestiging met Bo + groen vinkje. Er wordt bewust nog níéts afgeschreven; echte Stripe-koppeling (iDEAL + Apple Pay, capture-later) staat bij de open punten.
+- **Rooster-koppeling**: `GeboekteDiensten` toont komende boekingen naast de kringtaken (beheerder + hulpvrager) met annuleren via bottom sheet; binnen 24 u legt de app netjes uit dat het niet meer kan.
+- **Buddy-flow**: uitlegpagina met Bo-hero → "Vraag via je hulpkring" (beheerder → planning-tab, hulpvrager → kring-tab) of "Zet een oproep op de buurtkaart" (→ kaart).
+- **Mascotte Bo** (`src/ui/Bo.tsx`, uit de SVG's van de handoff): welkomstscherm (deinend), peek over de headerrand van Steun én Voorzien (`GradientHeader bo`-prop, vóór de golf getekend zodat hij er echt achter zit), boekingsbevestiging met vinkje-badge, lege staten (kring + "nog geen kring" op het rooster, `EmptyState bo`-prop). Regels: max één Bo per scherm, nooit op betaal-/juridische schermen, nooit uitrekken.
+- **Meldingen**: nieuwe kind 'boeking' onder de categorie Taken.
+- **Bewijs**: rls-smoke uitgebreid (28 checks groen tegen de echte database: geen limiet meer, anon ziet de catalogus niet, boekingen privé, prijs vastgelegd, annuleren werkt); 61 Jest-tests groen (nieuw: tijdsloten, "snelst", euro-notatie); lint + typecheck groen.
+- **Nog te doen bij deze feature**: echte Stripe-betalingen; aanbieder-portretfoto's (nu initiaal-avatar); prototype `TVZ App v2.dc.html` naast de build leggen zodra Jelle het aanlevert; eventueel een rondleiding-stap voor de nieuwe tab.
+
 ## Actuele stand (overdracht, 28-07-2026 einde dag)
 - App staat op TestFlight en werkt op het toestel van de opdrachtgever; login via 6-cijferige code uit de mail (magic link werkt ook). JS-fixes gaan via `eas update --channel production --environment production --platform ios`; native wijzigingen vergen een nieuwe build.
 - Productie-crashes opgelost: env vars in EAS (build + update-environments), robuuste magic-link callback, React Compiler UIT (evalueerde `x!.id` in handlers tijdens render), realtime-kanalen uniek per component, presence als singleton, storage-policies voor ID-upsert.
@@ -185,7 +200,7 @@ Waar de vrijwilliger opleidingen volgt, krijgt de beheerder (en de hulpvrager) d
 ## Open punten / niet vergeten
 - Apple team-ID: 5QFB2FHYYQ (Individual) — staat in eas.json.
 - Docker installeren voor lokale Supabase-stack (`supabase start`) — tot die tijd migraties via `supabase db push` naar cloud.
-- RevenueCat/IAP-implementatie (besluit #5) — vóór publieke release met betaald abonnement.
+- Stripe-koppeling voor boekingen (iDEAL + Apple Pay, capture-later) — het abonnement en daarmee RevenueCat/IAP zijn per 05-08-2026 vervallen.
 - Universal links definitief domein (nu vercel-URL).
 - Moderatie-e-mailadres bepalen.
 - `availability_weeks` meenemen in taakvoorstellen/notificaties (nu alleen UI + opslag).

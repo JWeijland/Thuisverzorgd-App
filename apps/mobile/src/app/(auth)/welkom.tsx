@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
 import { colors, gradient, radius, spacing } from '@/theme';
-import { Button, TvzBounce, TvzText } from '@/ui';
+import { Bo, Button, TvzBounce, TvzText } from '@/ui';
 import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Welkom (screen 01): navy gradient, logo met stuiterende balkjes, twee knoppen. */
@@ -30,6 +30,10 @@ export default function WelkomScreen() {
           <TvzText preset="body" style={styles.tagline}>
             {t('welkom.tagline')}
           </TvzText>
+          {/* Mascotte Bo zwaait zachtjes deinend onder het logo (handoff). */}
+          <TvzBounce delay={400} style={styles.bo}>
+            <Bo width={132} />
+          </TvzBounce>
         </View>
         <View style={styles.buttons}>
           <Button
@@ -84,6 +88,9 @@ const styles = StyleSheet.create({
   tagline: {
     color: 'rgba(255,255,255,0.85)',
     marginTop: spacing.xs,
+  },
+  bo: {
+    marginTop: spacing.xxl,
   },
   buttons: {
     gap: spacing.cardGap,
