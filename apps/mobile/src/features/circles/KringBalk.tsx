@@ -42,9 +42,6 @@ export function KringBalk({
   const [open, setOpen] = useState(false);
 
   const list = members.data ?? [];
-  const actieveVrijwilligers = list.filter(
-    (member) => member.member_role === 'vrijwilliger' && member.status === 'actief',
-  ).length;
   // De foto van de hulpvrager staat voorop: dat is het gezicht van de kring.
   const hulpvrager = list.find((member) => member.member_role === 'hulpvrager');
   const gezicht = hulpvrager ?? list.find((member) => member.member_role === 'beheerder');
@@ -126,11 +123,6 @@ export function KringBalk({
                   router.push('/uitnodigen');
                 }}
               />
-              {actieveVrijwilligers >= 2 ? (
-                <TvzText preset="secondary" style={styles.limiet}>
-                  {t('kring.gratisLimiet')}
-                </TvzText>
-              ) : null}
               {linkCode ? (
                 <Card dashed style={styles.codeKaart}>
                   <TvzText preset="meta" style={styles.codeLabel}>
@@ -197,11 +189,6 @@ const styles = StyleSheet.create({
   },
   beheer: {
     marginTop: spacing.lg,
-  },
-  limiet: {
-    textAlign: 'center',
-    marginTop: spacing.sm,
-    color: colors.inkFaint,
   },
   codeKaart: {
     alignItems: 'center',

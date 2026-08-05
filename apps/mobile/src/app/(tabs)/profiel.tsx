@@ -11,7 +11,7 @@ import { NotificationSettings } from '@/features/notifications/NotificationSetti
 import { removePushToken } from '@/features/notifications/push';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { STRAAL_OPTIES, dichtstbijzijndeStraal, straalLabel } from '@/features/onboarding/straal';
-import { useSubscription, useUpdateProfile } from '@/features/subscription/api';
+import { useUpdateProfile } from '@/features/profile/api';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { WEEKDAY_SHORT, isoWeekKey, isoWeekNumber } from '@/lib/dates';
@@ -42,14 +42,10 @@ const DAY_CODES = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'];
 /** Profiel (screens 17/23): rolspecifieke secties + instellingenlijst. */
 export default function ProfielScreen() {
   const profile = useProfile();
-  const subscription = useSubscription();
   const update = useUpdateProfile();
   const { largeText, setLargeText } = useTextScale();
   const p = profile.data;
   const isVolunteer = p?.role === 'vrijwilliger';
-  const isBeheerder = p?.role === 'beheerder';
-  const subscribed =
-    subscription.data?.status === 'proef' || subscription.data?.status === 'actief';
 
   const queryClient = useQueryClient();
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -235,29 +231,6 @@ export default function ProfielScreen() {
           </TvzText>
           {p?.role ? <Pill label={ROLE_LABELS[p.role] ?? p.role} /> : null}
         </View>
-
-        {isBeheerder ? (
-          <Card style={styles.card}>
-            <View style={styles.row}>
-              <View style={styles.rowText}>
-                <TvzText preset="cardTitle">{t('profiel.abonnement')}</TvzText>
-                <TvzText preset="secondary">
-                  {subscription.data?.status === 'proef'
-                    ? t('profiel.proef')
-                    : subscribed
-                      ? t('profiel.actief')
-                      : t('profiel.gratis')}
-                </TvzText>
-              </View>
-              <Button
-                label={subscribed ? t('profiel.beheren') : t('profiel.upgraden')}
-                variant="outline"
-                style={styles.smallButton}
-                onPress={() => router.push('/abonnement')}
-              />
-            </View>
-          </Card>
-        ) : null}
 
         {isVolunteer ? (
           <>
@@ -724,7 +697,7 @@ export default function ProfielScreen() {
           }}
         />
         <Button
-          label={t('abonnement.later')}
+          label={t('algemeen.sluiten')}
           variant="outline"
           style={styles.logout}
           onPress={() => setDeleteOpen(false)}

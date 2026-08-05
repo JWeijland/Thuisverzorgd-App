@@ -24,7 +24,6 @@ export default function UitnodigenScreen() {
     const msg = err instanceof Error ? err.message : '';
     if (msg.includes('niet_gevonden')) return t('uitnodigen.nietGevonden');
     if (msg.includes('al_lid')) return t('uitnodigen.alLid');
-    if (msg.includes('gratis_limiet')) return t('uitnodigen.limietBereikt');
     return `${t('algemeen.foutTitel')}. ${t('algemeen.foutOpnieuw')}.`;
   }
 

@@ -65,7 +65,7 @@ function KringLeeg() {
     <SafeAreaView style={styles.safeBg} edges={['top']}>
       <View style={styles.leegWrap}>
         <Card>
-          <EmptyState title={t('kring.legeStaatTitel')} body={t('kring.legeStaatTekst')} />
+          <EmptyState title={t('kring.legeStaatTitel')} body={t('kring.legeStaatTekst')} bo />
           <Button
             label={t('kring.bekijkKaart')}
             variant="cta"
@@ -191,10 +191,6 @@ function KringDetail({
   const workload = computeWorkload(monthTasks.data ?? [], now);
   const maxCount = workload[0]?.count ?? 0;
 
-  const activeVolunteers = (members.data ?? []).filter(
-    (member) => member.member_role === 'vrijwilliger' && member.status === 'actief',
-  ).length;
-
   const roleSuffix = (senderId: string) => {
     const member = (members.data ?? []).find((item) => item.profile_id === senderId);
     return member?.member_role === 'beheerder' ? ` (${t('kring.rolBeheerder')})` : '';
@@ -310,11 +306,6 @@ function KringDetail({
                 size="lg"
                 onPress={() => router.push('/uitnodigen')}
               />
-              {activeVolunteers >= 2 ? (
-                <TvzText preset="secondary" style={styles.limiet}>
-                  {t('kring.gratisLimiet')}
-                </TvzText>
-              ) : null}
               <Card dashed style={styles.codeCardSmall}>
                 <TvzText preset="meta" style={styles.codeLabel}>
                   {t('kring.koppelTitel')}
@@ -492,10 +483,5 @@ const styles = StyleSheet.create({
   advies: {
     marginTop: spacing.md,
     fontStyle: 'italic',
-  },
-  limiet: {
-    textAlign: 'center',
-    marginTop: spacing.sm,
-    color: colors.inkFaint,
   },
 });
