@@ -38,8 +38,9 @@ export function visibleTabs(role: string | null | undefined): string[] {
   if (role === 'vrijwilliger') {
     return ['rooster', 'buurt', 'steun', 'profiel'];
   }
-  // Hulpvrager houdt het zo eenvoudig mogelijk: wie er komt, hulp regelen, kring.
-  if (role === 'hulpvrager') return ['rooster', 'voorzien', 'kring'];
+  // Hulpvrager houdt het zo eenvoudig mogelijk: wie er komt, hulp regelen, de
+  // buddy's op de kaart (haar kaart toont alléén buddy's) en haar kring.
+  if (role === 'hulpvrager') return ['rooster', 'voorzien', 'buurt', 'kring'];
   return [...TAB_ORDER];
 }
 

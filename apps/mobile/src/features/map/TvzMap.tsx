@@ -55,12 +55,18 @@ export { Marker };
  */
 const PIN_PATH =
   'M26 2.75a20.75 20.75 0 0 1 14.67 35.42L26 52.84 11.33 38.17A20.75 20.75 0 0 1 26 2.75z';
-const PIN_W = 34;
-const PIN_H = 43;
+const PIN_W = 40;
+const PIN_H = 50;
 /** Hoogte van de labelpil onder de druppel (inclusief overlap). */
 const LABEL_H = 20;
 // De punt van de druppel (y 52.84 van 66) hoort op de coördinaat te staan.
 const PIN_ANCHOR_Y = 52.84 / 66;
+/**
+ * Onzichtbare rand rond elke marker: het tikbare vlak van een custom marker is
+ * precies de view zelf, en een druppel van 40pt alleen was te priegelig
+ * (feedback 05-08). Zo haalt elke marker ruim de 44pt-tikdoelregel.
+ */
+const HIT_PAD = 12;
 
 /**
  * Hulpkring: witte druppel met navy rand en twee stipjes (blauw + groen), met
@@ -80,9 +86,10 @@ export function KringMarker({
   onPress?: () => void;
 }) {
   // Met label is de marker hoger; de punt van de druppel moet op de coördinaat
-  // blijven staan, dus schuift het anker mee omhoog.
-  const hoogte = naam ? PIN_H + LABEL_H : PIN_H;
-  const ankerY = naam ? (PIN_H * PIN_ANCHOR_Y) / hoogte : PIN_ANCHOR_Y;
+  // blijven staan, dus schuift het anker mee omhoog. De onzichtbare tikrand
+  // bovenaan telt ook mee.
+  const hoogte = HIT_PAD + PIN_H + (naam ? LABEL_H : 0);
+  const ankerY = (HIT_PAD + PIN_H * PIN_ANCHOR_Y) / hoogte;
 
   return (
     <Marker
@@ -194,8 +201,8 @@ export function RequestMarker({
   label?: string;
   onPress?: () => void;
 }) {
-  const hoogte = label ? PIN_H + LABEL_H : PIN_H;
-  const ankerY = label ? (PIN_H * PIN_ANCHOR_Y) / hoogte : PIN_ANCHOR_Y;
+  const hoogte = HIT_PAD + PIN_H + (label ? LABEL_H : 0);
+  const ankerY = (HIT_PAD + PIN_H * PIN_ANCHOR_Y) / hoogte;
 
   return (
     <Marker
@@ -236,6 +243,8 @@ export function OwnLocationMarker({ lat, lon }: { lat: number; lon: number }) {
 const styles = StyleSheet.create({
   kringWrap: {
     alignItems: 'center',
+    paddingTop: HIT_PAD,
+    paddingHorizontal: HIT_PAD,
   },
   label: {
     marginTop: -4,
@@ -253,29 +262,30 @@ const styles = StyleSheet.create({
   },
   buddyWrap: {
     alignItems: 'center',
+    padding: HIT_PAD - 4,
   },
   labelHulpvraag: {
     borderColor: colors.primaryDark,
   },
   buddy: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: colors.primary,
-    borderWidth: 2,
+    borderWidth: 2.5,
     borderColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
   buddyFoto: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 37,
+    height: 37,
+    borderRadius: 18.5,
   },
   buddyInitial: {
     color: colors.white,
-    fontSize: 12,
+    fontSize: 14,
   },
   own: {
     width: 16,

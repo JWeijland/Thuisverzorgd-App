@@ -41,12 +41,16 @@ export default function BuurtScreen() {
   const profile = useProfile();
   const role = profile.data?.role;
   const isVolunteer = role === 'vrijwilliger';
+  // De hulpvrager krijgt een zo rustig mogelijke kaart: alleen de buddy's uit
+  // de buurt (met foto), geen kringen, aanvragen van anderen of zoekbalk
+  // (feedback 05-08).
+  const isHulpvrager = role === 'hulpvrager';
 
   const circles = useMapCircles();
   const requests = useOpenRequests();
   // Beheerders en hulpvragers zoeken vooral buddy's: die staan standaard aan.
   const [showBuddies, setShowBuddies] = useState(true);
-  const buddies = useMapBuddies(!isVolunteer && showBuddies);
+  const buddies = useMapBuddies(!isVolunteer && (isHulpvrager || showBuddies));
   const eigenKring = useMyCircle();
 
   const mapRef = useRef<MapView>(null);
@@ -76,14 +80,17 @@ export default function BuurtScreen() {
     });
   }, []);
 
-  const circleList = (circles.data ?? []).filter((circle) =>
-    query.trim().length === 0 ? true : circle.name.toLowerCase().includes(query.toLowerCase()),
-  );
+  const circleList = isHulpvrager
+    ? []
+    : (circles.data ?? []).filter((circle) =>
+        query.trim().length === 0 ? true : circle.name.toLowerCase().includes(query.toLowerCase()),
+      );
   const suggestions = query.trim().length > 0 ? circleList.slice(0, 4) : [];
 
-  // Niet beschikbaar? Dan blijven spontane aanvragen voor deze vrijwilliger van de kaart.
+  // Niet beschikbaar? Dan blijven spontane aanvragen voor deze vrijwilliger van
+  // de kaart. De hulpvrager ziet aanvragen van anderen nooit.
   const requestList =
-    isVolunteer && !available
+    isHulpvrager || (isVolunteer && !available)
       ? []
       : (requests.data ?? []).filter((request) => request.lat != null && request.lon != null);
 
@@ -155,7 +162,7 @@ export default function BuurtScreen() {
             }}
           />
         ))}
-        {!isVolunteer && showBuddies
+        {!isVolunteer && (isHulpvrager || showBuddies)
           ? (buddies.data ?? []).map((buddy) => (
               <BuddyMetFoto
                 key={buddy.id}
@@ -185,18 +192,20 @@ export default function BuurtScreen() {
       </TvzMap>
 
       <SafeAreaView edges={['top']} pointerEvents="box-none" style={styles.topLayer}>
-        <View style={[styles.search, shadows.card]}>
-          <Search color={colors.inkFaint} size={18} strokeWidth={2.2} />
-          <TextInput
-            textContentType="none"
-            autoComplete="off"
-            value={query}
-            onChangeText={setQuery}
-            placeholder={t('buurt.zoekPlaceholder')}
-            placeholderTextColor={colors.inkFaint}
-            style={styles.searchInput}
-          />
-        </View>
+        {!isHulpvrager ? (
+          <View style={[styles.search, shadows.card]}>
+            <Search color={colors.inkFaint} size={18} strokeWidth={2.2} />
+            <TextInput
+              textContentType="none"
+              autoComplete="off"
+              value={query}
+              onChangeText={setQuery}
+              placeholder={t('buurt.zoekPlaceholder')}
+              placeholderTextColor={colors.inkFaint}
+              style={styles.searchInput}
+            />
+          </View>
+        ) : null}
         {suggestions.length > 0 ? (
           <View style={[styles.suggestions, shadows.card]}>
             {suggestions.map((circle) => (
@@ -251,7 +260,7 @@ export default function BuurtScreen() {
               ⌄
             </TvzText>
           </Pressable>
-        ) : (
+        ) : !isHulpvrager ? (
           <View style={styles.filterRow}>
             <Chip
               label={t('buurt.chipBuddys')}
@@ -264,7 +273,7 @@ export default function BuurtScreen() {
               onPress={() => setShowBuddies(false)}
             />
           </View>
-        )}
+        ) : null}
       </SafeAreaView>
 
       <BottomSheet
@@ -372,6 +381,7 @@ export default function BuurtScreen() {
                 : null
             }
             kringId={role === 'beheerder' ? (eigenKring.data?.id ?? null) : null}
+            hulpvrager={isHulpvrager}
             onClose={() => setSelectedBuddy(null)}
           />
         ) : null}
@@ -521,12 +531,15 @@ function BuddyKaart({
   buddy,
   afstand,
   kringId,
+  hulpvrager = false,
   onClose,
 }: {
   buddy: MapBuddy;
   afstand: string | null;
   /** De kring waarvoor uitgenodigd mag worden, of null als die er niet is. */
   kringId: string | null;
+  /** De hulpvrager nodigt zelf niemand uit; de beheerder regelt dat. */
+  hulpvrager?: boolean;
   onClose: () => void;
 }) {
   const invite = useInvite(kringId ?? undefined);
@@ -594,7 +607,7 @@ function BuddyKaart({
         )
       ) : (
         <TvzText preset="secondary" style={styles.kringNote}>
-          {t('buurt.buddyGeenKring')}
+          {t(hulpvrager ? 'buurt.buddyHulpvrager' : 'buurt.buddyGeenKring')}
         </TvzText>
       )}
     </View>
