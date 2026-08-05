@@ -3,6 +3,7 @@ import {
   Calendar,
   MapPin,
   MessagesSquare,
+  Store,
   User,
   Users,
   type LucideIcon,
@@ -14,25 +15,31 @@ import { fonts } from '@/theme/typography';
 
 const ICONS: Record<string, LucideIcon> = {
   rooster: Calendar,
+  voorzien: Store,
   buurt: MapPin,
   kring: Users,
   steun: MessagesSquare,
   profiel: User,
 };
 
-export const TAB_ORDER = ['rooster', 'buurt', 'kring', 'steun', 'profiel'] as const;
+export const TAB_ORDER = ['rooster', 'voorzien', 'buurt', 'kring', 'steun', 'profiel'] as const;
 
 /**
  * Zichtbare tabs per rol. De vrijwilliger heeft geen aparte kring-tab: zijn
  * kring (leden + berichten) zit in de kop van de planning-tab (feedback 30-07).
+ * Voorzien (de marktplaats) is er alleen voor de zorg-rollen: zij regelen de
+ * hulp aan huis; de vrijwilliger houdt zijn takengerichte tabbalk.
  */
 export function visibleTabs(role: string | null | undefined): string[] {
   // Vrijwilliger én beheerder hebben hun kring in de kop van de planning-tab.
-  if (role === 'vrijwilliger' || role === 'beheerder') {
+  if (role === 'beheerder') {
+    return ['rooster', 'voorzien', 'buurt', 'steun', 'profiel'];
+  }
+  if (role === 'vrijwilliger') {
     return ['rooster', 'buurt', 'steun', 'profiel'];
   }
-  // Hulpvrager houdt het zo eenvoudig mogelijk: wie er komt en zijn kring.
-  if (role === 'hulpvrager') return ['rooster', 'kring'];
+  // Hulpvrager houdt het zo eenvoudig mogelijk: wie er komt, hulp regelen, kring.
+  if (role === 'hulpvrager') return ['rooster', 'voorzien', 'kring'];
   return [...TAB_ORDER];
 }
 

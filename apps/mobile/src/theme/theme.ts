@@ -35,6 +35,8 @@ export const colors = {
   surfaceAlt: '#EEF2F8',
   /** blauwe pill-achtergrond */
   tintBlue: '#EAF1F9',
+  /** lichtblauw hero-vlak van het dienst-detail (handoff voorzieningen) */
+  heroBlue: '#E9F1FA',
   /** app-achtergrond */
   bg: '#F5F8FC',
   white: '#FFFFFF',

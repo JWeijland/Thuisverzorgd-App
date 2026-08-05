@@ -3,7 +3,7 @@
  * Bewijst de harde eisen uit Fase 3:
  *  1. een niet-lid kan géén kringdata lezen (circles, tasks, messages, drafts, profielen)
  *  2. een lid kan dat wél, en claim_task is race-veilig gedragen
- *  3. de gratis limiet (2 vrijwilligers) wordt server-side afgedwongen
+ *  3. voorzieningen: catalogus alleen ingelogd, boekingen alleen je eigen
  *  4. adres van directe hulp is pas opvraagbaar na acceptatie
  *
  * Draaien:  node scripts/rls-smoke.mjs
@@ -143,29 +143,47 @@ try {
   const c5 = await C.client.from('task_drafts').select('*');
   check('lid ziet conceptplanning niet', (c5.data ?? []).length === 0);
 
-  // 3. Gratis limiet: 2e vrijwilliger mag, 3e niet zonder abonnement
+  // 3. Geen ledenlimiet meer (abonnement verwijderd, aug 2026): elke extra
+  //    vrijwilliger mag erbij. Daarnaast: voorzieningen-RLS.
   const d1 = await A.client.from('circle_members').insert({
     circle_id: circle.id,
     profile_id: D.id,
     member_role: 'vrijwilliger',
     status: 'actief',
   });
-  check('vrijwilliger 2 mag erbij (gratis)', !d1.error, d1.error?.message);
-  const e1 = await A.client.from('circle_members').insert({
-    circle_id: circle.id,
-    profile_id: E.id,
-    member_role: 'vrijwilliger',
-    status: 'actief',
-  });
-  check('vrijwilliger 3 geweigerd zonder abonnement', Boolean(e1.error), e1.error?.message);
-  await A.client.rpc('activate_subscription_stub');
+  check('vrijwilliger 2 mag erbij', !d1.error, d1.error?.message);
   const e2 = await A.client.from('circle_members').insert({
     circle_id: circle.id,
     profile_id: E.id,
     member_role: 'vrijwilliger',
     status: 'actief',
   });
-  check('vrijwilliger 3 mag erbij mét abonnement', !e2.error, e2.error?.message);
+  check('vrijwilliger 3 mag erbij (geen limiet meer)', !e2.error, e2.error?.message);
+
+  // Voorzieningen: catalogus alleen ingelogd; boekingen alleen je eigen.
+  const anonClient = createClient(URL, ANON, { auth: { persistSession: false } });
+  const s0 = await anonClient.from('services').select('*');
+  check('anon ziet de dienstencatalogus niet', (s0.data ?? []).length === 0);
+  const s1 = await A.client.from('services').select('id, price_cents').eq('slug', 'kapper').single();
+  check('ingelogd leest de catalogus', Boolean(s1.data), s1.error?.message);
+  // Ruim buiten de 24-uursgrens, anders weigert cancel_booking terecht.
+  const overtwee = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+  const s2 = await A.client.rpc('create_booking', {
+    p_service: s1.data.id,
+    p_slot: overtwee,
+    p_method: 'ideal',
+  });
+  check('boeken via RPC lukt', !s2.error, s2.error?.message);
+  const s3 = await B.client.from('bookings').select('*');
+  check('een ander ziet die boeking niet', (s3.data ?? []).length === 0);
+  const s4 = await A.client.from('bookings').select('price_cents').eq('id', s2.data).single();
+  check(
+    'eigen boeking zichtbaar met vastgelegde prijs',
+    s4.data?.price_cents === s1.data.price_cents,
+  );
+  const s5 = await A.client.rpc('cancel_booking', { p_booking: s2.data });
+  check('annuleren (ruim vooraf) lukt', !s5.error, s5.error?.message);
+  await admin.from('bookings').delete().eq('id', s2.data);
 
   // 4. Directe hulp: adres pas na acceptatie
   const { data: req } = await A.client

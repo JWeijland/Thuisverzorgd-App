@@ -21,6 +21,7 @@ export default function TabsLayout() {
         screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: '#F5F8FC' } }}
       >
         <Tabs.Screen name="rooster" options={{ title: t('tabs.rooster') }} />
+        <Tabs.Screen name="voorzien" options={{ title: t('tabs.voorzien') }} />
         <Tabs.Screen name="buurt" options={{ title: t('tabs.buurt') }} />
         <Tabs.Screen name="kring" options={{ title: t('tabs.kring') }} />
         <Tabs.Screen name="steun" options={{ title: t('tabs.steun') }} />

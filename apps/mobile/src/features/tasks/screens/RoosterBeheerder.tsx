@@ -21,6 +21,7 @@ import { TaskPlanner } from '@/features/tasks/TaskPlanner';
 import { TaskRow } from '@/features/tasks/TaskRow';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { useProfile } from '@/features/onboarding/useAuth';
+import { GeboekteDiensten } from '@/features/voorzieningen/GeboekteDiensten';
 import { t } from '@/i18n';
 import {
   formatHumanDate,
@@ -96,7 +97,7 @@ export function RoosterBeheerder() {
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           {!circle.isLoading && !circle.data ? (
             <Card style={styles.section}>
-              <EmptyState title={t('rooster.geenKring')} body={t('rooster.geenKringTekst')} />
+              <EmptyState title={t('rooster.geenKring')} body={t('rooster.geenKringTekst')} bo />
               <Button
                 label={t('kring.maakKnop')}
                 variant="cta"
@@ -245,6 +246,8 @@ export function RoosterBeheerder() {
               ) : null}
             </>
           ) : null}
+
+          <GeboekteDiensten />
         </ScrollView>
       </KeyboardAvoidingView>
     </View>

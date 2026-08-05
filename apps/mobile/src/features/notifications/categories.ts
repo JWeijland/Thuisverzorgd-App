@@ -1,6 +1,9 @@
 /** Categorie → de meldingssoorten (kinds) die de database-triggers gebruiken. */
 export const NOTIFICATION_CATEGORIES: { labelKey: string; kinds: string[] }[] = [
-  { labelKey: 'meldingen.catTaken', kinds: ['taak_nieuw', 'taak_geclaimd', 'taak_geannuleerd'] },
+  {
+    labelKey: 'meldingen.catTaken',
+    kinds: ['taak_nieuw', 'taak_geclaimd', 'taak_geannuleerd', 'boeking'],
+  },
   {
     labelKey: 'meldingen.catDirecteHulp',
     kinds: ['aanbod', 'aanbod_antwoord', 'aanvraag_ingetrokken'],

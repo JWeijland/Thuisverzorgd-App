@@ -22,6 +22,7 @@ describe('meldingscategorieën', () => {
         'aanbod',
         'aanbod_antwoord',
         'aanvraag_ingetrokken',
+        'boeking',
         'forum_antwoord',
         'kringbericht',
         'makelaar',

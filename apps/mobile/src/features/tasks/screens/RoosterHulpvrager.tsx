@@ -7,6 +7,7 @@ import { useCircleMembers, useMyCircle } from '@/features/circles/api';
 import { useTasks } from '@/features/tasks/api';
 import { taskLabel } from '@/features/tasks/logic';
 import { useProfile } from '@/features/onboarding/useAuth';
+import { GeboekteDiensten } from '@/features/voorzieningen/GeboekteDiensten';
 import { t } from '@/i18n';
 import { formatHumanDate, formatTime, greetingKey, isoWeekDays, toDateString } from '@/lib/dates';
 import { colors, radius, shadows, spacing } from '@/theme';
@@ -140,6 +141,8 @@ export function RoosterHulpvrager() {
             </TvzText>
           </>
         ) : null}
+
+        <GeboekteDiensten />
       </ScrollView>
     </View>
   );
