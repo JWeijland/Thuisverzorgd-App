@@ -47,13 +47,12 @@ const SUBNAV_LABEL = {
 type SubTab = keyof typeof SUBNAV_LABEL;
 
 /**
- * De derde plek in de subnav verschilt per rol: de vrijwilliger volgt
- * opleidingen, de beheerder en de hulpvrager hebben de Wegwijzer met de
- * wetten en regelingen rond mantelzorg.
+ * Beheerder en vrijwilliger zien dezelfde volledige subnav: de Wegwijzer
+ * (wetten en regelingen) én de opleidingen horen bij allebei (feedback 05-08).
+ * Alleen de hulpvrager houdt het compacter: opleidingen zijn niet voor haar.
  */
 export function subnavVoor(role: string | null | undefined): SubTab[] {
-  if (role === 'vrijwilliger') return ['forum', 'makelaar', 'opleiding'];
-  if (role === 'beheerder' || role === 'hulpvrager') return ['forum', 'makelaar', 'wegwijzer'];
+  if (role === 'hulpvrager') return ['forum', 'makelaar', 'wegwijzer'];
   return ['forum', 'makelaar', 'wegwijzer', 'opleiding'];
 }
 
@@ -228,8 +227,11 @@ const styles = StyleSheet.create({
   },
   subnav: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm,
     marginTop: spacing.md,
+    // Rechts ruimte laten voor Bo, die over de rand van de header piept.
+    paddingRight: 72,
   },
   subnavPill: {
     borderRadius: radius.pill,

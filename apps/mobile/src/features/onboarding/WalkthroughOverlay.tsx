@@ -74,6 +74,7 @@ export function WalkthroughOverlay({ uid, role }: Props) {
         body={t(current.textKey)}
         step={step + 1}
         totalSteps={steps.length}
+        bo
         arrow="down"
         arrowOffset={arrowX - 20 - 10}
         onNext={() => {

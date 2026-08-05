@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { colors, radius, shadows, spacing } from '@/theme';
+import { Bo } from '@/ui/Bo';
 import { Button } from '@/ui/Button';
 import { TvzText } from '@/ui/TvzText';
 
@@ -16,6 +17,8 @@ type Props = {
   arrow?: 'up' | 'down';
   /** Horizontale positie van het pijltje, vanaf links. */
   arrowOffset?: number;
+  /** Mascotte Bo zit bovenop het wolkje (rondleiding, handoff). */
+  bo?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -32,11 +35,17 @@ export function Coachmark({
   onSkip,
   arrow,
   arrowOffset = 32,
+  bo,
   style,
 }: Props) {
   const isLast = step >= totalSteps;
   return (
     <View style={style}>
+      {bo ? (
+        <View pointerEvents="none" style={styles.bo}>
+          <Bo width={92} />
+        </View>
+      ) : null}
       {arrow === 'up' ? (
         <View style={[styles.arrow, styles.arrowUp, { marginLeft: arrowOffset }]} />
       ) : null}
@@ -74,6 +83,13 @@ export function Coachmark({
 const ARROW = 10;
 
 const styles = StyleSheet.create({
+  // Bo zit óp het wolkje: zijn voetjes overlappen de bovenrand van de kaart.
+  bo: {
+    alignSelf: 'flex-end',
+    marginRight: 18,
+    marginBottom: -26,
+    zIndex: 1,
+  },
   card: {
     backgroundColor: colors.white,
     borderRadius: radius.card,

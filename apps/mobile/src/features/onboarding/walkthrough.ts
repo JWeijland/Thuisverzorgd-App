@@ -11,8 +11,10 @@ export type WalkthroughStep = {
 };
 
 /**
- * Rondleiding per rol: beheerder 5 stappen, vrijwilliger 4, hulpvrager 2.
- * Elk wolkje legt uit welke knop wat doet. Overslaan kan altijd (eis handoff).
+ * Rondleiding per rol: beheerder 6 stappen, vrijwilliger 4, hulpvrager 4.
+ * Elk wolkje legt uit welke knop wat doet en hoort bij het scherm dat op dat
+ * moment zichtbaar is; elke stap wijst naar een tab die deze rol écht heeft.
+ * Overslaan kan altijd (eis handoff).
  */
 export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
   beheerder: [
@@ -23,16 +25,24 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       route: '/rooster',
     },
     {
+      // De kring zit voor de beheerder in de kop van de planning; het wolkje
+      // hoort dus bij het rooster (er is geen kring-tab voor deze rol).
+      titleKey: 'rondleiding.beheerder3Titel',
+      textKey: 'rondleiding.beheerder3Tekst',
+      tab: 'rooster',
+      route: '/rooster',
+    },
+    {
+      titleKey: 'rondleiding.beheerderVoorzienTitel',
+      textKey: 'rondleiding.beheerderVoorzienTekst',
+      tab: 'voorzien',
+      route: '/voorzien',
+    },
+    {
       titleKey: 'rondleiding.beheerder2Titel',
       textKey: 'rondleiding.beheerder2Tekst',
       tab: 'buurt',
       route: '/buurt',
-    },
-    {
-      titleKey: 'rondleiding.beheerder3Titel',
-      textKey: 'rondleiding.beheerder3Tekst',
-      tab: 'kring',
-      route: '/kring',
     },
     {
       titleKey: 'rondleiding.beheerder4Titel',
@@ -79,6 +89,18 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       textKey: 'rondleiding.hulpvrager1Tekst',
       tab: 'rooster',
       route: '/rooster',
+    },
+    {
+      titleKey: 'rondleiding.hulpvragerVoorzienTitel',
+      textKey: 'rondleiding.hulpvragerVoorzienTekst',
+      tab: 'voorzien',
+      route: '/voorzien',
+    },
+    {
+      titleKey: 'rondleiding.hulpvragerKaartTitel',
+      textKey: 'rondleiding.hulpvragerKaartTekst',
+      tab: 'buurt',
+      route: '/buurt',
     },
     {
       titleKey: 'rondleiding.hulpvrager2Titel',

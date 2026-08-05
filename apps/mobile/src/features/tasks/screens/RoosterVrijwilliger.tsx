@@ -96,7 +96,7 @@ export function RoosterVrijwilliger() {
               ))}
               {!tasks.isLoading && visibleTasks.length === 0 ? (
                 <Card>
-                  <EmptyState title={t('rooster.geenTaken')} body={t('rooster.openTakenTip')} />
+                  <EmptyState title={t('rooster.geenTaken')} body={t('rooster.openTakenTip')} bo />
                 </Card>
               ) : null}
             </View>
@@ -106,7 +106,7 @@ export function RoosterVrijwilliger() {
           </>
         ) : (
           <Card style={styles.emptyCircle}>
-            <EmptyState title={t('kring.legeStaatTitel')} body={t('kring.legeStaatTekst')} />
+            <EmptyState title={t('kring.legeStaatTitel')} body={t('kring.legeStaatTekst')} bo />
           </Card>
         )}
       </ScrollView>

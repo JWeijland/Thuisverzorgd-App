@@ -93,12 +93,12 @@ export function RoosterHulpvrager() {
           </View>
         ) : circle.data ? (
           <Card style={styles.restCard}>
-            <EmptyState title={t('rooster.rustigVandaag')} body={t('rooster.rustigTekst')} />
+            <EmptyState title={t('rooster.rustigVandaag')} body={t('rooster.rustigTekst')} bo />
           </Card>
         ) : (
           // Nog geen kring: alleen de koppelcode is nog nodig.
           <Card style={styles.restCard}>
-            <EmptyState title={t('koppelcode.nodigTitel')} body={t('koppelcode.nodigTekst')} />
+            <EmptyState title={t('koppelcode.nodigTitel')} body={t('koppelcode.nodigTekst')} bo />
             <Button
               label={t('koppelcode.invullen')}
               variant="cta"
