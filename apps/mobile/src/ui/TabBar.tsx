@@ -1,9 +1,13 @@
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import {
+  BookOpen,
   Calendar,
+  CirclePlus,
+  Heart,
   MapPin,
   MessagesSquare,
   Store,
+  Sun,
   User,
   Users,
   type LucideIcon,
@@ -13,35 +17,58 @@ import { t } from '@/i18n';
 import { colors, radius, shadows, tabBar } from '@/theme';
 import { fonts } from '@/theme/typography';
 
-const ICONS: Record<string, LucideIcon> = {
-  rooster: Calendar,
-  voorzien: Store,
-  buurt: MapPin,
-  kring: Users,
-  steun: MessagesSquare,
-  profiel: User,
-};
-
 export const TAB_ORDER = ['rooster', 'voorzien', 'buurt', 'kring', 'steun', 'profiel'] as const;
 
+type TabName = (typeof TAB_ORDER)[number];
+
+type TabConfig = { name: TabName; labelKey: string; icon: LucideIcon };
+
 /**
- * Zichtbare tabs per rol. De vrijwilliger heeft geen aparte kring-tab: zijn
- * kring (leden + berichten) zit in de kop van de planning-tab (feedback 30-07).
- * Voorzien (de marktplaats) is er alleen voor de zorg-rollen: zij regelen de
- * hulp aan huis; de vrijwilliger houdt zijn takengerichte tabbalk.
+ * Tabbalk per rol (ontwerp 4.0): de volgorde volgt de drie lagen
+ * (1 Steun · 2 Kring en Buurt · 3 Voorzien) en de labels zeggen wat de tab
+ * voor déze rol is. Dezelfde fysieke routes, drie verschillende apps:
+ * de beheerder start op Steun, de buddy leeft in zijn Taken en de
+ * hulpvrager ziet Vandaag.
  */
+const ROL_TABS: Record<string, TabConfig[]> = {
+  beheerder: [
+    { name: 'steun', labelKey: 'tabs.steun', icon: Heart },
+    { name: 'rooster', labelKey: 'tabs.kring', icon: Users },
+    { name: 'buurt', labelKey: 'tabs.buurt', icon: MapPin },
+    { name: 'voorzien', labelKey: 'tabs.voorzien', icon: Store },
+    { name: 'profiel', labelKey: 'tabs.profiel', icon: User },
+  ],
+  vrijwilliger: [
+    { name: 'rooster', labelKey: 'tabs.taken', icon: Calendar },
+    { name: 'buurt', labelKey: 'tabs.buurt', icon: MapPin },
+    { name: 'steun', labelKey: 'tabs.leren', icon: BookOpen },
+    { name: 'profiel', labelKey: 'tabs.profiel', icon: User },
+  ],
+  hulpvrager: [
+    { name: 'rooster', labelKey: 'tabs.vandaag', icon: Sun },
+    { name: 'voorzien', labelKey: 'tabs.hulp', icon: CirclePlus },
+    { name: 'steun', labelKey: 'tabs.steun', icon: Heart },
+    { name: 'kring', labelKey: 'tabs.kring', icon: Users },
+  ],
+};
+
+/** Zonder (bekende) rol: alle tabs in de oude volgorde, neutrale labels. */
+const STANDAARD_TABS: TabConfig[] = [
+  { name: 'rooster', labelKey: 'tabs.rooster', icon: Calendar },
+  { name: 'voorzien', labelKey: 'tabs.voorzien', icon: Store },
+  { name: 'buurt', labelKey: 'tabs.buurt', icon: MapPin },
+  { name: 'kring', labelKey: 'tabs.kring', icon: Users },
+  { name: 'steun', labelKey: 'tabs.steun', icon: MessagesSquare },
+  { name: 'profiel', labelKey: 'tabs.profiel', icon: User },
+];
+
+export function tabsVoor(role: string | null | undefined): TabConfig[] {
+  return ROL_TABS[role ?? ''] ?? STANDAARD_TABS;
+}
+
+/** Zichtbare tabs voor een rol, in de volgorde van de tabbalk. */
 export function visibleTabs(role: string | null | undefined): string[] {
-  // Vrijwilliger én beheerder hebben hun kring in de kop van de planning-tab.
-  if (role === 'beheerder') {
-    return ['rooster', 'voorzien', 'buurt', 'steun', 'profiel'];
-  }
-  if (role === 'vrijwilliger') {
-    return ['rooster', 'buurt', 'steun', 'profiel'];
-  }
-  // Hulpvrager houdt het zo eenvoudig mogelijk: wie er komt, hulp regelen, de
-  // buddy's op de kaart (haar kaart toont alléén buddy's) en haar kring.
-  if (role === 'hulpvrager') return ['rooster', 'voorzien', 'buurt', 'kring'];
-  return [...TAB_ORDER];
+  return tabsVoor(role).map((tab) => tab.name);
 }
 
 // Minimale typing van de tab-bar-props die expo-router (react-navigation) aanlevert;
@@ -54,20 +81,22 @@ type TabBarProps = {
     };
     navigate: (name: string) => void;
   };
-  /** Tabnamen die deze rol niet ziet. */
-  hidden?: string[];
+  /** Rol van de ingelogde gebruiker; bepaalt volgorde, labels en iconen. */
+  role?: string | null;
 };
 
 /** Zwevende witte pill-tabbalk: tabs × 64 met korte naam, actief = navy pill. */
-export function TvzTabBar({ state, navigation, hidden = [] }: TabBarProps) {
-  const routes = state.routes.filter((route) => !hidden.includes(route.name));
+export function TvzTabBar({ state, navigation, role }: TabBarProps) {
+  const tabs = tabsVoor(role);
+  const activeName = state.routes[state.index]?.name;
   return (
     <View pointerEvents="box-none" style={styles.wrap}>
       <View style={[styles.bar, shadows.floating]}>
-        {routes.map((route) => {
-          const Icon = ICONS[route.name] ?? User;
-          const active = state.routes[state.index]?.name === route.name;
-          const label = t(`tabs.${route.name}`);
+        {tabs.map(({ name, labelKey, icon: Icon }) => {
+          const route = state.routes.find((r) => r.name === name);
+          if (!route) return null;
+          const active = activeName === name;
+          const label = t(labelKey);
           return (
             <Pressable
               key={route.key}

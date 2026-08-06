@@ -19,8 +19,8 @@ describe('getStartRoute', () => {
     expect(getStartRoute(true, { role: 'vrijwilliger', id_verified: true })).toBe('/rooster');
   });
 
-  it('beheerder en hulpvrager direct naar de app', () => {
-    expect(getStartRoute(true, { role: 'beheerder', id_verified: false })).toBe('/rooster');
+  it('beheerder start op Steun (laag 1), hulpvrager op Vandaag', () => {
+    expect(getStartRoute(true, { role: 'beheerder', id_verified: false })).toBe('/steun');
     expect(getStartRoute(true, { role: 'hulpvrager', id_verified: false })).toBe('/rooster');
   });
 });
