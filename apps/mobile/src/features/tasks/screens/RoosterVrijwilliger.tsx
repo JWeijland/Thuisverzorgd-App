@@ -11,8 +11,9 @@ import { useTaskRpc, useTasks, type Task } from '@/features/tasks/api';
 import { TaskRow } from '@/features/tasks/TaskRow';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { useProfile } from '@/features/onboarding/useAuth';
+import { useBoekingen } from '@/features/voorzieningen/api';
 import { t } from '@/i18n';
-import { formatHumanDate, isoWeekDays, isoWeekNumber } from '@/lib/dates';
+import { formatHumanDate, isoWeekDays, isoWeekNumber, toDateString } from '@/lib/dates';
 import { colors, radius, spacing } from '@/theme';
 import {
   BottomSheet,
@@ -42,6 +43,23 @@ export function RoosterVrijwilliger() {
     (task) => !selectedDay || task.date === selectedDay,
   );
 
+  // Geboekte diensten als blauwe stipjes: de buddy ziet dezelfde week als
+  // de beheerder en de hulpvrager (rode draad).
+  const boekingen = useBoekingen();
+  const weekKeys = week.map((day) => toDateString(day));
+  const boekingDagen = (boekingen.data ?? [])
+    .map((boeking) => toDateString(new Date(boeking.slot_at)))
+    .filter((dag) => weekKeys.includes(dag));
+
+  // Kleine teller: hoe vaak hielp je deze maand al? Waardering is persoonlijk
+  // en gemeend, nooit opgeklopt (brandbook 1.4).
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const monthTasks = useTasks(circle.data?.id, monthStart, monthEnd);
+  const geholpen = (monthTasks.data ?? []).filter(
+    (task) => task.claimed_by === profile.data?.id && task.status === 'gedaan',
+  ).length;
+
   function closeSheet() {
     setCompleting(null);
     setNote('');
@@ -70,10 +88,21 @@ export function RoosterVrijwilliger() {
       <ScrollView contentContainerStyle={styles.container}>
         {circle.data ? (
           <>
+            {geholpen > 0 ? (
+              <Card style={styles.teller}>
+                <TvzText preset="secondary" style={styles.tellerTekst}>
+                  {geholpen === 1
+                    ? t('rooster.geholpen1')
+                    : t('rooster.geholpen', { aantal: geholpen })}
+                </TvzText>
+              </Card>
+            ) : null}
             <SectionHeader title={t('rooster.weekTitel', { week: isoWeekNumber(now) })} />
             <WeekStrip
               anchor={now}
               tasks={tasks.data ?? []}
+              boekingDagen={boekingDagen}
+              legenda
               selected={selectedDay}
               onSelectDay={(key) => setSelectedDay(key === selectedDay ? undefined : key)}
             />
@@ -188,6 +217,13 @@ const styles = StyleSheet.create({
   },
   emptyCircle: {
     marginTop: spacing.lg,
+  },
+  teller: {
+    backgroundColor: colors.successBg,
+    marginBottom: spacing.sm,
+  },
+  tellerTekst: {
+    color: colors.successText,
   },
   noteInput: {
     backgroundColor: colors.bg,

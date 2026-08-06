@@ -129,6 +129,25 @@ export function useCreateTask(circleId: string | undefined) {
   });
 }
 
+/**
+ * De hulpvrager vraagt zelf een buddy: via de RPC `vraag_buddy` wordt dat een
+ * open taak in de eigen kring (ontwerp 4.0, rode draad).
+ */
+export function useVraagBuddy(circleId: string | undefined) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { type: NewTask['type']; custom_label?: string | null }) => {
+      const { error } = await supabase.rpc('vraag_buddy', {
+        p_circle: circleId!,
+        p_type: input.type,
+        p_custom: input.custom_label ?? null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tasks', circleId] }),
+  });
+}
+
 export function useTaskRpc(circleId: string | undefined) {
   const queryClient = useQueryClient();
   const invalidate = () => {

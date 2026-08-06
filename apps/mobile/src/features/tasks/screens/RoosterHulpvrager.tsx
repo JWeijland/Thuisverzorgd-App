@@ -6,8 +6,10 @@ import { UitlogKnop } from '@/features/onboarding/UitlogKnop';
 import { useCircleMembers, useMyCircle } from '@/features/circles/api';
 import { useTasks } from '@/features/tasks/api';
 import { taskLabel } from '@/features/tasks/logic';
+import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { GeboekteDiensten } from '@/features/voorzieningen/GeboekteDiensten';
+import { useBoekingen } from '@/features/voorzieningen/api';
 import { t } from '@/i18n';
 import { formatHumanDate, formatTime, greetingKey, isoWeekDays, toDateString } from '@/lib/dates';
 import { colors, radius, shadows, spacing } from '@/theme';
@@ -49,6 +51,14 @@ export function RoosterHulpvrager() {
   );
   const nextTask = upcoming[0];
   const beheerder = (members.data ?? []).find((member) => member.member_role === 'beheerder');
+
+  // Dezelfde week als bij de beheerder en de buddy's (rode draad), met de
+  // geboekte diensten als blauwe stipjes.
+  const boekingen = useBoekingen();
+  const weekKeys = week.map((day) => toDateString(day));
+  const boekingDagen = (boekingen.data ?? [])
+    .map((boeking) => toDateString(new Date(boeking.slot_at)))
+    .filter((dag) => weekKeys.includes(dag));
 
   return (
     <View style={styles.safe}>
@@ -142,7 +152,32 @@ export function RoosterHulpvrager() {
           </>
         ) : null}
 
+        {circle.data ? (
+          <>
+            <TvzText preset="cardTitle" style={styles.straks}>
+              {t('rooster.jeWeek')}
+            </TvzText>
+            <Card>
+              <WeekStrip anchor={now} tasks={tasks.data ?? []} boekingDagen={boekingDagen} legenda />
+            </Card>
+          </>
+        ) : null}
+
         <GeboekteDiensten />
+
+        {circle.data ? (
+          <Card style={styles.vraagKaart}>
+            <TvzText preset="body" style={styles.vraagTekst}>
+              {t('rooster.ietsNodig')}
+            </TvzText>
+            <Button
+              label={t('rooster.vraagHulp')}
+              variant="cta"
+              size="lg"
+              onPress={() => router.navigate('/voorzien')}
+            />
+          </Card>
+        ) : null}
       </ScrollView>
     </View>
   );
@@ -194,5 +229,15 @@ const styles = StyleSheet.create({
   tip: {
     marginTop: spacing.md,
     fontSize: 14.5,
+  },
+  vraagKaart: {
+    marginTop: spacing.xl,
+    alignItems: 'stretch',
+    paddingVertical: spacing.xl,
+  },
+  vraagTekst: {
+    textAlign: 'center',
+    fontSize: 17,
+    marginBottom: spacing.md,
   },
 });

@@ -155,7 +155,12 @@
     "terugdraaien": "Terugdraaien",
     "bekijkInRooster": "Bekijk in het rooster",
     "kringSub": "De week: wie komt wanneer",
-    "vulUitleg": "Er staan nog plekken open. Vul ze met een buddy, een buurtoproep of een dienst."
+    "vulUitleg": "Er staan nog plekken open. Vul ze met een buddy, een buurtoproep of een dienst.",
+    "geholpen1": "Je hebt deze maand 1 keer geholpen. Goed bezig!",
+    "geholpen": "Je hebt deze maand {aantal} keer geholpen. Goed bezig!",
+    "jeWeek": "Je week",
+    "ietsNodig": "Heb je iets nodig?",
+    "vraagHulp": "Vraag om hulp"
   },
   "planner": {
     "watNodig": "Wat is er nodig?",
@@ -741,5 +746,37 @@
     "dienstKnop": "Bekijk de diensten",
     "dienstPill": "betaald",
     "slotzin": "Wat je ook kiest: iedereen ziet gewoon wie er komt."
+  },
+  "hulpKeuze": {
+    "titel": "Waar wil je hulp bij?",
+    "uitleg": "Kies wat past. Je beheerder kijkt altijd mee.",
+    "buddyTitel": "Een buddy uit de buurt",
+    "buddyTekst": "Gezelschap, een wandeling of een handje hulp van een vrijwilliger.",
+    "buddyKnop": "Vraag een buddy",
+    "dienstTitel": "Hulp aan huis boeken",
+    "dienstTekst": "De kapper, boodschappen, warm eten en meer. Betaald, vaste gezichten.",
+    "dienstKnop": "Bekijk de diensten",
+    "slotzin": "Alles wat je vraagt, komt in je week te staan."
+  },
+  "buddyVragen": {
+    "titel": "Een buddy vragen",
+    "uitleg": "We vragen het je kring",
+    "waarvoor": "Waarvoor?",
+    "voet": "Je beheerder zet het in de week en je hoort wie er komt.",
+    "verstuur": "Verstuur naar de kring",
+    "klaarTitel": "Gevraagd!",
+    "klaarTekst": "Je vraag staat in de week van de kring. Je beheerder regelt het verder en je hoort snel wie er komt.",
+    "klaarKnop": "Terug naar Vandaag"
+  },
+  "mijnKring": {
+    "titel": "Mijn kring",
+    "uitleg": "Deze mensen staan om je heen.",
+    "beheerderTekst": "{naam} regelt alles voor je: het rooster, de buddy’s en de afspraken. Je vaste aanspreekpunt.",
+    "buddyTekst": "Vrijwilligers uit de buurt. Zij komen langs voor gezelschap en een handje hulp. Dat kost niets.",
+    "makelaarTitel": "De hulpmakelaar",
+    "makelaarTekst": "Denkt mee over regels en geld. Je vindt de hulpmakelaar onder Steun.",
+    "instellingen": "Instellingen",
+    "instellingenSub": "Grotere letters, meldingen en je profiel, {naam}.",
+    "slotzin": "Samen sta je er nooit alleen voor."
   }
 }
