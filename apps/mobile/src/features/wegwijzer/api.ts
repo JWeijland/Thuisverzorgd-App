@@ -74,6 +74,25 @@ export type Zoektreffer = {
 
 export type Suggestie = { term: string; slug: string; titel: string };
 
+export type AntwoordBron = { titel: string; url: string };
+
+/** Het onderdeel uit de kennisbank dat een ingetypte vraag beantwoordt. */
+export type Antwoord = {
+  sectie_id: string;
+  module_id: string;
+  module_slug: string;
+  module_titel: string;
+  thema: string;
+  thema_slug: string;
+  thema_kleur: ThemaKleur;
+  soort: SectieSoort;
+  titel: string;
+  antwoord: string;
+  wetten: string[];
+  bronnen: AntwoordBron[];
+  score: number;
+};
+
 /** Alle thema's met hun aantal onderwerpen. */
 export function useGuideThemes() {
   const { session } = useSession();
@@ -169,6 +188,26 @@ export function useGuideSearch(term: string) {
       const { data, error } = await supabase.rpc('search_wegwijzer', { p_zoek: schoon });
       if (error) throw error;
       return (data ?? []) as Zoektreffer[];
+    },
+  });
+}
+
+/**
+ * Direct antwoord op een getypte vraag. De server geeft alleen iets terug als
+ * álle inhoudswoorden van de vraag in één onderdeel voorkomen; daardoor is
+ * een gevonden antwoord betrouwbaar en zwijgt de kaart bij twijfel.
+ */
+export function useGuideAntwoord(term: string) {
+  const { session } = useSession();
+  const schoon = normaliseer(term);
+  return useQuery({
+    queryKey: ['wegwijzer-antwoord', schoon],
+    enabled: !!session && magZoeken(schoon),
+    staleTime: 60 * 1000,
+    queryFn: async (): Promise<Antwoord[]> => {
+      const { data, error } = await supabase.rpc('wegwijzer_antwoord', { p_vraag: schoon });
+      if (error) throw error;
+      return (data ?? []) as Antwoord[];
     },
   });
 }

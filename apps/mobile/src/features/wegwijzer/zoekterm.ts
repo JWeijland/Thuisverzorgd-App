@@ -46,6 +46,25 @@ export function splitsTreffer(treffer: string | null | undefined): TrefferDeel[]
 }
 
 /**
+ * Een antwoord inkorten voor de antwoordkaart: liefst op een alineagrens,
+ * anders op een zinseinde, en pas als dat niet lukt hard met een beletselteken.
+ */
+export function knipAntwoord(tekst: string, maxLengte = 420): { tekst: string; geknipt: boolean } {
+  const schoon = tekst.trim();
+  if (schoon.length <= maxLengte) return { tekst: schoon, geknipt: false };
+  const stuk = schoon.slice(0, maxLengte);
+  const alinea = stuk.lastIndexOf('\n\n');
+  if (alinea > maxLengte * 0.4) {
+    return { tekst: stuk.slice(0, alinea).trim(), geknipt: true };
+  }
+  const zin = Math.max(stuk.lastIndexOf('. '), stuk.lastIndexOf('.\n'));
+  if (zin > maxLengte * 0.3) {
+    return { tekst: stuk.slice(0, zin + 1).trim(), geknipt: true };
+  }
+  return { tekst: `${stuk.trimEnd()}…`, geknipt: true };
+}
+
+/**
  * Zoeken zonder verbinding, of terwijl het serverantwoord onderweg is:
  * filtert de al ingeladen onderwerpen op titel, samenvatting en synoniemen.
  */

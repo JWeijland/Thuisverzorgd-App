@@ -1,4 +1,36 @@
-import { filterLokaal, magZoeken, normaliseer, splitsTreffer } from '@/features/wegwijzer/zoekterm';
+import {
+  filterLokaal,
+  knipAntwoord,
+  magZoeken,
+  normaliseer,
+  splitsTreffer,
+} from '@/features/wegwijzer/zoekterm';
+
+describe('knipAntwoord', () => {
+  it('laat korte antwoorden heel', () => {
+    expect(knipAntwoord('Kort antwoord.')).toEqual({ tekst: 'Kort antwoord.', geknipt: false });
+  });
+
+  it('knipt het liefst op een alineagrens', () => {
+    const eerste = 'Eerste alinea die lang genoeg is om mee te tellen in het antwoord.';
+    const lang = `${eerste}\n\n${'tweede alinea '.repeat(40)}`;
+    expect(knipAntwoord(lang, 120)).toEqual({ tekst: eerste, geknipt: true });
+  });
+
+  it('valt terug op een zinseinde', () => {
+    const lang = `Eerste zin met genoeg woorden erin. ${'woord '.repeat(80)}`;
+    const geknipt = knipAntwoord(lang, 100);
+    expect(geknipt.geknipt).toBe(true);
+    expect(geknipt.tekst).toBe('Eerste zin met genoeg woorden erin.');
+  });
+
+  it('knipt hard als er geen natuurlijke grens is', () => {
+    const lang = 'x'.repeat(500);
+    const geknipt = knipAntwoord(lang, 100);
+    expect(geknipt.geknipt).toBe(true);
+    expect(geknipt.tekst.endsWith('…')).toBe(true);
+  });
+});
 
 describe('normaliseer', () => {
   it('haalt hoofdletters, accenten en dubbele spaties weg', () => {

@@ -1,21 +1,32 @@
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import { Bookmark, ChevronRight, MessagesSquare, Search, X } from 'lucide-react-native';
+import {
+  Bookmark,
+  ChevronRight,
+  ExternalLink,
+  MessagesSquare,
+  Search,
+  Sparkles,
+  X,
+} from 'lucide-react-native';
 
 import {
   useDebounced,
+  useGuideAntwoord,
   useGuideModules,
   useGuideSearch,
   useGuideSuggesties,
   useGuideThemes,
   useLogZoekopdracht,
+  type Antwoord,
   type GuideModule,
   type ThemaKleur,
   type Zoektreffer,
 } from '@/features/wegwijzer/api';
 import { ThemaIcoon } from '@/features/wegwijzer/ThemaIcoon';
-import { filterLokaal, magZoeken, splitsTreffer } from '@/features/wegwijzer/zoekterm';
+import { filterLokaal, knipAntwoord, magZoeken, splitsTreffer } from '@/features/wegwijzer/zoekterm';
 import { t } from '@/i18n';
 import { colors, radius, spacing, themaTints } from '@/theme';
 import { Card, Chip, EmptyState, Pill, SectionHeader, TvzText } from '@/ui';
@@ -54,6 +65,7 @@ export function WegwijzerLijst() {
   const themas = useGuideThemes();
   const modules = useGuideModules();
   const treffers = useGuideSearch(zoekterm);
+  const antwoorden = useGuideAntwoord(zoekterm);
   const suggesties = useGuideSuggesties(zoekterm);
   const logZoekopdracht = useLogZoekopdracht();
 
@@ -128,6 +140,10 @@ export function WegwijzerLijst() {
                   />
                 ))}
               </ScrollView>
+            ) : null}
+
+            {(antwoorden.data ?? []).length > 0 ? (
+              <AntwoordKaart antwoorden={antwoorden.data!} />
             ) : null}
 
             <TvzText preset="meta" style={styles.telling}>
@@ -251,6 +267,100 @@ export function WegwijzerLijst() {
         )}
       </ScrollView>
     </View>
+  );
+}
+
+/**
+ * Direct antwoord op een getypte vraag: het onderdeel uit de kennisbank dat
+ * alle inhoudswoorden van de vraag bevat, met daaronder het onderwerp waar het
+ * uit komt en de bronnen die het onderbouwen. Vinden we niets met voldoende
+ * zekerheid, dan verschijnt deze kaart niet en blijft de gewone lijst over.
+ */
+function AntwoordKaart({ antwoorden }: { antwoorden: Antwoord[] }) {
+  const beste = antwoorden[0];
+  if (!beste) return null;
+  const tint = themaTint(beste.thema_kleur);
+  const { tekst, geknipt } = knipAntwoord(beste.antwoord);
+  const stappen = beste.soort === 'stappen' ? tekst.split('\n').filter(Boolean) : [];
+  const overige = antwoorden.slice(1).filter((rij) => rij.module_id !== beste.module_id);
+
+  return (
+    <Card style={[styles.antwoord, { borderColor: tint.vlak }]}>
+      <View style={styles.antwoordKop}>
+        <Sparkles color={tint.icoon} size={16} strokeWidth={2.4} />
+        <TvzText preset="meta" style={[styles.antwoordLabel, { color: tint.icoon }]}>
+          {t('wegwijzer.antwoordKop')}
+        </TvzText>
+        <Pill label={beste.thema} color={tint.icoon} backgroundColor={tint.vlak} />
+      </View>
+      <TvzText preset="cardTitle" style={styles.kaartTitel}>
+        {beste.titel}
+      </TvzText>
+      {stappen.length > 0 ? (
+        <View style={styles.antwoordStappen}>
+          {stappen.map((stap, index) => (
+            <TvzText key={stap} preset="body" style={styles.antwoordTekst}>
+              {index + 1}. {stap.trim()}
+            </TvzText>
+          ))}
+        </View>
+      ) : (
+        <TvzText preset="body" style={styles.antwoordTekst}>
+          {tekst}
+        </TvzText>
+      )}
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => openModule(beste.module_id)}
+        style={styles.antwoordUit}
+        hitSlop={6}
+      >
+        <TvzText preset="meta" style={styles.antwoordUitTekst}>
+          {t('wegwijzer.antwoordUit', { onderwerp: beste.module_titel })}
+          {geknipt ? ` · ${t('wegwijzer.antwoordLees')}` : ''}
+        </TvzText>
+        <ChevronRight color={colors.primaryMid} size={16} strokeWidth={2.4} />
+      </Pressable>
+
+      {beste.bronnen.length > 0 ? (
+        <>
+          <TvzText preset="meta" style={styles.antwoordBronKop}>
+            {t('wegwijzer.antwoordBronnen')}
+          </TvzText>
+          {beste.bronnen.map((bron) => (
+            <Pressable
+              key={bron.url}
+              accessibilityRole="link"
+              onPress={() => WebBrowser.openBrowserAsync(bron.url)}
+              style={styles.antwoordBron}
+              hitSlop={4}
+            >
+              <ExternalLink color={colors.primaryMid} size={15} strokeWidth={2.2} />
+              <TvzText preset="meta" style={styles.antwoordBronTekst}>
+                {bron.titel}
+              </TvzText>
+            </Pressable>
+          ))}
+        </>
+      ) : null}
+
+      {overige.length > 0 ? (
+        <View style={styles.antwoordOverige}>
+          <TvzText preset="meta" style={styles.antwoordBronKop}>
+            {t('wegwijzer.antwoordMeer')}
+          </TvzText>
+          <View style={styles.chips}>
+            {overige.map((rij) => (
+              <Chip
+                key={rij.sectie_id}
+                label={rij.module_titel}
+                onPress={() => openModule(rij.module_id)}
+              />
+            ))}
+          </View>
+        </View>
+      ) : null}
+    </Card>
   );
 }
 
@@ -425,6 +535,55 @@ const styles = StyleSheet.create({
   },
   kaart: {
     paddingVertical: spacing.lg,
+  },
+  antwoord: {
+    borderWidth: 2,
+    paddingVertical: spacing.lg,
+  },
+  antwoordKop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  antwoordLabel: {
+    flex: 1,
+  },
+  antwoordStappen: {
+    gap: spacing.xs,
+  },
+  antwoordTekst: {
+    fontSize: 15,
+    lineHeight: 23,
+  },
+  antwoordUit: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+    minHeight: 32,
+  },
+  antwoordUitTekst: {
+    color: colors.primaryMid,
+    flexShrink: 1,
+  },
+  antwoordBronKop: {
+    color: colors.inkFaint,
+    marginTop: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  antwoordBron: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    minHeight: 32,
+  },
+  antwoordBronTekst: {
+    color: colors.primary,
+    flexShrink: 1,
+  },
+  antwoordOverige: {
+    marginTop: spacing.xs,
   },
   kaartKop: {
     flexDirection: 'row',

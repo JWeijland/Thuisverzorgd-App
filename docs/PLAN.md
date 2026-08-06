@@ -205,6 +205,7 @@ Bron: `handoff-voorzieningen/CONCEPT.md` + de Bo-SVG's. Afgesproken met Jelle: S
 - **Direct te doen:** gebruiker test de realtime-fix; daarna verse iOS-build + submit (echte app-icoon + NL-camerateksten zitten dan ingebakken), daarna Android-build, Sentry, App Store-teksten.
 
 ## Voortgangslog
+- 2026-08-06: Wegwijzer volledig nagelopen en uitgebreid. Alle 33 links gecontroleerd (4 kapotte vervangen: DementieLijn i.p.v. Alzheimer Telefoon, rechtspraak.nl, SVB, rijksoverheid-pgb), feiten geverifieerd tegen officiële bronnen (eigen risico €385 in 2026 bevestigd; bijstandsregels 1-1-2026 bevestigd; SVB-kwartaalbedrag verwijderd omdat het niet meer op svb.nl staat). 13 nieuwe onderwerpen (o.a. palliatieve zorg, ziekenhuisontslag, medicijnen, GGZ-naasten, 18 worden, toeslagen, rijbewijs en dementie, financieel misbruik, jonge mantelzorgers): nu 54 onderwerpen, 206 secties, 175 bronlinks incl. wetteksten op wetten.overheid.nl. Nieuw: vragen typen in de zoekbalk geeft een direct antwoord uit de kennisbank met bronnen erbij (`wegwijzer_antwoord` RPC, extractief met vangnet; AntwoordKaart in de app). Migraties 160000 t/m 190000 gepusht en live getest. Nog te doen: EAS-update publiceren zodat de nieuwe UI op telefoons komt.
 - 2026-07-27: Repo + GitHub opgezet, ANALYSE.md af, vragenronde beantwoord, Supabase-project aangemaakt (`pfvxgzosntzzhydzzkaj`). Fase 1 gestart.
 
 ## Open punten / niet vergeten
