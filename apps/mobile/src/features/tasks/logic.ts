@@ -7,14 +7,22 @@ export function taskLabel(task: Pick<Task, 'type' | 'custom_label'>): string {
   return t(`planner.type${task.type.charAt(0).toUpperCase()}${task.type.slice(1)}`);
 }
 
-export type DayDot = 'open' | 'ingepland';
+export type DayDot = 'open' | 'ingepland' | 'dienst';
 
-/** Stipjes in de weekstrip: oranje = open, groen = ingepland/gedaan (max 3 per dag). */
-export function dayDots(tasks: Task[], dateKey: string): DayDot[] {
-  return tasks
+/**
+ * Stipjes in de weekstrip, de rode draad van de app: oranje = nog open,
+ * groen = een buddy gaat (ingepland/gedaan), kringblauw = geboekte dienst.
+ * `boekingDagen` zijn de datumsleutels (yyyy-mm-dd) van geboekte diensten.
+ * Maximaal 3 stipjes per dag, taken eerst.
+ */
+export function dayDots(tasks: Task[], dateKey: string, boekingDagen: string[] = []): DayDot[] {
+  const taakDots: DayDot[] = tasks
     .filter((task) => task.date === dateKey && task.status !== 'geannuleerd')
-    .slice(0, 3)
     .map((task) => (task.status === 'open' ? 'open' : 'ingepland'));
+  const dienstDots: DayDot[] = boekingDagen
+    .filter((dag) => dag === dateKey)
+    .map(() => 'dienst' as const);
+  return [...taakDots, ...dienstDots].slice(0, 3);
 }
 
 export type WorkloadRow = { profileId: string; name: string; count: number };

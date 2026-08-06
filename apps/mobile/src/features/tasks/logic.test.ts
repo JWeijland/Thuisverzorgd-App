@@ -38,6 +38,15 @@ describe('dayDots', () => {
     expect(dayDots(tasks, '2026-07-30')).toEqual(['open', 'ingepland', 'ingepland']);
     expect(dayDots(tasks, '2026-07-31')).toEqual([]);
   });
+
+  it('blauw voor geboekte diensten, achter de taken en binnen het maximum', () => {
+    const tasks = [task({ status: 'ingepland' })];
+    expect(dayDots(tasks, '2026-07-30', ['2026-07-30'])).toEqual(['ingepland', 'dienst']);
+    expect(dayDots([], '2026-07-31', ['2026-07-31'])).toEqual(['dienst']);
+    expect(dayDots([], '2026-07-31', ['2026-07-30'])).toEqual([]);
+    const vol = [task({ status: 'open' }), task({ status: 'open' }), task({ status: 'open' })];
+    expect(dayDots(vol, '2026-07-30', ['2026-07-30'])).toEqual(['open', 'open', 'open']);
+  });
 });
 
 describe('computeWorkload', () => {

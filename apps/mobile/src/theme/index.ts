@@ -10,6 +10,8 @@ export {
   chatTintFor,
   themaTints,
   type ThemaTint,
+  rolTints,
+  type RolTint,
 } from '@/theme/theme';
 export { fonts, text } from '@/theme/typography';
 export { shadows } from '@/theme/shadows';

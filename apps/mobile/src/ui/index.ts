@@ -12,5 +12,6 @@ export { Toggle } from '@/ui/Toggle';
 export { EmptyState } from '@/ui/EmptyState';
 export { BottomSheet } from '@/ui/BottomSheet';
 export { Coachmark } from '@/ui/Coachmark';
-export { Bo, BoPeek } from '@/ui/Bo';
+export { Bo, BoPeek, type BoRol } from '@/ui/Bo';
+export { RolChip } from '@/ui/RolChip';
 export { tvzIn, TvzBounce, PulseDot } from '@/ui/animations';

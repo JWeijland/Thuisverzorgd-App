@@ -668,5 +668,20 @@
     "annulerenUitleg": "Gratis tot 24 uur vooraf. De aanbieder krijgt bericht.",
     "annulerenBevestig": "Ja, annuleer",
     "annulerenTeLaat": "Annuleren kan tot 24 uur vooraf. Komt het echt niet uit? Vraag de hulpmakelaar om mee te denken."
+  },
+  "rolchip": {
+    "beheerder": "beheerder",
+    "beheerderMeervoud": "beheerders",
+    "vrijwilliger": "buddy",
+    "vrijwilligerMeervoud": "buddy's",
+    "hulpvrager": "hulpvrager",
+    "hulpvragerMeervoud": "hulpvragers",
+    "makelaar": "hulpmakelaar",
+    "makelaarMeervoud": "hulpmakelaars"
+  },
+  "week": {
+    "legendaBuddy": "een buddy komt",
+    "legendaDienst": "hulp aan huis",
+    "legendaOpen": "nog leeg"
   }
 }

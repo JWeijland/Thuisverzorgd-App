@@ -21,6 +21,8 @@ export const colors = {
   successText: '#4C7A16',
   warnBg: '#FBF3E0',
   warnText: '#9A6E0B',
+  /** semantisch oranje (brandbook "warning"): open plekken in de week */
+  warnDot: '#E19E11',
   errorBg: '#FDEDEC',
   error: '#D9413A',
   /** bodytekst */
@@ -74,6 +76,20 @@ export const themaTints = {
 } as const;
 
 export type ThemaTint = keyof typeof themaTints;
+
+/**
+ * Rolkleuren uit het logo-verhaal (brandbook 2.1/2.2): blauw vraagt
+ * (hulpvrager), groen geeft (buddy), navy draagt (beheerder, "de steun").
+ * De makelaar leent het wegwijzer-paars. Gebruikt door RolChip en Bo.
+ */
+export const rolTints = {
+  beheerder: { vlak: '#E4EBF4', tekst: colors.primary, stip: colors.primary },
+  vrijwilliger: { vlak: colors.successBg, tekst: colors.successText, stip: colors.accentDark },
+  hulpvrager: { vlak: colors.tintBlue, tekst: colors.primaryMid, stip: colors.primaryMid },
+  makelaar: { vlak: '#EFE6F7', tekst: '#6B4E93', stip: '#6B4E93' },
+} as const;
+
+export type RolTint = keyof typeof rolTints;
 
 /** Standaard-gradient (headers, welkom, videocall): 115deg primaryDark → primaryMid. */
 export const gradient = {
