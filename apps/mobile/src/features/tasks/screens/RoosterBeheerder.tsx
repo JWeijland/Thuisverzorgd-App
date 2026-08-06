@@ -15,26 +15,23 @@ import { KringBalk } from '@/features/circles/KringBalk';
 import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
 import { EigenFotoKnop } from '@/features/avatars/EigenFotoKnop';
 import { InboxBell } from '@/features/notifications/InboxBell';
-import { useCreateTask, useTaskLogs, useTaskRpc, useTasks } from '@/features/tasks/api';
-import { computeWorkload, taskLabel } from '@/features/tasks/logic';
-import { TaskPlanner } from '@/features/tasks/TaskPlanner';
+import { useTaskLogs, useTaskRpc, useTasks } from '@/features/tasks/api';
+import { taskLabel } from '@/features/tasks/logic';
 import { TaskRow } from '@/features/tasks/TaskRow';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { GeboekteDiensten } from '@/features/voorzieningen/GeboekteDiensten';
+import { useBoekingen } from '@/features/voorzieningen/api';
 import { t } from '@/i18n';
-import {
-  formatHumanDate,
-  formatTime,
-  greetingKey,
-  isoWeekDays,
-  isoWeekNumber,
-  toDateString,
-} from '@/lib/dates';
-import { colors, radius, spacing } from '@/theme';
+import { formatTime, isoWeekDays, isoWeekNumber, toDateString } from '@/lib/dates';
+import { colors, spacing } from '@/theme';
 import { Button, Card, EmptyState, GradientHeader, PulseDot, SectionHeader, TvzText } from '@/ui';
 
-/** Rooster · beheerder (screen 05/06): begroeting, taak van vandaag, planner, weekstrip, lijst, Uit de kring. */
+/**
+ * Kring-tab · beheerder (ontwerp 4.0): de week van de kring. Eén functie:
+ * zien wie er wanneer komt en open plekken vullen. Plannen, leden en
+ * berichten zijn eigen pagina's (/taak-plannen, /kring, /kringchat).
+ */
 export function RoosterBeheerder() {
   const profile = useProfile();
   const circle = useMyCircle();
@@ -42,12 +39,10 @@ export function RoosterBeheerder() {
   const week = isoWeekDays(now);
   const tasks = useTasks(circle.data?.id, week[0]!, week[6]!);
   const logs = useTaskLogs(circle.data?.id);
-  const createTask = useCreateTask(circle.data?.id);
+  const boekingen = useBoekingen();
   const { cancel } = useTaskRpc(circle.data?.id);
-  const [plannerOpen, setPlannerOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string | undefined>();
 
-  const firstName = profile.data?.name.split(' ')[0] ?? '';
   const todayKey = toDateString(now);
   const todayTask = (tasks.data ?? []).find(
     (task) => task.date === todayKey && task.status === 'ingepland' && task.claimer,
@@ -57,18 +52,16 @@ export function RoosterBeheerder() {
     (task) => !selectedDay || task.date === selectedDay,
   );
 
-  // Belastingverdeling van deze maand (stond eerder op de kring-tab).
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  const monthTasks = useTasks(circle.data?.id, monthStart, monthEnd);
-  const workload = computeWorkload(monthTasks.data ?? [], now);
-  const maxCount = workload[0]?.count ?? 0;
+  const weekKeys = week.map((day) => toDateString(day));
+  const boekingDagen = (boekingen.data ?? [])
+    .map((boeking) => toDateString(new Date(boeking.slot_at)))
+    .filter((dag) => weekKeys.includes(dag));
 
   return (
     <View style={styles.safe}>
       <GradientHeader
-        title={t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
-        subtitle={formatHumanDate(now)}
+        title={circle.data?.name ?? t('tabs.kring')}
+        subtitle={t('rooster.kringSub')}
         wobbel
         right={
           <View style={styles.headerActies}>
@@ -146,28 +139,18 @@ export function RoosterBeheerder() {
                 onActionPress={() => router.push('/weekplanning')}
               />
               <Button
-                label={plannerOpen ? t('rooster.sluitTaakplanner') : t('rooster.taakInplannen')}
+                label={t('rooster.taakInplannen')}
                 variant="cta"
                 size="lg"
-                onPress={() => setPlannerOpen((open) => !open)}
+                onPress={() => router.push('/taak-plannen')}
               />
-              {plannerOpen ? (
-                <Card style={styles.plannerCard}>
-                  <TaskPlanner
-                    anchor={now}
-                    submitLabel={t('planner.zetInRooster')}
-                    busy={createTask.isPending}
-                    onSubmit={(task) => {
-                      createTask.mutate(task, { onSuccess: () => setPlannerOpen(false) });
-                    }}
-                  />
-                </Card>
-              ) : null}
 
               <View style={styles.weekStrip}>
                 <WeekStrip
                   anchor={now}
                   tasks={tasks.data ?? []}
+                  boekingDagen={boekingDagen}
+                  legenda
                   selected={selectedDay}
                   onSelectDay={(key) => setSelectedDay(key === selectedDay ? undefined : key)}
                 />
@@ -190,41 +173,13 @@ export function RoosterBeheerder() {
                 ) : null}
               </View>
 
-              {workload.length > 0 ? (
-                <>
-                  <SectionHeader title={t('kring.wieDoetWat')} />
-                  <Card style={styles.workloadCard}>
-                    {workload.map((row) => (
-                      <View key={row.profileId} style={styles.workloadRow}>
-                        <TvzText preset="secondary" style={styles.workloadName}>
-                          {row.name}
-                        </TvzText>
-                        <View style={styles.workloadTrack}>
-                          <View
-                            style={[
-                              styles.workloadBar,
-                              {
-                                width: `${Math.max(8, (row.count / Math.max(maxCount, 1)) * 100)}%`,
-                                backgroundColor:
-                                  row.count === maxCount ? colors.primary : colors.accent,
-                              },
-                            ]}
-                          />
-                        </View>
-                        <TvzText preset="meta" style={styles.workloadCount}>
-                          {row.count === 1
-                            ? t('kring.taak1')
-                            : t('kring.taken', { aantal: row.count })}
-                        </TvzText>
-                      </View>
-                    ))}
-                    {workload.length > 1 ? (
-                      <TvzText preset="secondary" style={styles.advies}>
-                        {t('kring.spreidAdvies', { naam: workload[0]!.name })}
-                      </TvzText>
-                    ) : null}
-                  </Card>
-                </>
+              {(tasks.data ?? []).some((task) => task.status === 'open') ? (
+                <Card style={styles.vulKaart}>
+                  <TvzText preset="secondary" style={styles.vulTekst}>
+                    {t('rooster.vulUitleg')}
+                  </TvzText>
+                  <Button label={t('steunHub.vulDeWeek')} onPress={() => router.push('/vul-de-week')} />
+                </Card>
               ) : null}
 
               {(logs.data ?? []).length > 0 ? (
@@ -272,35 +227,11 @@ const styles = StyleSheet.create({
   kringBalkWrap: {
     marginTop: spacing.md,
   },
-  workloadCard: {
-    gap: spacing.sm,
+  vulKaart: {
+    marginTop: spacing.md,
   },
-  workloadRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  workloadName: {
-    width: 56,
-  },
-  workloadTrack: {
-    flex: 1,
-    height: 8,
-    borderRadius: radius.pill,
-    backgroundColor: colors.surfaceAlt,
-    overflow: 'hidden',
-  },
-  workloadBar: {
-    height: 8,
-    borderRadius: radius.pill,
-  },
-  workloadCount: {
-    width: 64,
-    textAlign: 'right',
-  },
-  advies: {
-    marginTop: spacing.sm,
-    fontStyle: 'italic',
+  vulTekst: {
+    marginBottom: spacing.md,
   },
   todayRow: {
     flexDirection: 'row',
@@ -316,9 +247,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     backgroundColor: colors.tintBlue,
     borderWidth: 0,
-  },
-  plannerCard: {
-    marginTop: spacing.cardGap,
   },
   weekStrip: {
     marginTop: spacing.md,

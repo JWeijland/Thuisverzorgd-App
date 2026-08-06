@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import type { ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { GraduationCap, MapPin, Users } from 'lucide-react-native';
 
@@ -18,7 +19,7 @@ import { Button, Card, EmptyState, Pill, SectionHeader, StatusPill, TvzText } fr
  * Opleidingen (feedback 30-07): cursussen die je zelf op de telefoon doet en
  * klassikale bijeenkomsten met een professional in de buurt.
  */
-export function OpleidingenLijst() {
+export function OpleidingenLijst({ footer }: { footer?: ReactNode } = {}) {
   const courses = useCourses();
   const groups = useCourseGroups();
 
@@ -49,6 +50,7 @@ export function OpleidingenLijst() {
       {(groups.data ?? []).map((groep) => (
         <GroepKaart key={groep.id} groep={groep} />
       ))}
+      {footer}
     </ScrollView>
   );
 }

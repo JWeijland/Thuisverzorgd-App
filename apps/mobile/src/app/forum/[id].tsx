@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Send } from 'lucide-react-native';
 
 import { useForumActions, usePost, useReplies } from '@/features/forum/api';
-import { TAG_LABEL } from '@/app/(tabs)/steun';
+import { TAG_LABEL } from '@/features/forum/tags';
 import { useSession } from '@/features/onboarding/useAuth';
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { t } from '@/i18n';

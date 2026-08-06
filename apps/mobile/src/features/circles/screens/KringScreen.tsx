@@ -11,7 +11,6 @@ import {
   useMyCircle,
   type Member,
 } from '@/features/circles/api';
-import { ChatView } from '@/features/circles/ChatView';
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useTasks } from '@/features/tasks/api';
 import { computeWorkload } from '@/features/tasks/logic';
@@ -23,6 +22,7 @@ import {
   Card,
   EmptyState,
   GradientHeader,
+  RolChip,
   SectionHeader,
   StatusPill,
   TextField,
@@ -182,7 +182,6 @@ function KringDetail({
   const profile = useProfile();
   const members = useCircleMembers(circleId);
   const isBeheerder = profile.data?.role === 'beheerder';
-  const [tab, setTab] = useState<'leden' | 'berichten'>('leden');
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -191,57 +190,49 @@ function KringDetail({
   const workload = computeWorkload(monthTasks.data ?? [], now);
   const maxCount = workload[0]?.count ?? 0;
 
-  const roleSuffix = (senderId: string) => {
-    const member = (members.data ?? []).find((item) => item.profile_id === senderId);
-    return member?.member_role === 'beheerder' ? ` (${t('kring.rolBeheerder')})` : '';
-  };
-
   return (
     <View style={styles.safeBg}>
       <LinearGradient {...gradient} style={styles.header}>
         <SafeAreaView edges={['top']}>
-          <TvzText preset="screenTitle" style={styles.headerTitle}>
-            {name}
-          </TvzText>
-          <TvzText preset="secondary" style={styles.headerSub}>
-            {isBeheerder
-              ? t('kring.subtitel', { aantal: (members.data ?? []).length })
-              : t('kring.subtitelLid', { aantal: (members.data ?? []).length })}
-          </TvzText>
-          <View style={styles.subnav}>
-            {(['leden', 'berichten'] as const).map((key) => (
-              <Pressable
-                key={key}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: tab === key }}
-                onPress={() => setTab(key)}
-                style={[styles.subnavPill, tab === key && styles.subnavActive]}
-              >
-                <TvzText
-                  preset="meta"
-                  style={tab === key ? styles.subnavTextActive : styles.subnavText}
-                >
-                  {t(`kring.${key}`)}
-                </TvzText>
-              </Pressable>
-            ))}
+          <View style={styles.headerRij}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('algemeen.terug')}
+              onPress={() => router.back()}
+              style={styles.terug}
+            >
+              <TvzText preset="cardTitle" style={styles.terugPijl}>
+                ←
+              </TvzText>
+            </Pressable>
+            <View style={styles.headerTekst}>
+              <TvzText preset="screenTitle" style={styles.headerTitle}>
+                {name}
+              </TvzText>
+              <TvzText preset="secondary" style={styles.headerSub}>
+                {isBeheerder
+                  ? t('kring.subtitel', { aantal: (members.data ?? []).length })
+                  : t('kring.subtitelLid', { aantal: (members.data ?? []).length })}
+              </TvzText>
+            </View>
           </View>
         </SafeAreaView>
       </LinearGradient>
 
-      {tab === 'berichten' ? (
-        <ChatView circleId={circleId} roleSuffix={roleSuffix} />
-      ) : (
+      {
         <ScrollView contentContainerStyle={styles.ledenList}>
+          <View style={styles.motiefKlein}>
+            <KringMotief />
+          </View>
           {(members.data ?? []).map((member) => {
             const status = STATUS_MAP[member.status];
-            const roleLabel =
-              member.member_role === 'hulpvrager'
-                ? t('kring.rolHulpvrager')
-                : member.member_role === 'beheerder'
-                  ? t('kring.rolBeheerder')
-                  : t('kring.rolVrijwilliger');
             const isHulpvrager = member.member_role === 'hulpvrager';
+            const rol =
+              member.member_role === 'hulpvrager'
+                ? 'hulpvrager'
+                : member.member_role === 'beheerder'
+                  ? 'beheerder'
+                  : 'vrijwilliger';
             return (
               <Card
                 key={member.id}
@@ -255,9 +246,14 @@ function KringDetail({
                   />
                   <View style={styles.memberInfo}>
                     <TvzText preset="cardTitle">{member.profile?.name ?? ''}</TvzText>
-                    <TvzText preset="secondary">{roleLabel}</TvzText>
+                    <TvzText preset="secondary" style={styles.rolUitleg}>
+                      {t(`kring.rolUitleg${rol.charAt(0).toUpperCase()}${rol.slice(1)}`)}
+                    </TvzText>
                   </View>
-                  <StatusPill label={t(status.key)} kind={status.kind} />
+                  <View style={styles.memberRechts}>
+                    <RolChip rol={rol} />
+                    <StatusPill label={t(status.key)} kind={status.kind} />
+                  </View>
                 </View>
               </Card>
             );
@@ -317,7 +313,7 @@ function KringDetail({
             </>
           ) : null}
         </ScrollView>
-      )}
+      }
     </View>
   );
 }
@@ -410,26 +406,36 @@ const styles = StyleSheet.create({
   },
   headerSub: {
     color: 'rgba(255,255,255,0.8)',
-    marginBottom: spacing.md,
   },
-  subnav: {
+  headerRij: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing.sm,
   },
-  subnavPill: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 16,
-    paddingVertical: 7,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+  terug: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.16)',
   },
-  subnavActive: {
-    backgroundColor: colors.white,
-  },
-  subnavText: {
+  terugPijl: {
     color: colors.white,
   },
-  subnavTextActive: {
-    color: colors.primary,
+  headerTekst: {
+    flex: 1,
+  },
+  motiefKlein: {
+    marginBottom: spacing.sm,
+  },
+  memberRechts: {
+    alignItems: 'flex-end',
+    gap: 6,
+  },
+  rolUitleg: {
+    marginTop: 2,
   },
   ledenList: {
     padding: spacing.screen,

@@ -153,7 +153,9 @@
     "bannerTeVroeg": "Afronden kan pas vanaf {dag} {tijd}.",
     "bannerAfgerond": "Afgerond, dankjewel! Toch niet gedaan? Draai het hieronder terug.",
     "terugdraaien": "Terugdraaien",
-    "bekijkInRooster": "Bekijk in het rooster"
+    "bekijkInRooster": "Bekijk in het rooster",
+    "kringSub": "De week: wie komt wanneer",
+    "vulUitleg": "Er staan nog plekken open. Vul ze met een buddy, een buurtoproep of een dienst."
   },
   "planner": {
     "watNodig": "Wat is er nodig?",
@@ -169,7 +171,10 @@
     "typeWandelen": "Wandelen",
     "typeVervoer": "Vervoer",
     "typeGezelschap": "Gezelschap",
-    "typeAnders": "Anders"
+    "typeAnders": "Anders",
+    "titel": "Taak inplannen",
+    "uitleg": "Zet hem in de week, de buddy’s pakken hem op",
+    "rodeDraad": "De taak komt in de week te staan; de kring en je naaste zien hem meteen."
   },
   "weekplanning": {
     "titel": "Planning maken",
@@ -234,7 +239,10 @@
     "rolBeheerder": "Beheerder",
     "legeStaatTitel": "Nog geen kring",
     "legeStaatTekst": "Je bent nog geen lid van een hulpkring. Bekijk de kaart om kringen in de buurt te vinden, of wacht op een uitnodiging.",
-    "bekijkKaart": "Bekijk de kaart"
+    "bekijkKaart": "Bekijk de kaart",
+    "rolUitlegBeheerder": "Regelt en plant: het rooster, de buddy’s en de boekingen.",
+    "rolUitlegVrijwilliger": "Komt langs, gratis en vrijwillig.",
+    "rolUitlegHulpvrager": "Hier draait de kring om: ziet wie er komt en kan zelf hulp vragen."
   },
   "aanvraag": {
     "titelAanvraag": "Aanvraag voor de kring",
@@ -683,5 +691,55 @@
     "legendaBuddy": "een buddy komt",
     "legendaDienst": "hulp aan huis",
     "legendaOpen": "nog leeg"
+  },
+  "steunHub": {
+    "subtitel": "Samen houden jullie {naam} thuis.",
+    "subtitelLeeg": "Alles begint hier.",
+    "weekTitel": "De week van de kring",
+    "weekNr": "week {week}",
+    "allesGevuld": "De week is gevuld.",
+    "openTaak1": "1 plek staat nog open.",
+    "openTaken": "{aantal} plekken staan nog open.",
+    "vulDeWeek": "Vul de week",
+    "kiesTitel": "Waar wil je heen?",
+    "wegwijzerTitel": "Wegwijzer",
+    "wegwijzerTekst": "Zoek uit hoe het zit, van WMO tot wonen.",
+    "makelaarTitel": "Hulpmakelaar",
+    "makelaarTekst": "Denkt gratis met je mee, uit jouw buurt.",
+    "makelaarOnline": "online",
+    "forumTitel": "Forum",
+    "forumTekst": "Vragen en ervaringen van mensen die net als jij voor iemand zorgen."
+  },
+  "leren": {
+    "titel": "Leren",
+    "uitleg": "Korte opleidingen die je bezoeken makkelijker maken.",
+    "forumTitel": "Forum",
+    "forumTekst": "Tips en ervaringen van andere buddy’s."
+  },
+  "steunKeuze": {
+    "titel": "Steun",
+    "uitleg": "Een mens die meedenkt, of rustig zelf lezen.",
+    "praatTitel": "Praat met de hulpmakelaar",
+    "praatTekst": "Denkt gratis met je mee, over grote en kleine vragen.",
+    "praatOnline": "nu bereikbaar",
+    "lezenTitel": "Rustig lezen",
+    "lezenTekst": "Over vergeten, geld en prettig thuis wonen, in gewone taal."
+  },
+  "vulWeek": {
+    "titel": "Vul de week",
+    "uitleg": "Drie wegen, een uitkomst: een afspraak in de week",
+    "open1": "Er staat nog 1 plek open in de week.",
+    "open": "Er staan nog {aantal} plekken open in de week.",
+    "kringTitel": "Vraag je kring",
+    "kringTekst": "Zet een taak in het rooster; jullie buddy’s zien hem meteen. Kan niemand? Dan zoekt de buddy-pool mee.",
+    "kringKnop": "Taak inplannen",
+    "buurtTitel": "Oproep in de buurt",
+    "buurtTekst": "Buddy’s dichtbij zien je oproep op de kaart. Je adres blijft verborgen tot jij iemand toelaat.",
+    "buurtKnop": "Naar de buurtkaart",
+    "dienstTitel": "Boek een dienst",
+    "dienstTekst": "Vaste gezichten uit de buurt, van kapper tot warme maaltijd. Betalen na het bezoek.",
+    "dienstKnop": "Bekijk de diensten",
+    "dienstPill": "betaald",
+    "slotzin": "Wat je ook kiest: iedereen ziet gewoon wie er komt."
   }
 }

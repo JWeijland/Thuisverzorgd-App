@@ -40,13 +40,13 @@ function openModule(id: string) {
 }
 
 /**
- * Naar de hulpmakelaar-chat, met de vraag alvast in het tekstvak. `navigate`
- * en niet `push`: we willen terug naar de bestaande Steun-tab, geen tweede.
+ * Naar de hulpmakelaar-chat (eigen pagina sinds ontwerp 4.0), met de vraag
+ * alvast in het tekstvak.
  */
 export function vraagAanMakelaar(vraag?: string) {
-  router.navigate({
-    pathname: '/(tabs)/steun',
-    params: vraag ? { tab: 'makelaar', vraag } : { tab: 'makelaar' },
+  router.push({
+    pathname: '/hulpmakelaar',
+    params: vraag ? { vraag } : {},
   });
 }
 
