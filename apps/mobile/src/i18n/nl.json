@@ -39,7 +39,8 @@
     "vrijwilligerUitleg": "Word buddy en help af en toe iemand dichtbij. Jij bepaalt wanneer.",
     "hulpvragerTitel": "Ik krijg zelf hulp",
     "hulpvragerUitleg": "Er is een hulpkring voor jou. Vul de koppelcode in die je van je beheerder kreeg en kijk mee: wie er komt en wanneer.",
-    "koppelcodeLink": "Ik heb een koppelcode gekregen"
+    "koppelcodeLink": "Ik heb een koppelcode gekregen",
+    "samenZin": "Drie rollen, één kring: samen houden jullie iemand thuis op de been."
   },
   "koppelcode": {
     "titel": "Vul je koppelcode in",
@@ -778,5 +779,30 @@
     "instellingen": "Instellingen",
     "instellingenSub": "Grotere letters, meldingen en je profiel, {naam}.",
     "slotzin": "Samen sta je er nooit alleen voor."
+  },
+  "verhaal": {
+    "titel": "Eén doel: langer thuis wonen",
+    "uitleg": "Thuisverzorgd heeft één opdracht: je naaste kan thuis blijven wonen, met de buurt om zich heen. Dat gaat in drie stappen.",
+    "stap1Titel": "Weten wat kan",
+    "stap1Tekst": "In Steun vind je de wegwijzer en een hulpmakelaar die meedenkt. Elk antwoord eindigt in een volgende stap.",
+    "stap2Titel": "Hulp regelen",
+    "stap2Tekst": "Zelfde vraag, twee smaken: gratis via je kring en de buurt, of betaald via de diensten. Wat je ook kiest, het wordt een afspraak.",
+    "stap3Titel": "Er is iemand",
+    "stap3Tekst": "Alles landt in dezelfde week. Iedereen ziet wie er komt, niemand hoeft te raden.",
+    "weekTitel": "Zo ziet zo’n week eruit"
+  },
+  "kringuitleg": {
+    "beheerderTitel": "Jij regelt, de kring draait",
+    "vrijwilligerTitel": "Jij komt langs, dat is goud",
+    "hulpvragerTitel": "Deze mensen staan om je heen",
+    "ditBenJij": "(dit ben jij)",
+    "rolBeheerderTitel": "De beheerder",
+    "rolBeheerderTekst": "Regelt en plant: het rooster, de buddy’s en de boekingen.",
+    "rolVrijwilligerTitel": "De buddy’s",
+    "rolVrijwilligerTekst": "Komen langs voor gezelschap en een handje hulp. Gratis en vrijwillig.",
+    "rolHulpvragerTitel": "De hulpvrager",
+    "rolHulpvragerTekst": "Hier draait de kring om: ziet wie er komt en kan zelf om hulp vragen.",
+    "rodeDraad": "Alles wat jullie regelen, gratis of betaald, komt samen in één week.",
+    "deAppIn": "De app in"
   }
 }

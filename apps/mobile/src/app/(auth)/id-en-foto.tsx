@@ -94,7 +94,7 @@ export default function IdEnFotoScreen() {
         .eq('id', uid);
       if (updateError) throw updateError;
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      router.replace('/rooster');
+      router.replace({ pathname: '/kringuitleg', params: { rol: 'vrijwilliger' } });
     } catch (err) {
       const detail = err instanceof Error ? ` (${err.message})` : '';
       setError(`${t('idFoto.uploadMislukt')}${detail}`);

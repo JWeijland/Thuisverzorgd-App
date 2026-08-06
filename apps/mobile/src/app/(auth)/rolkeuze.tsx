@@ -7,11 +7,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
-import { colors, radius, shadows, spacing } from '@/theme';
-import { TvzText } from '@/ui';
+import { colors, radius, rolTints, shadows, spacing } from '@/theme';
+import { Bo, RolChip, TvzText } from '@/ui';
 import { useStatusBalk } from '@/lib/statusbalk';
 
-/** Rolkeuze (screen 03): twee grote kaarten + koppelcode-link voor de hulpvrager. */
+/**
+ * Rolkeuze (ontwerp 4.0): drie kaarten met de rol-Bo's in de vaste
+ * rolkleuren. Na de keuze volgt de kringuitleg, zodat iedereen weet hoe de
+ * rollen samenwerken.
+ */
 export default function RolkeuzeScreen() {
   useStatusBalk('donker');
   const { session } = useSession();
@@ -38,7 +42,11 @@ export default function RolkeuzeScreen() {
       // Direct naar het doel navigeren (niet via '/'): voorkomt dat het
       // rolkeuzescherm nogmaals verschijnt terwijl het profiel nog herlaadt.
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      router.replace(role === 'vrijwilliger' ? '/id-en-foto' : '/rooster');
+      router.replace(
+        role === 'vrijwilliger'
+          ? '/id-en-foto'
+          : { pathname: '/kringuitleg', params: { rol: 'beheerder' } },
+      );
       return;
     }
     setBusy(false);
@@ -56,40 +64,80 @@ export default function RolkeuzeScreen() {
           accessibilityRole="button"
           disabled={busy}
           onPress={() => chooseRole('beheerder')}
-          style={({ pressed }) => [styles.card, shadows.card, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.card,
+            shadows.card,
+            { borderLeftColor: rolTints.beheerder.stip },
+            pressed && styles.pressed,
+          ]}
         >
-          <View style={[styles.rolePill, { backgroundColor: colors.primaryMid }]} />
-          <TvzText preset="cardTitle" style={styles.cardTitle}>
-            {t('rolkeuze.beheerderTitel')}
-          </TvzText>
-          <TvzText preset="secondary">{t('rolkeuze.beheerderUitleg')}</TvzText>
+          <View style={styles.cardRij}>
+            <Bo width={56} rol="beheerder" />
+            <View style={styles.cardTekst}>
+              <TvzText preset="cardTitle" style={styles.cardTitle}>
+                {t('rolkeuze.beheerderTitel')}
+              </TvzText>
+              <TvzText preset="secondary">{t('rolkeuze.beheerderUitleg')}</TvzText>
+            </View>
+          </View>
+          <View style={styles.chipWrap}>
+            <RolChip rol="beheerder" />
+          </View>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
           disabled={busy}
           onPress={() => chooseRole('vrijwilliger')}
-          style={({ pressed }) => [styles.card, shadows.card, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.card,
+            shadows.card,
+            { borderLeftColor: rolTints.vrijwilliger.stip },
+            pressed && styles.pressed,
+          ]}
         >
-          <View style={[styles.rolePill, { backgroundColor: colors.accent }]} />
-          <TvzText preset="cardTitle" style={styles.cardTitle}>
-            {t('rolkeuze.vrijwilligerTitel')}
-          </TvzText>
-          <TvzText preset="secondary">{t('rolkeuze.vrijwilligerUitleg')}</TvzText>
+          <View style={styles.cardRij}>
+            <Bo width={56} rol="vrijwilliger" />
+            <View style={styles.cardTekst}>
+              <TvzText preset="cardTitle" style={styles.cardTitle}>
+                {t('rolkeuze.vrijwilligerTitel')}
+              </TvzText>
+              <TvzText preset="secondary">{t('rolkeuze.vrijwilligerUitleg')}</TvzText>
+            </View>
+          </View>
+          <View style={styles.chipWrap}>
+            <RolChip rol="vrijwilliger" />
+          </View>
         </Pressable>
 
         <Pressable
           accessibilityRole="button"
           disabled={busy}
           onPress={chooseHulpvrager}
-          style={({ pressed }) => [styles.card, shadows.card, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.card,
+            shadows.card,
+            { borderLeftColor: rolTints.hulpvrager.stip },
+            pressed && styles.pressed,
+          ]}
         >
-          <View style={[styles.rolePill, { backgroundColor: colors.primaryDark }]} />
-          <TvzText preset="cardTitle" style={styles.cardTitle}>
-            {t('rolkeuze.hulpvragerTitel')}
-          </TvzText>
-          <TvzText preset="secondary">{t('rolkeuze.hulpvragerUitleg')}</TvzText>
+          <View style={styles.cardRij}>
+            <Bo width={56} rol="hulpvrager" />
+            <View style={styles.cardTekst}>
+              <TvzText preset="cardTitle" style={styles.cardTitle}>
+                {t('rolkeuze.hulpvragerTitel')}
+              </TvzText>
+              <TvzText preset="secondary">{t('rolkeuze.hulpvragerUitleg')}</TvzText>
+            </View>
+          </View>
+          <View style={styles.chipWrap}>
+            <RolChip rol="hulpvrager" />
+          </View>
         </Pressable>
+
+        <TvzText preset="secondary" style={styles.samenZin}>
+          {t('rolkeuze.samenZin')}
+        </TvzText>
       </View>
     </SafeAreaView>
   );
@@ -111,19 +159,29 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
     borderRadius: radius.card,
+    borderLeftWidth: 5,
     padding: spacing.cardPadding,
     marginBottom: spacing.md,
   },
   pressed: {
     opacity: 0.85,
   },
-  rolePill: {
-    width: 30,
-    height: 18,
-    borderRadius: radius.pill,
-    marginBottom: spacing.md,
+  cardRij: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  cardTekst: {
+    flex: 1,
   },
   cardTitle: {
     marginBottom: 4,
+  },
+  chipWrap: {
+    marginTop: spacing.sm,
+  },
+  samenZin: {
+    textAlign: 'center',
+    marginTop: spacing.xs,
   },
 });

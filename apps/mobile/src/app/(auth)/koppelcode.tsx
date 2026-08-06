@@ -34,7 +34,7 @@ export default function KoppelcodeScreen() {
       return;
     }
     await queryClient.invalidateQueries();
-    router.replace('/rooster');
+    router.replace({ pathname: '/kringuitleg', params: { rol: 'hulpvrager' } });
   }
 
   /** Nog geen code? Dan alvast naar de app; de code kan later alsnog. */
@@ -44,7 +44,7 @@ export default function KoppelcodeScreen() {
     await supabase.rpc('change_role', { p_role: 'hulpvrager' });
     await queryClient.invalidateQueries({ queryKey: ['profile'] });
     setBusy(false);
-    router.replace('/rooster');
+    router.replace({ pathname: '/kringuitleg', params: { rol: 'hulpvrager' } });
   }
 
   return (

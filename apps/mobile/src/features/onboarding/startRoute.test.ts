@@ -6,9 +6,9 @@ describe('getStartRoute', () => {
     expect(getStartRoute(false, null)).toBe('/welkom');
   });
 
-  it('met sessie maar zonder rol naar rolkeuze', () => {
-    expect(getStartRoute(true, null)).toBe('/rolkeuze');
-    expect(getStartRoute(true, { role: null, id_verified: false })).toBe('/rolkeuze');
+  it('met sessie maar zonder rol eerst het verhaal, dan rolkeuze', () => {
+    expect(getStartRoute(true, null)).toBe('/verhaal');
+    expect(getStartRoute(true, { role: null, id_verified: false })).toBe('/verhaal');
   });
 
   it('vrijwilliger zonder ID-check naar id-en-foto', () => {
