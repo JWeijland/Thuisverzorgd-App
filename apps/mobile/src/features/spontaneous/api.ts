@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { useSession } from '@/features/onboarding/useAuth';
+import { haptics } from '@/lib/haptics';
 import { supabase } from '@/lib/supabase';
 
 export type RequestType = 'boodschappen' | 'vervoer' | 'medicijnen' | 'gezelschap' | 'anders';
@@ -223,7 +224,11 @@ export function useSpontaneousActions() {
       const { error } = await supabase.rpc('accept_offer', { p_offer: offerId });
       if (error) throw error;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      void haptics.voltooid();
+      invalidate();
+    },
+    onError: () => void haptics.fout(),
   });
 
   const rejectOffer = useMutation({

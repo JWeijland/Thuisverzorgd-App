@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useSession } from '@/features/onboarding/useAuth';
+import { haptics } from '@/lib/haptics';
 import { supabase } from '@/lib/supabase';
 
 export type Aanbieder = {
@@ -100,7 +101,12 @@ export function useCreateBoeking() {
       if (error) throw error;
       return data as string;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['boekingen'] }),
+    onSuccess: () => {
+      // Het "aankoop rond"-moment: lang en bevredigend.
+      void haptics.voltooid();
+      queryClient.invalidateQueries({ queryKey: ['boekingen'] });
+    },
+    onError: () => void haptics.fout(),
   });
 }
 

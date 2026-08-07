@@ -1,4 +1,6 @@
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+
+import { haptics } from '@/lib/haptics';
 import {
   BookOpen,
   Calendar,
@@ -110,6 +112,7 @@ export function TvzTabBar({ state, navigation, role }: TabBarProps) {
                   canPreventDefault: true,
                 });
                 if (!active && !event.defaultPrevented) {
+                  void haptics.selectie();
                   navigation.navigate(route.name);
                 }
               }}

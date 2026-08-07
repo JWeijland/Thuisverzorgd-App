@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { haptics } from '@/lib/haptics';
 import { colors, radius } from '@/theme';
 
 type Props = {
@@ -40,7 +41,10 @@ export function Toggle({ value, onValueChange, accessibilityLabel }: Props) {
       accessibilityRole="switch"
       accessibilityState={{ checked: value }}
       accessibilityLabel={accessibilityLabel}
-      onPress={() => onValueChange(!value)}
+      onPress={() => {
+        void haptics.selectie();
+        onValueChange(!value);
+      }}
       hitSlop={8}
     >
       <Animated.View style={[styles.track, trackStyle]}>

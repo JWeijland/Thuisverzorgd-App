@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { useSession } from '@/features/onboarding/useAuth';
+import { haptics } from '@/lib/haptics';
 import { supabase } from '@/lib/supabase';
 import { toDateString } from '@/lib/dates';
 
@@ -161,7 +162,11 @@ export function useTaskRpc(circleId: string | undefined) {
       if (error) throw error;
       return data as boolean;
     },
-    onSuccess: invalidate,
+    onSuccess: (gelukt) => {
+      if (gelukt) void haptics.voltooid();
+      invalidate();
+    },
+    onError: () => void haptics.fout(),
   });
   const release = useMutation({
     mutationFn: async (taskId: string) => {
@@ -178,7 +183,11 @@ export function useTaskRpc(circleId: string | undefined) {
       });
       if (error) throw error;
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      void haptics.voltooid();
+      invalidate();
+    },
+    onError: () => void haptics.fout(),
   });
   const cancel = useMutation({
     mutationFn: async (taskId: string) => {

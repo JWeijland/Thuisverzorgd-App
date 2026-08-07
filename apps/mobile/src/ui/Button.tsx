@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
 
+import { haptics, type HapticSoort } from '@/lib/haptics';
 import { colors, hitTarget, radius, scaleText, shadows, text, useTextScale } from '@/theme';
 
 type Variant = 'primary' | 'cta' | 'outline' | 'outlineOnDark' | 'danger';
@@ -11,6 +12,17 @@ type Props = {
   size?: 'md' | 'lg';
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** Trilpatroon bij indrukken; standaard passend bij de variant. */
+  haptic?: HapticSoort | 'geen';
+};
+
+/** Standaard voelt een groene CTA steviger dan een gewone knop. */
+const hapticPerVariant: Record<Variant, HapticSoort> = {
+  primary: 'tik',
+  cta: 'stevig',
+  outline: 'tik',
+  outlineOnDark: 'tik',
+  danger: 'waarschuwing',
 };
 
 /**
@@ -24,15 +36,20 @@ export function Button({
   size = 'md',
   disabled = false,
   style,
+  haptic,
 }: Props) {
   const { factor } = useTextScale();
   const v = variants[variant];
+  const trilSoort = haptic ?? hapticPerVariant[variant];
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}
-      onPress={onPress}
+      onPress={() => {
+        if (trilSoort !== 'geen') void haptics[trilSoort]();
+        onPress?.();
+      }}
       style={({ pressed }) => [
         styles.base,
         size === 'lg' && styles.lg,

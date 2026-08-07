@@ -13,6 +13,7 @@ import { Send } from 'lucide-react-native';
 import { useMessages, useSendMessage } from '@/features/circles/api';
 import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
+import { haptics } from '@/lib/haptics';
 import { useKeyboardOpen } from '@/lib/keyboard';
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { chatTintFor, colors, radius, spacing } from '@/theme';
@@ -40,6 +41,7 @@ export function ChatView({ circleId, roleSuffix }: Props) {
   function submit() {
     const body = draft.trim();
     if (!body) return;
+    void haptics.tik();
     setDraft('');
     send.mutate(body);
   }
