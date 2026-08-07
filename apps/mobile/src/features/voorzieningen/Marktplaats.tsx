@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import {
   Car,
   ChevronRight,
@@ -25,6 +25,19 @@ import { colors, gradient, radius, spacing } from '@/theme';
 import { EmptyState, GradientHeader, TvzText, tvzIn } from '@/ui';
 import { TerugKop } from '@/ui/TerugKop';
 import Animated from 'react-native-reanimated';
+
+/** Warme foto per dienst (Pexels, zie assets/images/diensten/BRONNEN.md). */
+const DIENST_FOTOS: Record<string, number> = {
+  kapper: require('../../../assets/images/diensten/kapper.jpg'),
+  boodschappen: require('../../../assets/images/diensten/boodschappen.jpg'),
+  maaltijden: require('../../../assets/images/diensten/maaltijden.jpg'),
+  schoonmaak: require('../../../assets/images/diensten/schoonmaak.jpg'),
+  tuinman: require('../../../assets/images/diensten/tuinman.jpg'),
+  'massage-fysio': require('../../../assets/images/diensten/massage-fysio.jpg'),
+  vervoer: require('../../../assets/images/diensten/vervoer.jpg'),
+  'hond-uitlaten': require('../../../assets/images/diensten/hond-uitlaten.jpg'),
+  klusjesman: require('../../../assets/images/diensten/klusjesman.jpg'),
+};
 
 /** Elke dienst een eigen herkenbaar icoon op de tegel. */
 const DIENST_ICONS: Record<string, LucideIcon> = {
@@ -137,6 +150,7 @@ export function Marktplaats({ terug = false }: Props) {
 
 function DienstTegel({ dienst }: { dienst: Dienst }) {
   const Icon = DIENST_ICONS[dienst.slug] ?? Sparkles;
+  const foto = DIENST_FOTOS[dienst.slug];
   const prijs =
     dienst.unit === 'uur'
       ? `${euro(dienst.price_cents)}${t('voorzien.uurKort')}`
@@ -149,18 +163,24 @@ function DienstTegel({ dienst }: { dienst: Dienst }) {
         onPress={() => router.push({ pathname: '/dienst/[slug]', params: { slug: dienst.slug } })}
         style={styles.tegel}
       >
-        <View style={styles.ikoonTegel}>
-          <Icon color={colors.primaryMid} size={24} strokeWidth={2.2} />
+        {foto ? (
+          <Image source={foto} style={styles.tegelFoto} resizeMode="cover" />
+        ) : (
+          <View style={styles.ikoonTegel}>
+            <Icon color={colors.primaryMid} size={24} strokeWidth={2.2} />
+          </View>
+        )}
+        <View style={styles.tegelTekst}>
+          <TvzText preset="cardTitle" numberOfLines={1} style={styles.tegelNaam}>
+            {dienst.name}
+          </TvzText>
+          <TvzText preset="meta" style={styles.tegelPrijs}>
+            {prijs}
+          </TvzText>
+          <TvzText preset="secondary" numberOfLines={1} style={styles.tegelAanbieder}>
+            {dienst.provider.business}
+          </TvzText>
         </View>
-        <TvzText preset="cardTitle" numberOfLines={1} style={styles.tegelNaam}>
-          {dienst.name}
-        </TvzText>
-        <TvzText preset="meta" style={styles.tegelPrijs}>
-          {prijs}
-        </TvzText>
-        <TvzText preset="secondary" numberOfLines={1} style={styles.tegelAanbieder}>
-          {dienst.provider.business}
-        </TvzText>
       </Pressable>
     </Animated.View>
   );
@@ -256,9 +276,18 @@ const styles = StyleSheet.create({
   tegel: {
     backgroundColor: colors.white,
     borderRadius: radius.tile,
-    padding: spacing.lg,
-    // Bijna vierkant blokje, zoals de vormregel voorschrijft.
-    minHeight: 148,
+    // Bijna vierkant blokje, zoals de vormregel voorschrijft; de foto loopt
+    // tot de rand, dus de tegel zelf knipt de hoeken bij.
+    overflow: 'hidden',
+    minHeight: 168,
+  },
+  tegelFoto: {
+    width: '100%',
+    height: 96,
+  },
+  tegelTekst: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   ikoonTegel: {
     width: 44,
@@ -267,7 +296,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceAlt,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: spacing.md,
+    marginTop: spacing.lg,
+    marginLeft: spacing.lg,
   },
   tegelNaam: {
     fontSize: 16,
