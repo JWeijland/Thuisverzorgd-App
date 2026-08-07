@@ -4,7 +4,9 @@ module.exports = ({ config }) => ({
   name: 'Thuisverzorgd',
   slug: 'thuisverzorgd',
   owner: 'jelleweijlands-team',
-  version: '0.1.0',
+  // 0.2.0: kaartlaag gewisseld naar MapLibre (native wijziging; runtime volgt
+  // deze versie, zodat oude installs geen onverenigbare JS-updates krijgen).
+  version: '0.2.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
   scheme: 'tvz',
