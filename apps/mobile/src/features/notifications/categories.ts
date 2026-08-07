@@ -10,7 +10,7 @@ export const NOTIFICATION_CATEGORIES: { labelKey: string; kinds: string[] }[] = 
   },
   { labelKey: 'meldingen.catKringberichten', kinds: ['kringbericht'] },
   { labelKey: 'meldingen.catForum', kinds: ['forum_antwoord', 'makelaar'] },
-  { labelKey: 'meldingen.catUitnodigingen', kinds: ['uitnodiging'] },
+  { labelKey: 'meldingen.catUitnodigingen', kinds: ['uitnodiging', 'uitnodiging_antwoord'] },
 ];
 
 /** Een categorie staat aan tenzij één van zijn kinds expliciet is uitgezet. */

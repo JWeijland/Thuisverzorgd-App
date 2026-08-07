@@ -30,6 +30,7 @@ describe('meldingscategorieën', () => {
         'taak_geclaimd',
         'taak_nieuw',
         'uitnodiging',
+        'uitnodiging_antwoord',
       ].sort(),
     );
   });

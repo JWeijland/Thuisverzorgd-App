@@ -1,14 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
+import { haptics } from '@/lib/haptics';
 import { supabase } from '@/lib/supabase';
 import { colors, radius, spacing } from '@/theme';
-import { Button, Card, Pill, TvzText } from '@/ui';
+import { Button, Card, Pill, TextField, TvzText } from '@/ui';
 import { useStatusBalk } from '@/lib/statusbalk';
 
 type InvitationDetail = {
@@ -40,6 +42,7 @@ export default function AanvraagScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session } = useSession();
   const queryClient = useQueryClient();
+  const [bericht, setBericht] = useState('');
 
   const invitation = useQuery({
     queryKey: ['invitation', id],
@@ -60,14 +63,18 @@ export default function AanvraagScreen() {
       const { error } = await supabase.rpc('respond_invitation', {
         p_invitation: id!,
         p_accept: accept,
+        p_message: bericht.trim() || null,
       });
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, accepted) => {
+      // Lid worden van een kring is een groot moment; afwijzen een klein.
+      void (accepted ? haptics.voltooid() : haptics.succes());
       queryClient.invalidateQueries({ queryKey: ['invitation', id] });
       queryClient.invalidateQueries({ queryKey: ['circle-members'] });
       router.back();
     },
+    onError: () => void haptics.fout(),
   });
 
   const markVideo = useMutation({
@@ -169,6 +176,13 @@ export default function AanvraagScreen() {
               </TvzText>
             ) : isOwner && item.kind === 'aanvraag' ? (
               <>
+                <TextField
+                  label={t('aanvraag.berichtjeLabel')}
+                  placeholder={t('aanvraag.berichtjePlaceholder')}
+                  value={bericht}
+                  onChangeText={setBericht}
+                  multiline
+                />
                 <Button
                   label={item.video_done ? t('aanvraag.videoGedaan') : t('aanvraag.startVideo')}
                   variant="primary"
@@ -204,6 +218,13 @@ export default function AanvraagScreen() {
               </>
             ) : isInvitee && item.kind === 'uitnodiging' ? (
               <>
+                <TextField
+                  label={t('aanvraag.berichtjeLabel')}
+                  placeholder={t('aanvraag.berichtjePlaceholder')}
+                  value={bericht}
+                  onChangeText={setBericht}
+                  multiline
+                />
                 <Button
                   label={t('aanvraag.accepteren')}
                   variant="cta"

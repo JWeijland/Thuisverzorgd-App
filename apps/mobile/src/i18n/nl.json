@@ -266,6 +266,8 @@
     "afwijzen": "Afwijzen",
     "accepteren": "Uitnodiging accepteren",
     "afgehandeld": "Deze aanvraag is al afgehandeld.",
+    "berichtjeLabel": "Stuur een berichtje mee (niet verplicht)",
+    "berichtjePlaceholder": "Bijvoorbeeld: Leuk, ik kom er graag bij!",
     "limiet": "Gratis tot 2 vrijwilligers. Activeer het abonnement om meer buddy's toe te laten."
   },
   "account": {
