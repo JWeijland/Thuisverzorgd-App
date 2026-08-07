@@ -1,5 +1,5 @@
 import { forwardRef, useState, type ReactNode } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Platform, StyleSheet, View } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
 import Svg, {
   Circle as SvgCircle,
@@ -34,8 +34,16 @@ export const TvzMap = forwardRef<MapView, TvzMapProps>(function TvzMap(
       style={StyleSheet.absoluteFill}
       initialRegion={initialRegion}
       onRegionChangeComplete={onRegionChangeComplete}
+      // Rustige, gedempte kaart: minder verzadigde kleuren (iOS), geen
+      // winkels/restaurants, gebouwen of 3D-gekantel — de kringen en buddy's
+      // zijn de hoofdrolspelers, niet de kaart zelf.
+      mapType={Platform.OS === 'ios' ? 'mutedStandard' : 'standard'}
       showsUserLocation={false}
       showsPointsOfInterests={false}
+      showsBuildings={false}
+      showsTraffic={false}
+      showsIndoors={false}
+      pitchEnabled={false}
       toolbarEnabled={false}
     >
       {children}
