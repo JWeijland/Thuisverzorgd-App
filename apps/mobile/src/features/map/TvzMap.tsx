@@ -1,6 +1,17 @@
-import { forwardRef, useState, type ReactNode } from 'react';
-import { Image, Platform, StyleSheet, View } from 'react-native';
-import MapView, { Marker, type Region } from 'react-native-maps';
+import {
+  Camera,
+  Map as MapLibreMap,
+  Marker as MapLibreMarker,
+  type CameraRef,
+} from '@maplibre/maplibre-react-native';
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
+import { Image, StyleSheet, View } from 'react-native';
 import Svg, {
   Circle as SvgCircle,
   Ellipse,
@@ -10,13 +21,33 @@ import Svg, {
   Text as SvgText,
 } from 'react-native-svg';
 
+import tvzStijl from '@/features/map/tvz-stijl.json';
 import { colors } from '@/theme';
 import { TvzText } from '@/ui';
 
 /**
- * Enige plek die react-native-maps importeert (ADR-0004): een latere overstap
- * naar bijv. Mapbox raakt alleen dit bestand.
+ * Enige plek die de kaartbibliotheek importeert (ADR-0004). Sinds 08-2026 is
+ * dat MapLibre met OpenFreeMap-tegels en een eigen merkstijl (tvz-stijl.json:
+ * OpenFreeMap Positron, omgekleurd; gratis, geen account of sleutel nodig).
+ * De buitenkant (Region, animateToRegion, Marker met coordinate/anchor) houdt
+ * bewust de oude react-native-maps-vorm aan, zodat de schermen niets merken.
  */
+
+export type Region = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
+
+export type TvzMapHandle = {
+  animateToRegion: (region: Region, durationMs?: number) => void;
+};
+
+/** Webmercator-benadering: hoeveel zoom hoort bij deze uitsnede. */
+function zoomVoorDelta(longitudeDelta: number): number {
+  return Math.log2(360 / Math.max(longitudeDelta, 0.0005));
+}
 
 type TvzMapProps = {
   initialRegion: Region;
@@ -24,35 +55,88 @@ type TvzMapProps = {
   children?: ReactNode;
 };
 
-export const TvzMap = forwardRef<MapView, TvzMapProps>(function TvzMap(
+export const TvzMap = forwardRef<TvzMapHandle, TvzMapProps>(function TvzMap(
   { initialRegion, onRegionChangeComplete, children },
   ref,
 ) {
+  const cameraRef = useRef<CameraRef>(null);
+
+  useImperativeHandle(ref, () => ({
+    animateToRegion: (region, durationMs = 500) => {
+      cameraRef.current?.easeTo({
+        center: [region.longitude, region.latitude],
+        zoom: zoomVoorDelta(region.longitudeDelta),
+        duration: durationMs,
+      });
+    },
+  }));
+
   return (
-    <MapView
-      ref={ref}
+    <MapLibreMap
       style={StyleSheet.absoluteFill}
-      initialRegion={initialRegion}
-      onRegionChangeComplete={onRegionChangeComplete}
-      // Rustige, gedempte kaart: minder verzadigde kleuren (iOS), geen
-      // winkels/restaurants, gebouwen of 3D-gekantel — de kringen en buddy's
-      // zijn de hoofdrolspelers, niet de kaart zelf.
-      mapType={Platform.OS === 'ios' ? 'mutedStandard' : 'standard'}
-      showsUserLocation={false}
-      showsPointsOfInterests={false}
-      showsBuildings={false}
-      showsTraffic={false}
-      showsIndoors={false}
-      pitchEnabled={false}
-      toolbarEnabled={false}
+      mapStyle={tvzStijl as never}
+      onRegionDidChange={(event) => {
+        const [west, zuid, oost, noord] = event.nativeEvent.bounds;
+        onRegionChangeComplete?.({
+          latitude: (zuid + noord) / 2,
+          longitude: (west + oost) / 2,
+          latitudeDelta: noord - zuid,
+          longitudeDelta: oost - west,
+        });
+      }}
     >
+      <Camera
+        ref={cameraRef}
+        initialViewState={{
+          center: [initialRegion.longitude, initialRegion.latitude],
+          zoom: zoomVoorDelta(initialRegion.longitudeDelta),
+        }}
+      />
       {children}
-    </MapView>
+    </MapLibreMap>
   );
 });
 
-export type { Region };
-export { Marker };
+type MarkerProps = {
+  coordinate: { latitude: number; longitude: number };
+  /** Welk punt van de view op de coördinaat staat (0..1, zoals react-native-maps). */
+  anchor?: { x: number; y: number };
+  onPress?: () => void;
+  children: ReactNode;
+};
+
+/**
+ * Marker met de oude buitenkant: MapLibre kent alleen benoemde ankers
+ * ("center", "bottom", ...), dus het vrije {x,y}-anker wordt hier vertaald
+ * naar "center" plus een pixel-offset op basis van de gemeten viewgrootte.
+ */
+export function Marker({ coordinate, anchor, onPress, children }: MarkerProps) {
+  const [maat, setMaat] = useState<{ w: number; h: number } | null>(null);
+  const ax = anchor?.x ?? 0.5;
+  const ay = anchor?.y ?? 0.5;
+  const offset: [number, number] = maat
+    ? [(0.5 - ax) * maat.w, (0.5 - ay) * maat.h]
+    : [0, 0];
+  return (
+    <MapLibreMarker
+      lngLat={[coordinate.longitude, coordinate.latitude]}
+      anchor="center"
+      offset={offset}
+      onPress={onPress}
+    >
+      <View
+        onLayout={(event) => {
+          const { width, height } = event.nativeEvent.layout;
+          if (width && height && (maat?.w !== width || maat?.h !== height)) {
+            setMaat({ w: width, h: height });
+          }
+        }}
+      >
+        {children}
+      </View>
+    </MapLibreMarker>
+  );
+}
 
 /**
  * Druppelmarkers naar het handoff-ontwerp 1d ("druppel met labelpill", zonder
@@ -103,9 +187,7 @@ export function KringMarker({
     <Marker
       coordinate={{ latitude: lat, longitude: lon }}
       onPress={onPress}
-      tracksViewChanges={false}
       anchor={{ x: 0.5, y: ankerY }}
-      centerOffset={{ x: 0, y: (0.5 - ankerY) * hoogte }}
     >
       <View style={styles.kringWrap}>
         <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
@@ -166,20 +248,16 @@ export function BuddyMarker({
   uri?: string;
   onPress?: () => void;
 }) {
-  // De marker moet opnieuw renderen zodra de foto binnen is; daarna weer
-  // bevriezen voor de performance.
-  const [tracks, setTracks] = useState(true);
   return (
     <Marker
       coordinate={{ latitude: lat, longitude: lon }}
       onPress={onPress}
-      tracksViewChanges={tracks}
       anchor={{ x: 0.5, y: 0.5 }}
     >
       <View style={styles.buddyWrap}>
         <View style={styles.buddy}>
           {uri ? (
-            <Image source={{ uri }} style={styles.buddyFoto} onLoadEnd={() => setTracks(false)} />
+            <Image source={{ uri }} style={styles.buddyFoto} />
           ) : (
             <TvzText preset="meta" style={styles.buddyInitial}>
               {voornaam.charAt(0).toUpperCase()}
@@ -216,9 +294,7 @@ export function RequestMarker({
     <Marker
       coordinate={{ latitude: lat, longitude: lon }}
       onPress={onPress}
-      tracksViewChanges={false}
       anchor={{ x: 0.5, y: ankerY }}
-      centerOffset={{ x: 0, y: (0.5 - ankerY) * hoogte }}
     >
       <View style={styles.kringWrap}>
         <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
@@ -242,7 +318,7 @@ export function RequestMarker({
 /** Eigen locatie: groene stip met witte rand. */
 export function OwnLocationMarker({ lat, lon }: { lat: number; lon: number }) {
   return (
-    <Marker coordinate={{ latitude: lat, longitude: lon }} tracksViewChanges={false}>
+    <Marker coordinate={{ latitude: lat, longitude: lon }}>
       <View style={styles.own} />
     </Marker>
   );

@@ -33,6 +33,7 @@ module.exports = ({ config }) => ({
   },
   plugins: [
     'expo-router',
+    '@maplibre/maplibre-react-native',
     [
       'expo-splash-screen',
       {

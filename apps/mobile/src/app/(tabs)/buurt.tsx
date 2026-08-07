@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MapPin, Search, Zap } from 'lucide-react-native';
-import type MapView from 'react-native-maps';
 
 import { useAvatarUrl } from '@/features/avatars/api';
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
@@ -22,6 +21,7 @@ import {
   RequestMarker,
   TvzMap,
   type Region,
+  type TvzMapHandle,
 } from '@/features/map/TvzMap';
 import { useInvite, useMyCircle } from '@/features/circles/api';
 import { useProfile } from '@/features/onboarding/useAuth';
@@ -53,7 +53,7 @@ export default function BuurtScreen() {
   const buddies = useMapBuddies(!isVolunteer && (isHulpvrager || showBuddies));
   const eigenKring = useMyCircle();
 
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<TvzMapHandle>(null);
   const [region, setRegion] = useState<Region>(DEFAULT_REGION);
   const [ownLocation, setOwnLocation] = useState<LatLng | null>(null);
   const [query, setQuery] = useState('');
