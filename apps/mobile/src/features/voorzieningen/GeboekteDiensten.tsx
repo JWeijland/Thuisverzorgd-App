@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { AanbiederAvatar } from '@/features/voorzieningen/AanbiederAvatar';
 import { useBoekingen, useCancelBoeking, type Boeking } from '@/features/voorzieningen/api';
-import { euro, slotLabel } from '@/features/voorzieningen/slots';
+import { slotLabel } from '@/features/voorzieningen/slots';
 import { t } from '@/i18n';
-import { colors, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 import { BottomSheet, Button, Card, SectionHeader, TvzText } from '@/ui';
 
 /**
@@ -42,6 +43,11 @@ export function GeboekteDiensten() {
         {lijst.map((boeking) => (
           <Card key={boeking.id} style={styles.kaart}>
             <View style={styles.rij}>
+              <AanbiederAvatar
+                slug={boeking.service?.slug ?? ''}
+                naam={boeking.service?.provider?.name ?? ''}
+                size={40}
+              />
               <View style={styles.tekst}>
                 <TvzText preset="cardTitle">{boeking.service?.name ?? ''}</TvzText>
                 <TvzText preset="secondary">
@@ -51,9 +57,14 @@ export function GeboekteDiensten() {
                   })}
                 </TvzText>
               </View>
-              <TvzText preset="meta" style={styles.prijs}>
-                {euro(boeking.price_cents)}
-              </TvzText>
+              {/* Geen prijs meer in de planning: die heb je bij het boeken al
+                  gezien en in je rooster gaat het om het moment, niet om het
+                  bedrag (feedback Jelle 11-08). */}
+              <View style={styles.statusPill}>
+                <TvzText preset="meta" style={styles.statusTekst}>
+                  {t('voorzien.statusGeboekt')}
+                </TvzText>
+              </View>
             </View>
             <Button
               label={t('voorzien.annuleren')}
@@ -114,8 +125,14 @@ const styles = StyleSheet.create({
   tekst: {
     flex: 1,
   },
-  prijs: {
-    color: colors.primary,
+  statusPill: {
+    backgroundColor: colors.successBg,
+    borderRadius: radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  statusTekst: {
+    color: colors.successText,
   },
   annuleerKnop: {
     marginTop: spacing.md,

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { useCreateCircle } from '@/features/circles/api';
+import { netteKoppelcode } from '@/features/circles/koppelcode';
 import {
   KRINGOPBOUW_STAPPEN,
   useBewaarKringConcept,
@@ -20,7 +21,6 @@ import {
   type KringAntwoorden,
   type TaakSoort,
 } from '@/features/circles/kringopbouw';
-import { AdresVeld } from '@/features/circles/AdresVeld';
 import { PadHeader } from '@/features/navigatie/PadHeader';
 import { useCreateTask } from '@/features/tasks/api';
 import { taakSoortLabel } from '@/features/tasks/logic';
@@ -28,7 +28,7 @@ import { t } from '@/i18n';
 import { toDateString } from '@/lib/dates';
 import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme';
-import { Bo, Button, Card, TextField, TvzText } from '@/ui';
+import { AdresVeld, Bo, Button, Card, TextField, TvzText } from '@/ui';
 
 const TAKEN: TaakSoort[] = ['boodschappen', 'wandelen', 'vervoer', 'koken', 'gezelschap', 'anders'];
 
@@ -270,7 +270,7 @@ function Wizard({
                 <TextField
                   label={t('mijnCode.koppelLabel')}
                   value={antwoorden.code ?? ''}
-                  onChangeText={(code) => zet({ code: code.toUpperCase() })}
+                  onChangeText={(code) => zet({ code: netteKoppelcode(code) })}
                   placeholder="TVZ-XXXX"
                   autoCapitalize="characters"
                   autoCorrect={false}

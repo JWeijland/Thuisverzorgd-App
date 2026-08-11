@@ -1,19 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import {
-  Car,
-  Dog,
-  Flower2,
-  Hammer,
-  HeartPulse,
-  Scissors,
-  ShoppingBasket,
-  Soup,
-  Sparkles,
-  type LucideIcon,
-} from 'lucide-react-native';
+import { Star } from 'lucide-react-native';
 
+import { AanbiederAvatar } from '@/features/voorzieningen/AanbiederAvatar';
 import { useDiensten, type Dienst } from '@/features/voorzieningen/api';
 import { euro } from '@/features/voorzieningen/slots';
 import { t } from '@/i18n';
@@ -35,19 +25,6 @@ const DIENST_FOTOS: Record<string, number> = {
   vervoer: require('../../../assets/images/diensten/vervoer.jpg'),
   'hond-uitlaten': require('../../../assets/images/diensten/hond-uitlaten.jpg'),
   klusjesman: require('../../../assets/images/diensten/klusjesman.jpg'),
-};
-
-/** Elke dienst een eigen herkenbaar icoon op de tegel. */
-const DIENST_ICONS: Record<string, LucideIcon> = {
-  kapper: Scissors,
-  boodschappen: ShoppingBasket,
-  maaltijden: Soup,
-  schoonmaak: Sparkles,
-  tuinman: Flower2,
-  'massage-fysio': HeartPulse,
-  vervoer: Car,
-  'hond-uitlaten': Dog,
-  klusjesman: Hammer,
 };
 
 /**
@@ -98,6 +75,13 @@ export function Marktplaats() {
             </Pressable>
         </Animated.View>
 
+        <View style={styles.sectieKop}>
+          <TvzText preset="sectionTitle">{t('voorzien.dienstenTitel')}</TvzText>
+          <TvzText preset="secondary" style={styles.sectieSub}>
+            {t('voorzien.dienstenSub')}
+          </TvzText>
+        </View>
+
         <View style={styles.grid}>
           {lijst.map((dienst) => (
             <DienstTegel key={dienst.id} dienst={dienst} />
@@ -110,12 +94,12 @@ export function Marktplaats() {
 }
 
 function DienstTegel({ dienst }: { dienst: Dienst }) {
-  const Icon = DIENST_ICONS[dienst.slug] ?? Sparkles;
   const foto = DIENST_FOTOS[dienst.slug];
   const prijs =
     dienst.unit === 'uur'
       ? `${euro(dienst.price_cents)}${t('voorzien.uurKort')}`
       : euro(dienst.price_cents);
+  const cijfer = String(Number(dienst.rating)).replace('.', ',');
   return (
     <Animated.View entering={tvzIn} style={styles.tegelWrap}>
       <Pressable
@@ -124,23 +108,37 @@ function DienstTegel({ dienst }: { dienst: Dienst }) {
         onPress={() => router.push({ pathname: '/dienst/[slug]', params: { slug: dienst.slug } })}
         style={styles.tegel}
       >
-        {foto ? (
-          <Image source={foto} style={styles.tegelFoto} resizeMode="cover" />
-        ) : (
-          <View style={styles.ikoonTegel}>
-            <Icon color={colors.primaryMid} size={24} strokeWidth={2.2} />
+        <View style={styles.tegelBeeld}>
+          {foto ? <Image source={foto} style={styles.tegelFoto} resizeMode="cover" /> : null}
+          {/* De aanbieder als gezicht op de rand van de foto: je boekt een
+              mens, geen categorie. */}
+          <View style={styles.aanbiederRing}>
+            <AanbiederAvatar
+              slug={dienst.slug}
+              naam={dienst.provider.name}
+              avatarPad={dienst.provider.avatar_path}
+              size={34}
+            />
           </View>
-        )}
+        </View>
         <View style={styles.tegelTekst}>
           <TvzText preset="cardTitle" numberOfLines={1} style={styles.tegelNaam}>
             {dienst.name}
           </TvzText>
-          <TvzText preset="meta" style={styles.tegelPrijs}>
-            {prijs}
-          </TvzText>
           <TvzText preset="secondary" numberOfLines={1} style={styles.tegelAanbieder}>
             {dienst.provider.business}
           </TvzText>
+          <View style={styles.tegelVoet}>
+            <TvzText preset="meta" style={styles.tegelPrijs}>
+              {prijs}
+            </TvzText>
+            <View style={styles.beoordeling}>
+              <Star size={12} strokeWidth={2} color={colors.accentDark} fill={colors.accent} />
+              <TvzText preset="meta" style={styles.beoordelingTekst}>
+                {cijfer}
+              </TvzText>
+            </View>
+          </View>
         </View>
       </Pressable>
     </Animated.View>
@@ -207,6 +205,12 @@ const styles = StyleSheet.create({
   gratisTekst: {
     color: colors.successText,
   },
+  sectieKop: {
+    marginTop: spacing.md,
+  },
+  sectieSub: {
+    marginTop: 2,
+  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -216,40 +220,61 @@ const styles = StyleSheet.create({
     flexBasis: '48%',
     flexGrow: 1,
   },
+  // Rustige witte kaart met een haarlijn eromheen in plaats van een schaduw:
+  // dat leest strakker in een raster (feedback Jelle 11-08).
   tegel: {
     backgroundColor: colors.white,
     borderRadius: radius.tile,
-    // Bijna vierkant blokje, zoals de vormregel voorschrijft; de foto loopt
-    // tot de rand, dus de tegel zelf knipt de hoeken bij.
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.line,
     overflow: 'hidden',
-    minHeight: 168,
+  },
+  tegelBeeld: {
+    height: 104,
+    backgroundColor: colors.surfaceAlt,
   },
   tegelFoto: {
     width: '100%',
-    height: 96,
+    height: '100%',
+  },
+  aanbiederRing: {
+    position: 'absolute',
+    left: spacing.md,
+    bottom: -17,
+    borderRadius: 21,
+    borderWidth: 2,
+    borderColor: colors.white,
+    backgroundColor: colors.white,
   },
   tegelTekst: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  ikoonTegel: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.card,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: spacing.lg,
-    marginLeft: spacing.lg,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
   },
   tegelNaam: {
     fontSize: 16,
   },
-  tegelPrijs: {
-    color: colors.primary,
-    marginTop: 2,
-  },
   tegelAanbieder: {
-    marginTop: 2,
+    marginTop: 1,
+  },
+  tegelVoet: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.line,
+  },
+  tegelPrijs: {
+    color: colors.ink,
+  },
+  beoordeling: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  beoordelingTekst: {
+    color: colors.inkSoft,
   },
 });

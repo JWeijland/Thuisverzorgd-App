@@ -16,7 +16,7 @@ import { useProfile } from '@/features/onboarding/useAuth';
 import { useUpdateProfile } from '@/features/profile/api';
 import { t } from '@/i18n';
 import { colors, radius, shadows, spacing } from '@/theme';
-import { BottomSheet, Button, Chip, PulseDot, TextField, TvzText } from '@/ui';
+import { AdresVeld, BottomSheet, Button, Chip, PulseDot, TextField, TvzText } from '@/ui';
 
 const TYPES: RequestType[] = ['boodschappen', 'vervoer', 'medicijnen', 'gezelschap', 'anders'];
 
@@ -52,12 +52,16 @@ export function RequesterFlow({ ownLocation, directOpenen = false }: Props) {
   const [composeOpen, setComposeOpen] = useState(directOpenen);
   const [type, setType] = useState<RequestType>('boodschappen');
   const [customNote, setCustomNote] = useState('');
-  const [address, setAddress] = useState('');
+  // null = nog niet zelf aangepast; dan geldt het adres van je profiel. Zo
+  // hoef je het maar één keer in te vullen, ook als dit venster meteen
+  // openstaat (feedback Jelle 11-08).
+  const [eigenAdres, setEigenAdres] = useState<string | null>(null);
   const [bezig, setBezig] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelMessage, setCancelMessage] = useState('');
 
   const request = myRequest.data;
+  const address = eigenAdres ?? profile.data?.street_address ?? '';
 
   /**
    * De oproep hoort op het ingevulde adres te staan, niet op waar de telefoon
@@ -139,11 +143,11 @@ export function RequesterFlow({ ownLocation, directOpenen = false }: Props) {
                 onChangeText={setCustomNote}
               />
             ) : null}
-            <TextField
+            <AdresVeld
               label={t('directeHulp.adresLabel')}
               placeholder={t('directeHulp.adresPlaceholder')}
-              value={address}
-              onChangeText={setAddress}
+              waarde={address}
+              onChange={setEigenAdres}
             />
             <Button
               label={bezig ? t('algemeen.laden') : t('directeHulp.zetOpDeKaart')}
@@ -165,11 +169,8 @@ export function RequesterFlow({ ownLocation, directOpenen = false }: Props) {
             label={t('directeHulp.titel')}
             variant="cta"
             size="lg"
-            onPress={() => {
-              // Het bewaarde adres staat alvast klaar; aanpassen mag altijd.
-              setAddress(profile.data?.street_address ?? '');
-              setComposeOpen(true);
-            }}
+            // Het bewaarde adres staat alvast klaar; aanpassen mag altijd.
+            onPress={() => setComposeOpen(true)}
             style={styles.cta}
           />
         )}

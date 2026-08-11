@@ -1,9 +1,9 @@
 import * as Location from 'expo-location';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MapPin, Search, Zap } from 'lucide-react-native';
+import { MapPin, Zap } from 'lucide-react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { BuddyMetFoto } from '@/features/map/BuddyMetFoto';
@@ -36,16 +36,20 @@ import { haptics } from '@/lib/haptics';
 import { useKeyboard } from '@/lib/keyboard';
 import { t } from '@/i18n';
 import { colors, radius, shadows, spacing } from '@/theme';
-import { BottomSheet, Button, Chip, TvzText } from '@/ui';
+import { BottomSheet, Button, TvzText } from '@/ui';
 import { useStatusBalk } from '@/lib/statusbalk';
 
 /**
- * Buurt (handoff, scherm 08): kaart met kringen, buddy's en directe hulpvragen.
+ * Buurt (handoff, scherm 08): de kaart van de buurt.
  *
- * Voor de vrijwilliger is dit het startscherm: dan geen zoekbalk en geen
- * gekleurde kop, alleen de drie schuifjes die als losse witte pillen over de
- * kaart zweven. Beheerder en hulpvrager komen hier alleen nog via de
- * buurt-scan of via het knopje op de kringpagina.
+ * Voor de vrijwilliger is dit het startscherm: hij ziet kringen die buddy's
+ * zoeken en directe hulpvragen, met de drie schuifjes als losse witte pillen
+ * over de kaart.
+ *
+ * Beheerder en hulpvrager komen hier om zelf hulp te vragen. Zij zien alleen
+ * de buddy's: de hulpvragen en hulpkringen van anderen gaan hen niet aan, en
+ * zonder zoekbalk en filterpillen blijft de kaart zelf het beeld (feedback
+ * Jelle 11-08).
  */
 export function BuurtScherm() {
   const { hulpvraag } = useLocalSearchParams<{ hulpvraag?: string }>();
@@ -53,22 +57,18 @@ export function BuurtScherm() {
   const profile = useProfile();
   const role = profile.data?.role;
   const isVolunteer = role === 'vrijwilliger';
-  // De hulpvrager krijgt een zo rustig mogelijke kaart: alleen de buddy's uit
-  // de buurt (met foto), geen kringen, aanvragen van anderen of zoekbalk
-  // (feedback 05-08).
   const isHulpvrager = role === 'hulpvrager';
+  /** Wie zelf hulp zoekt (beheerder of hulpvrager) ziet uitsluitend buddy's. */
+  const alleenBuddys = !isVolunteer;
 
   const circles = useMapCircles();
   const requests = useOpenRequests();
-  // Beheerders en hulpvragers zoeken vooral buddy's: die staan standaard aan.
-  const [showBuddies, setShowBuddies] = useState(true);
-  const buddies = useMapBuddies(!isVolunteer && (isHulpvrager || showBuddies));
+  const buddies = useMapBuddies(alleenBuddys);
   const eigenKring = useMyCircle();
 
   const mapRef = useRef<TvzMapHandle>(null);
   const [region, setRegion] = useState<Region>(DEFAULT_REGION);
   const [ownLocation, setOwnLocation] = useState<LatLng | null>(null);
-  const [query, setQuery] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<OpenRequest | null>(null);
   const [selectedCircle, setSelectedCircle] = useState<MapCircle | null>(null);
   const [selectedBuddy, setSelectedBuddy] = useState<MapBuddy | null>(null);
@@ -92,17 +92,12 @@ export function BuurtScherm() {
     });
   }, []);
 
-  const circleList = isHulpvrager
-    ? []
-    : (circles.data ?? []).filter((circle) =>
-        query.trim().length === 0 ? true : circle.name.toLowerCase().includes(query.toLowerCase()),
-      );
-  const suggestions = query.trim().length > 0 ? circleList.slice(0, 4) : [];
+  const circleList = alleenBuddys ? [] : (circles.data ?? []);
 
   // Niet beschikbaar? Dan blijven spontane aanvragen voor deze vrijwilliger van
-  // de kaart. De hulpvrager ziet aanvragen van anderen nooit.
+  // de kaart. Beheerder en hulpvrager zien aanvragen van anderen nooit.
   const requestList =
-    isHulpvrager || (isVolunteer && !available)
+    alleenBuddys || !available
       ? []
       : (requests.data ?? []).filter((request) => request.lat != null && request.lon != null);
 
@@ -174,7 +169,7 @@ export function BuurtScherm() {
             }}
           />
         ))}
-        {!isVolunteer && (isHulpvrager || showBuddies)
+        {alleenBuddys
           ? (buddies.data ?? []).map((buddy) => (
               <BuddyMetFoto
                 key={buddy.id}
@@ -205,46 +200,6 @@ export function BuurtScherm() {
 
       <SafeAreaView edges={['top']} pointerEvents="box-none" style={styles.topLayer}>
         {isVolunteer ? <ZwevendeSchuifjes pad="vrijwilliger" /> : null}
-        {!isHulpvrager && !isVolunteer ? (
-          <View style={[styles.search, shadows.card]}>
-            <Search color={colors.inkFaint} size={18} strokeWidth={2.2} />
-            <TextInput
-              textContentType="none"
-              autoComplete="off"
-              value={query}
-              onChangeText={setQuery}
-              placeholder={t('buurt.zoekPlaceholder')}
-              placeholderTextColor={colors.inkFaint}
-              style={styles.searchInput}
-            />
-          </View>
-        ) : null}
-        {suggestions.length > 0 ? (
-          <View style={[styles.suggestions, shadows.card]}>
-            {suggestions.map((circle) => (
-              <Pressable
-                key={circle.id}
-                accessibilityRole="button"
-                onPress={() => {
-                  setQuery('');
-                  mapRef.current?.animateToRegion(
-                    {
-                      latitude: circle.lat,
-                      longitude: circle.lon,
-                      latitudeDelta: 0.03,
-                      longitudeDelta: 0.02,
-                    },
-                    500,
-                  );
-                }}
-                style={styles.suggestion}
-              >
-                <TvzText preset="body">{circle.name}</TvzText>
-              </Pressable>
-            ))}
-          </View>
-        ) : null}
-
         {isVolunteer ? (
           <Pressable
             accessibilityRole="button"
@@ -273,19 +228,6 @@ export function BuurtScherm() {
               ⌄
             </TvzText>
           </Pressable>
-        ) : !isHulpvrager ? (
-          <View style={styles.filterRow}>
-            <Chip
-              label={t('buurt.chipBuddys')}
-              selected={showBuddies}
-              onPress={() => setShowBuddies(true)}
-            />
-            <Chip
-              label={t('buurt.chipKringen')}
-              selected={!showBuddies}
-              onPress={() => setShowBuddies(false)}
-            />
-          </View>
         ) : null}
       </SafeAreaView>
 
@@ -398,22 +340,6 @@ export function BuurtScherm() {
             kringId={role === 'beheerder' ? (eigenKring.data?.id ?? null) : null}
             hulpvrager={isHulpvrager}
             onClose={() => setSelectedBuddy(null)}
-          />
-        ) : null}
-        {!isVolunteer && selectedRequest ? (
-          <HulpvraagKaart
-            request={selectedRequest}
-            afstand={
-              ownLocation && selectedRequest.lat != null && selectedRequest.lon != null
-                ? formatDistance(
-                    haversineKm(ownLocation, {
-                      lat: selectedRequest.lat,
-                      lon: selectedRequest.lon,
-                    }),
-                  )
-                : null
-            }
-            onClose={() => setSelectedRequest(null)}
           />
         ) : null}
         {selectedCircle && !selectedRequest && !selectedBuddy ? (
@@ -644,52 +570,6 @@ function BuddyKaart({
   );
 }
 
-/** Kaartje bij een aangetikte hulpvraag, voor wie er zelf niet op kan reageren. */
-function HulpvraagKaart({
-  request,
-  afstand,
-  onClose,
-}: {
-  request: OpenRequest;
-  afstand: string | null;
-  onClose: () => void;
-}) {
-  return (
-    <View style={[styles.kringKaart, shadows.card]}>
-      <View style={styles.kringKop}>
-        <View style={styles.sheetZap}>
-          <Zap color={colors.primaryDark} size={15} strokeWidth={2.2} fill={colors.accent} />
-        </View>
-        <View style={styles.kringKopText}>
-          <TvzText preset="cardTitle">{t(REQUEST_TYPE_LABEL[request.type])}</TvzText>
-          <TvzText preset="secondary" style={styles.kringMeta}>
-            {[request.voornaam, afstand ? t('buurt.afstandVanJou', { afstand }) : null]
-              .filter(Boolean)
-              .join(' · ')}
-          </TvzText>
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('algemeen.sluiten')}
-          onPress={onClose}
-          hitSlop={12}
-          style={styles.sluitKnop}
-        >
-          <TvzText preset="cardTitle" style={styles.sluitKruis}>
-            ✕
-          </TvzText>
-        </Pressable>
-      </View>
-      {request.note ? (
-        <TvzText preset="secondary" style={styles.kringNote}>
-          {request.note}
-        </TvzText>
-      ) : null}
-    </View>
-  );
-}
-
-/** Buddy-marker die zelf de profielfoto uit de privé-bucket ophaalt. */
 const styles = StyleSheet.create({
   fill: {
     flex: 1,
@@ -697,39 +577,6 @@ const styles = StyleSheet.create({
   },
   topLayer: {
     paddingHorizontal: spacing.screen,
-  },
-  search: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.white,
-    borderRadius: radius.pill,
-    paddingHorizontal: 16,
-    minHeight: 46,
-  },
-  searchInput: {
-    flex: 1,
-    fontFamily: 'ComicNeue_400Regular',
-    fontSize: 15,
-    color: colors.ink,
-    paddingVertical: 10,
-  },
-  suggestions: {
-    backgroundColor: colors.white,
-    borderRadius: radius.card,
-    marginTop: 6,
-    overflow: 'hidden',
-  },
-  suggestion: {
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.line,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    gap: spacing.chipGap,
-    marginTop: spacing.sm,
   },
   // Tellerkaart (ontwerp 1a): navy vlak met groene pin, kringen dik, aanvragen eronder.
   // Zacht wit vlak dat over de kaart zweeft in plaats van een donkerblauw

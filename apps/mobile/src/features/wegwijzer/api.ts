@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
 
 import { useSession } from '@/features/onboarding/useAuth';
 import { magZoeken, normaliseer } from '@/features/wegwijzer/zoekterm';
@@ -164,16 +163,6 @@ export function useGuideLinks(moduleId: string | undefined) {
       return data as GuideLink[];
     },
   });
-}
-
-/** Wacht met zoeken tot er even niet getypt is. */
-export function useDebounced(waarde: string, ms = 250): string {
-  const [traag, setTraag] = useState(waarde);
-  useEffect(() => {
-    const timer = setTimeout(() => setTraag(waarde), ms);
-    return () => clearTimeout(timer);
-  }, [waarde, ms]);
-  return traag;
 }
 
 /** Zoeken op de server: full-text, synoniemen en een vangnet voor typefouten. */

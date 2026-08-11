@@ -1,5 +1,6 @@
 export { TvzText } from '@/ui/TvzText';
 export { TextField } from '@/ui/TextField';
+export { AdresVeld } from '@/ui/AdresVeld';
 export { Button } from '@/ui/Button';
 export { Pill } from '@/ui/Pill';
 export { Chip } from '@/ui/Chip';

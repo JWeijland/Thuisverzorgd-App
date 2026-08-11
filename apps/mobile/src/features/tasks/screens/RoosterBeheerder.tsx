@@ -43,7 +43,12 @@ export function RoosterBeheerder() {
   const profile = useProfile();
   const circle = useMyCircle();
   const now = new Date();
-  const week = isoWeekDays(now);
+  // Hoeveel weken je van deze week af zit; je verschuift hem door over de
+  // dagvakjes te vegen (wens Jelle 11-08).
+  const [weekOffset, setWeekOffset] = useState(0);
+  const anker = new Date(now);
+  anker.setDate(anker.getDate() + weekOffset * 7);
+  const week = isoWeekDays(anker);
   const tasks = useTasks(circle.data?.id, week[0]!, week[6]!);
   const logs = useTaskLogs(circle.data?.id);
   const { cancel } = useTaskRpc(circle.data?.id);
@@ -158,9 +163,11 @@ export function RoosterBeheerder() {
           {circle.data ? (
             <>
               <SectionHeader
-                title={t('rooster.weekTitel', { week: isoWeekNumber(now) })}
-                actionLabel={t('planner.heleWeek')}
-                onActionPress={() => router.push('/weekplanning')}
+                title={t('rooster.weekTitel', { week: isoWeekNumber(anker) })}
+                actionLabel={weekOffset === 0 ? t('planner.heleWeek') : t('rooster.dezeWeek')}
+                onActionPress={() =>
+                  weekOffset === 0 ? router.push('/weekplanning') : setWeekOffset(0)
+                }
               />
               <Button
                 label={t('rooster.taakInplannen')}
@@ -171,10 +178,14 @@ export function RoosterBeheerder() {
 
               <View style={styles.weekStrip}>
                 <WeekStrip
-                  anchor={now}
+                  anchor={anker}
                   tasks={tasks.data ?? []}
                   selected={selectedDay}
                   onSelectDay={(key) => setSelectedDay(key === selectedDay ? undefined : key)}
+                  onWeekWissel={(richting) => {
+                    setSelectedDay(undefined);
+                    setWeekOffset((huidig) => huidig + richting);
+                  }}
                 />
               </View>
 

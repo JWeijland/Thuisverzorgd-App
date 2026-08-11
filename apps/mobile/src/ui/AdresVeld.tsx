@@ -3,11 +3,12 @@ import { MapPin } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { useDebounced } from '@/features/wegwijzer/api';
+import { useDebounced } from '@/lib/useDebounced';
 import { t } from '@/i18n';
 import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme';
-import { TextField, TvzText } from '@/ui';
+import { TextField } from '@/ui/TextField';
+import { TvzText } from '@/ui/TvzText';
 
 /**
  * Adressuggesties uit de PDOK Locatieserver: de officiële adressen van het

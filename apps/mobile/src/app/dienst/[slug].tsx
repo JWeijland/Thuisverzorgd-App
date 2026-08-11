@@ -4,13 +4,14 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, Star } from 'lucide-react-native';
 
+import { AanbiederAvatar } from '@/features/voorzieningen/AanbiederAvatar';
 import { useDiensten } from '@/features/voorzieningen/api';
 import { euro, maakSlots } from '@/features/voorzieningen/slots';
 import { t } from '@/i18n';
 import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, radius, shadows, spacing } from '@/theme';
 import { fonts } from '@/theme/typography';
-import { Avatar, Button, TvzText } from '@/ui';
+import { Button, TvzText } from '@/ui';
 
 /**
  * Dienst-detail (handoff voorzieningen): geen blokjes of pillen maar een
@@ -48,7 +49,12 @@ export default function DienstDetail() {
             </Pressable>
             <View style={styles.heroInhoud}>
               <View style={styles.avatarRing}>
-                <Avatar name={dienst.provider.name} size={96} />
+                <AanbiederAvatar
+                  slug={dienst.slug}
+                  naam={dienst.provider.name}
+                  avatarPad={dienst.provider.avatar_path}
+                  size={96}
+                />
               </View>
               <TvzText preset="screenTitle" style={styles.dienstNaam}>
                 {dienst.name}

@@ -11,7 +11,6 @@ import {
 } from 'lucide-react-native';
 
 import {
-  useDebounced,
   useGuideAntwoord,
   useGuideModules,
   useGuideSearch,
@@ -26,6 +25,7 @@ import {
 import { ThemaIcoon } from '@/features/wegwijzer/ThemaIcoon';
 import { filterLokaal, magZoeken, splitsTreffer } from '@/features/wegwijzer/zoekterm';
 import { t } from '@/i18n';
+import { useDebounced } from '@/lib/useDebounced';
 import { colors, radius, spacing, themaTints } from '@/theme';
 import { Card, Chip, EmptyState, Pill, SectionHeader, TvzText } from '@/ui';
 

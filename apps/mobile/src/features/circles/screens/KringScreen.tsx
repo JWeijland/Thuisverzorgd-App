@@ -27,6 +27,7 @@ import {
   TvzText,
 } from '@/ui';
 import { ChatView } from '@/features/circles/ChatView';
+import { isVolledigeKoppelcode, netteKoppelcode } from '@/features/circles/koppelcode';
 import {
   koppelFoutTekst,
   useKoppelNaaste,
@@ -105,7 +106,7 @@ function KoppelNaasteKaart({ circleId }: { circleId: string }) {
         value={code}
         onChangeText={(waarde) => {
           setFout(null);
-          setCode(waarde.toUpperCase());
+          setCode(netteKoppelcode(waarde));
         }}
         placeholder="TVZ-XXXX"
         autoCapitalize="characters"
@@ -119,7 +120,7 @@ function KoppelNaasteKaart({ circleId }: { circleId: string }) {
       <Button
         label={t('mijnCode.koppelKnop')}
         variant="cta"
-        disabled={koppel.isPending || code.trim().length < 6}
+        disabled={koppel.isPending || !isVolledigeKoppelcode(code)}
         onPress={() => {
           void haptics.stevig();
           koppel.mutate(
