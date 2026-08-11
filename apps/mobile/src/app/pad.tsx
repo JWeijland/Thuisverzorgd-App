@@ -4,7 +4,8 @@ import { BookOpen, HeartHandshake, Settings } from 'lucide-react-native';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PADEN, type Pad } from '@/features/navigatie/paden';
+import { PADEN, schuifjesVoor, type Pad } from '@/features/navigatie/paden';
+import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { haptics } from '@/lib/haptics';
 import { useStatusBalk } from '@/lib/statusbalk';
@@ -61,7 +62,9 @@ export default function PadKeuze() {
 }
 
 function PadKaart({ pad, icoon }: { pad: Pad; icoon: React.ReactNode }) {
-  const eerste = pad.schuifjes[0];
+  const profile = useProfile();
+  const schuifjes = schuifjesVoor(pad, profile.data?.role);
+  const eerste = schuifjes[0];
   return (
     <Pressable
       accessibilityRole="button"
@@ -87,7 +90,7 @@ function PadKaart({ pad, icoon }: { pad: Pad; icoon: React.ReactNode }) {
           {t(pad.uitlegKey)}
         </TvzText>
         <View style={styles.kaartChips}>
-          {pad.schuifjes.map((schuifje) => (
+          {schuifjes.map((schuifje) => (
             <View key={schuifje.route} style={[styles.chip, { backgroundColor: pad.schuifjeVlak }]}>
               <TvzText preset="meta" style={styles.chipTekst}>
                 {t(schuifje.labelKey)}

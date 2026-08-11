@@ -120,6 +120,25 @@ export function actiefSchuifje(pad: Pad, pathname: string): Schuifje | null {
 }
 
 /**
+ * De hulpvrager krijgt een eenvoudiger versie van de paden: minder schuifjes
+ * en geen kruimelspoor, zodat er per scherm minder te kiezen valt. Het forum
+ * hoort bij het lotgenotencontact van de beheerder; de oudere zelf gaat naar
+ * de wegwijzer of naar een mens (afgestemd met Jelle).
+ */
+export function schuifjesVoor(pad: Pad, role: string | null | undefined): Schuifje[] {
+  if (role !== 'hulpvrager') return pad.schuifjes;
+  if (pad.id === 'weten') {
+    return pad.schuifjes.filter((schuifje) => !schuifje.route.endsWith('/forum'));
+  }
+  return pad.schuifjes;
+}
+
+/** De hulpvrager ziet geen kruimelspoor: één ding per scherm is genoeg. */
+export function toontKruimelspoor(role: string | null | undefined): boolean {
+  return role !== 'hulpvrager';
+}
+
+/**
  * Rollen die het keuzescherm met de twee paden zien. De vrijwilliger niet:
  * die verleent hulp en landt direct op de kaart.
  */

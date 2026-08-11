@@ -27,6 +27,7 @@ import { useInvite, useMyCircle } from '@/features/circles/api';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { useOpenRequests, type OpenRequest } from '@/features/spontaneous/api';
 import { REQUEST_TYPE_LABEL, RequesterFlow } from '@/features/spontaneous/RequesterFlow';
+import { KringRondjes } from '@/features/circles/KringRondjes';
 import { ZwevendeSchuifjes } from '@/features/navigatie/ZwevendeSchuifjes';
 import { VolunteerFlow } from '@/features/spontaneous/VolunteerFlow';
 import { countInRegion, DEFAULT_REGION, formatDistance, haversineKm, type LatLng } from '@/lib/geo';
@@ -284,6 +285,8 @@ export function BuurtScherm() {
           </View>
         ) : null}
       </SafeAreaView>
+
+      {isVolunteer ? <KringRondjes /> : null}
 
       <BottomSheet
         visible={listOpen}

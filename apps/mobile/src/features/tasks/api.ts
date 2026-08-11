@@ -9,11 +9,11 @@ import { toDateString } from '@/lib/dates';
 export type Task = {
   id: string;
   circle_id: string;
-  type: 'boodschappen' | 'wandelen' | 'vervoer' | 'gezelschap' | 'anders';
+  type: 'boodschappen' | 'wandelen' | 'vervoer' | 'koken' | 'gezelschap' | 'anders';
   custom_label: string | null;
   date: string;
   time: string;
-  recurrence: 'eenmalig' | 'wekelijks';
+  recurrence: 'eenmalig' | 'wekelijks' | 'tweewekelijks';
   status: 'open' | 'ingepland' | 'gedaan' | 'geannuleerd';
   claimed_by: string | null;
   claimer: {
@@ -112,6 +112,12 @@ export type NewTask = {
   date: string;
   time: string;
   recurrence: Task['recurrence'];
+  /**
+   * Direct aan één kringlid toewijzen (handoff, scherm 06 "Wie"). Zonder dit
+   * veld staat de taak open voor de hele kring.
+   */
+  claimed_by?: string | null;
+  status?: Task['status'];
 };
 
 export function useCreateTask(circleId: string | undefined) {

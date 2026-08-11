@@ -6,7 +6,13 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
-import { actiefSchuifje, PADEN, type PadId } from '@/features/navigatie/paden';
+import {
+  actiefSchuifje,
+  PADEN,
+  schuifjesVoor,
+  toontKruimelspoor,
+  type PadId,
+} from '@/features/navigatie/paden';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { useWalkthrough } from '@/features/onboarding/walkthrough';
 import { t } from '@/i18n';
@@ -65,6 +71,8 @@ export function PadHeader({
   const spoor = [actief ? t(actief.labelKey) : t(padConfig.titelKey), ...kruimels];
   const toonTerug = terug ?? kruimels.length > 0;
   const naam = profile.data?.name ?? '';
+  const schuifjes = schuifjesVoor(padConfig, profile.data?.role);
+  const toonSpoor = toontKruimelspoor(profile.data?.role);
 
   return (
     <LinearGradient
@@ -125,8 +133,8 @@ export function PadHeader({
           </Pressable>
         </View>
 
-        <View style={styles.spoor}>
-          {spoor.map((kruimel, i) => (
+        <View style={toonSpoor ? styles.spoor : styles.spoorUit}>
+          {(toonSpoor ? spoor : []).map((kruimel, i) => (
             <View key={`${kruimel}-${i}`} style={styles.kruimel}>
               {i > 0 ? <View style={styles.streepje} /> : null}
               <View style={[styles.bolletje, i === spoor.length - 1 && styles.bolletjeActief]} />
@@ -147,7 +155,7 @@ export function PadHeader({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.schuifjes}
           >
-            {padConfig.schuifjes.map((schuifje) => {
+            {schuifjes.map((schuifje) => {
               const isActief = schuifje.route === actief?.route;
               return (
                 <Pressable
@@ -234,6 +242,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: spacing.sm,
+  },
+  spoorUit: {
+    height: spacing.xs,
   },
   kruimel: {
     flexDirection: 'row',

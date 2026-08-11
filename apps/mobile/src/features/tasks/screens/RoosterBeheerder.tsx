@@ -1,16 +1,19 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Linking,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
+import { X } from 'lucide-react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useMyCircle } from '@/features/circles/api';
+import { ProefweekTerugblik } from '@/features/circles/ProefweekTerugblik';
 import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
 import { InboxBell } from '@/features/notifications/InboxBell';
 import { useTaskLogs, useTaskRpc, useTasks } from '@/features/tasks/api';
@@ -19,7 +22,6 @@ import { TaskRow } from '@/features/tasks/TaskRow';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { GeboekteDiensten } from '@/features/voorzieningen/GeboekteDiensten';
-import { useBoekingen } from '@/features/voorzieningen/api';
 import { t } from '@/i18n';
 import {
   formatHumanDate,
@@ -45,9 +47,12 @@ export function RoosterBeheerder() {
   const week = isoWeekDays(now);
   const tasks = useTasks(circle.data?.id, week[0]!, week[6]!);
   const logs = useTaskLogs(circle.data?.id);
-  const boekingen = useBoekingen();
   const { cancel } = useTaskRpc(circle.data?.id);
-  const [selectedDay, setSelectedDay] = useState<string | undefined>();
+  // Na het inplannen springt de agenda naar die dag en verschijnt de groene
+  // bevestiging (handoff, scherm 06 stap 8).
+  const { ingepland } = useLocalSearchParams<{ ingepland?: string }>();
+  const [selectedDay, setSelectedDay] = useState<string | undefined>(ingepland);
+  const [bevestiging, setBevestiging] = useState<string | undefined>(ingepland);
 
   const voornaam = profile.data?.name.split(' ')[0] ?? '';
 
@@ -60,10 +65,6 @@ export function RoosterBeheerder() {
     (task) => !selectedDay || task.date === selectedDay,
   );
 
-  const weekKeys = week.map((day) => toDateString(day));
-  const boekingDagen = (boekingen.data ?? [])
-    .map((boeking) => toDateString(new Date(boeking.slot_at)))
-    .filter((dag) => weekKeys.includes(dag));
 
   return (
     <View style={styles.safe}>
@@ -79,11 +80,34 @@ export function RoosterBeheerder() {
           </>
         }
       />
+      {bevestiging ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('algemeen.sluiten')}
+          onPress={() => setBevestiging(undefined)}
+          style={styles.bevestiging}
+        >
+          <TvzText preset="bodyBold" style={styles.bevestigingTekst}>
+            {t('planner.ingeplandKort')}
+          </TvzText>
+          <X color={colors.successText} size={18} strokeWidth={2.4} />
+        </Pressable>
+      ) : null}
+
       <KeyboardAvoidingView
         style={styles.fill}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+          {circle.data ? (
+            <ProefweekTerugblik
+              circleId={circle.data.id}
+              gestartOp={circle.data.trial_started_at ?? null}
+              bevestigdOp={circle.data.trial_confirmed_at ?? null}
+              nu={now}
+            />
+          ) : null}
+
           {!circle.isLoading && !circle.data ? (
             <Card style={styles.section}>
               <EmptyState title={t('rooster.geenKring')} body={t('rooster.geenKringTekst')} bo />
@@ -145,8 +169,6 @@ export function RoosterBeheerder() {
                 <WeekStrip
                   anchor={now}
                   tasks={tasks.data ?? []}
-                  boekingDagen={boekingDagen}
-                  legenda
                   selected={selectedDay}
                   onSelectDay={(key) => setSelectedDay(key === selectedDay ? undefined : key)}
                 />
@@ -169,14 +191,6 @@ export function RoosterBeheerder() {
                 ) : null}
               </View>
 
-              {(tasks.data ?? []).some((task) => task.status === 'open') ? (
-                <Card style={styles.vulKaart}>
-                  <TvzText preset="secondary" style={styles.vulTekst}>
-                    {t('rooster.vulUitleg')}
-                  </TvzText>
-                  <Button label={t('steunHub.vulDeWeek')} onPress={() => router.push('/vul-de-week')} />
-                </Card>
-              ) : null}
 
               {(logs.data ?? []).length > 0 ? (
                 <>
@@ -206,6 +220,21 @@ export function RoosterBeheerder() {
 }
 
 const styles = StyleSheet.create({
+  bevestiging: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginHorizontal: spacing.screen,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: 12,
+    backgroundColor: colors.successBg,
+  },
+  bevestigingTekst: {
+    flex: 1,
+    color: colors.successText,
+  },
   safe: { flex: 1, backgroundColor: colors.bg },
   fill: { flex: 1 },
   container: {

@@ -181,7 +181,24 @@
     "titel": "Taak inplannen",
     "uitleg": "Zet hem in de week, de buddy’s pakken hem op",
     "rodeDraad": "De taak komt in de week te staan; de kring en je naaste zien hem meteen.",
-    "typeKoken": "Koken of eten"
+    "typeKoken": "Koken of eten",
+    "voorDeKring": "Voor de kring van {naam}",
+    "ochtend": "Ochtend",
+    "middag": "Middag",
+    "avond": "Avond",
+    "weekTerug": "Week terug",
+    "weekVerder": "Week verder",
+    "herhaling_eenmalig": "Eenmalig",
+    "herhaling_wekelijks": "Elke week",
+    "herhaling_tweewekelijks": "Elke twee weken",
+    "wie": "Wie",
+    "wieKan": "Wie kan",
+    "wieKanUitleg": "De taak staat open voor de hele kring.",
+    "wieVastUitleg": "Deze taak staat meteen op zijn of haar naam.",
+    "vastPersoon": "op naam",
+    "openVoorKring": "open voor de kring",
+    "ingepland": "{taak} staat in het rooster.",
+    "ingeplandKort": "De taak staat in het rooster."
   },
   "weekplanning": {
     "titel": "Planning maken",
@@ -542,7 +559,8 @@
     "lijstGeenAanvragen": "Geen directe aanvragen op dit moment.",
     "lijstKringen": "Hulpkringen",
     "afstandVanJou": "{afstand} van jou",
-    "plekkenVrij": "{aantal} plekken vrij"
+    "plekkenVrij": "{aantal} plekken vrij",
+    "mijnKringen": "mijn kringen"
   },
   "directeHulp": {
     "titel": "Directe hulp",
@@ -906,5 +924,11 @@
     "startProefweek": "Start de proefweek",
     "kringnaam": "Kring van {naam}",
     "diegene": "diegene"
+  },
+  "proefweek": {
+    "titel": "Werkte deze week zo?",
+    "uitleg": "De proefweek zit erop. Klopt het rooster, of wil je nog schuiven?",
+    "werkte": "Zo is het goed",
+    "aanpassen": "Ik wil schuiven"
   }
 }

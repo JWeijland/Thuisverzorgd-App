@@ -10,9 +10,8 @@ import { useTaskRpc, useTasks, type Task } from '@/features/tasks/api';
 import { TaskRow } from '@/features/tasks/TaskRow';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { useProfile } from '@/features/onboarding/useAuth';
-import { useBoekingen } from '@/features/voorzieningen/api';
 import { t } from '@/i18n';
-import { formatHumanDate, isoWeekDays, isoWeekNumber, toDateString } from '@/lib/dates';
+import { formatHumanDate, isoWeekDays, isoWeekNumber } from '@/lib/dates';
 import { colors, radius, spacing } from '@/theme';
 import {
   BottomSheet,
@@ -42,13 +41,6 @@ export function RoosterVrijwilliger() {
     (task) => !selectedDay || task.date === selectedDay,
   );
 
-  // Geboekte diensten als blauwe stipjes: de buddy ziet dezelfde week als
-  // de beheerder en de hulpvrager (rode draad).
-  const boekingen = useBoekingen();
-  const weekKeys = week.map((day) => toDateString(day));
-  const boekingDagen = (boekingen.data ?? [])
-    .map((boeking) => toDateString(new Date(boeking.slot_at)))
-    .filter((dag) => weekKeys.includes(dag));
 
   // Kleine teller: hoe vaak hielp je deze maand al? Waardering is persoonlijk
   // en gemeend, nooit opgeklopt (brandbook 1.4).
@@ -95,8 +87,6 @@ export function RoosterVrijwilliger() {
             <WeekStrip
               anchor={now}
               tasks={tasks.data ?? []}
-              boekingDagen={boekingDagen}
-              legenda
               selected={selectedDay}
               onSelectDay={(key) => setSelectedDay(key === selectedDay ? undefined : key)}
             />

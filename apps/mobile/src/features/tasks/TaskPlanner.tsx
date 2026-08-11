@@ -2,12 +2,20 @@ import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import type { NewTask, Task } from '@/features/tasks/api';
+import { taakSoortLabel } from '@/features/tasks/logic';
 import { WEEKDAY_SHORT, isoWeekDays, toDateString } from '@/lib/dates';
 import { t } from '@/i18n';
 import { colors, spacing } from '@/theme';
 import { Button, Chip, TextField, TvzText } from '@/ui';
 
-const TYPES: Task['type'][] = ['boodschappen', 'wandelen', 'vervoer', 'gezelschap', 'anders'];
+const TYPES: Task['type'][] = [
+  'boodschappen',
+  'wandelen',
+  'vervoer',
+  'koken',
+  'gezelschap',
+  'anders',
+];
 const QUICK_TIMES = ['09:00', '12:00', '14:00', '16:00'];
 
 type Props = {
@@ -60,14 +68,6 @@ export function TaskPlanner({ anchor, submitLabel, onSubmit, busy }: Props) {
     });
   }
 
-  const typeLabels: Record<Task['type'], string> = {
-    boodschappen: t('planner.typeBoodschappen'),
-    wandelen: t('planner.typeWandelen'),
-    vervoer: t('planner.typeVervoer'),
-    gezelschap: t('planner.typeGezelschap'),
-    anders: t('planner.typeAnders'),
-  };
-
   return (
     <View>
       <StepLabel nr={1} label={t('planner.watNodig')} first />
@@ -75,7 +75,7 @@ export function TaskPlanner({ anchor, submitLabel, onSubmit, busy }: Props) {
         {TYPES.map((option) => (
           <Chip
             key={option}
-            label={typeLabels[option]}
+            label={taakSoortLabel(option)}
             selected={type === option}
             onPress={() => setType(option)}
           />

@@ -10,6 +10,10 @@ export type Circle = {
   owner_id: string;
   name: string;
   link_code: string;
+  /** Start van de proefweek; na 7 dagen vraagt Bo of het rooster werkte. */
+  trial_started_at?: string | null;
+  /** Moment waarop de kring bevestigde dat het proefrooster klopt. */
+  trial_confirmed_at?: string | null;
 };
 
 export type Member = {
@@ -39,11 +43,32 @@ export function useMyCircle() {
     queryFn: async (): Promise<Circle | null> => {
       const { data, error } = await supabase
         .from('circles')
-        .select('id, owner_id, name, link_code')
+        .select('id, owner_id, name, link_code, trial_started_at, trial_confirmed_at')
         .order('created_at', { ascending: true })
         .limit(1);
       if (error) throw error;
       return (data?.[0] as Circle) ?? null;
+    },
+  });
+}
+
+/**
+ * Alle kringen waar je lid van bent. Een vrijwilliger kan er meerdere hebben;
+ * die staan als rondjes rechtsonder op de kaart (handoff, scherm 08). RLS
+ * zorgt dat je alleen je eigen kringen terugkrijgt.
+ */
+export function useMyCircles() {
+  const { session } = useSession();
+  return useQuery({
+    queryKey: ['my-circles', session?.user.id],
+    enabled: !!session,
+    queryFn: async (): Promise<Circle[]> => {
+      const { data, error } = await supabase
+        .from('circles')
+        .select('id, owner_id, name, link_code')
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as Circle[];
     },
   });
 }
