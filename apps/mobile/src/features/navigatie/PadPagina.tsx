@@ -11,7 +11,7 @@ import { create } from 'zustand';
 import { colors } from '@/theme';
 
 type RichtingState = {
-  /** 1 = het volgende schuifje (van rechts), -1 = het vorige (van links). */
+  /** Waar de pagina vandaan komt: 1 = van rechts, -1 = van links. */
   richting: 1 | -1;
   /** Index van het schuifje waar je vandaan komt. */
   vorigeIndex: number;
@@ -21,15 +21,16 @@ type RichtingState = {
 };
 
 /**
- * Onthoudt welke kant je op gaat tussen de schuifjes, zodat de pagina
- * meebeweegt met de beweging die je maakt: naar een schuifje rechts komt de
- * pagina van rechts binnen, naar links van links.
+ * Onthoudt welke kant je op gaat tussen de schuifjes. De inhoud beweegt mee
+ * met de richting van je tik: tik je een schuifje links aan, dan schuift het
+ * scherm naar links; tik je rechts, dan schuift het naar rechts. Andersom
+ * voelt tegennatuurlijk (feedback Jelle 11-08).
  */
 export const useSchuifRichting = create<RichtingState>((set, get) => ({
   richting: 1,
   vorigeIndex: 0,
   zetRichting: (nieuweIndex) =>
-    set({ richting: nieuweIndex >= get().vorigeIndex ? 1 : -1, vorigeIndex: nieuweIndex }),
+    set({ richting: nieuweIndex >= get().vorigeIndex ? -1 : 1, vorigeIndex: nieuweIndex }),
   meldActief: (index) =>
     set((state) => (state.vorigeIndex === index ? state : { vorigeIndex: index })),
 }));

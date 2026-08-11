@@ -312,11 +312,9 @@ function MakelaarKiezer({
               </Pressable>
 
               {makelaar.onderwerpen.length > 0 ? (
-                <View style={styles.kiezerChips}>
-                  {makelaar.onderwerpen.slice(0, 3).map((onderwerp) => (
-                    <Pill key={onderwerp} label={onderwerp} />
-                  ))}
-                </View>
+                <TvzText preset="meta" style={styles.kiezerOnderwerpen}>
+                  {t('steun.helptMetKort')} {makelaar.onderwerpen.slice(0, 3).join(' · ')}
+                </TvzText>
               ) : null}
 
               <Button
@@ -403,9 +401,11 @@ function MakelaarProfiel({
               <TvzText preset="meta" style={styles.profielKop}>
                 {t('steun.profielKanHelpen')}
               </TvzText>
-              <View style={styles.profielChips}>
+              <View style={styles.profielOnderwerpen}>
                 {makelaar.onderwerpen.map((onderwerp) => (
-                  <Pill key={onderwerp} label={onderwerp} />
+                  <View key={onderwerp} style={styles.profielOnderwerp}>
+                    <TvzText preset="body">{onderwerp}</TvzText>
+                  </View>
                 ))}
               </View>
             </>
@@ -425,6 +425,14 @@ function MakelaarProfiel({
 }
 
 const styles = StyleSheet.create({
+  profielOnderwerpen: {
+    marginTop: spacing.sm,
+  },
+  profielOnderwerp: {
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
   kiezerLijst: {
     padding: spacing.screen,
     gap: spacing.cardGap,
@@ -453,10 +461,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
-  kiezerChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.chipGap,
+  kiezerOnderwerpen: {
+    color: colors.primaryMid,
   },
   fill: { flex: 1 },
   statusRow: {

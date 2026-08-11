@@ -17,7 +17,8 @@ import { TAGS, TAG_LABEL } from '@/features/forum/tags';
 import { t } from '@/i18n';
 import { useKeyboardOpen } from '@/lib/keyboard';
 import { colors, radius, spacing } from '@/theme';
-import { Card, Chip, EmptyState, Pill, TvzText } from '@/ui';
+import { Card, EmptyState, TvzText } from '@/ui';
+import { KeuzeRij } from '@/ui/KeuzeRij';
 import { PadHeader } from '@/features/navigatie/PadHeader';
 import { PadPagina } from '@/features/navigatie/PadPagina';
 
@@ -59,21 +60,22 @@ export default function ForumScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <ScrollView contentContainerStyle={styles.list}>
-            <View style={styles.chips}>
-              <Chip
-                label={t('steun.tagAlles')}
-                selected={filter === null}
-                onPress={() => setFilter(null)}
+            {/* Onderwerpen als een rij met een streep eronder in plaats van
+                een wolk pillen (feedback Jelle 11-08). */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.onderwerpen}
+            >
+              <KeuzeRij
+                opties={[
+                  { waarde: 'alles', label: t('steun.tagAlles') },
+                  ...TAGS.map((tag) => ({ waarde: tag.key, label: t(tag.labelKey) })),
+                ]}
+                gekozen={filter ?? 'alles'}
+                onKies={(waarde) => setFilter(waarde === 'alles' ? null : (waarde as ForumTag))}
               />
-              {TAGS.map((tag) => (
-                <Chip
-                  key={tag.key}
-                  label={t(tag.labelKey)}
-                  selected={filter === tag.key}
-                  onPress={() => setFilter(tag.key)}
-                />
-              ))}
-            </View>
+            </ScrollView>
 
             {!posts.isLoading && (posts.data ?? []).length === 0 ? (
               <Card>
@@ -95,7 +97,9 @@ export default function ForumScreen() {
                           {post.voornaam}
                           {post.city ? ` · ${post.city}` : ''} · {timeAgo(post.created_at)}
                         </TvzText>
-                        <Pill label={t(TAG_LABEL[post.tag])} />
+                        <TvzText preset="meta" style={styles.onderwerpLabel}>
+                          {t(TAG_LABEL[post.tag])}
+                        </TvzText>
                       </View>
                       <TvzText preset="cardTitle" style={styles.postTitle}>
                         {post.title}
@@ -114,9 +118,13 @@ export default function ForumScreen() {
             ))}
           </ScrollView>
 
-          {/* Typebalk: de gekozen categorie staat als pil vóór het veld. */}
+          {/* Typebalk: het gekozen onderwerp staat als tekst vóór het veld. */}
           <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
-            {filter ? <Pill label={t(TAG_LABEL[filter])} /> : null}
+            {filter ? (
+              <TvzText preset="meta" style={styles.onderwerpLabel}>
+                {t(TAG_LABEL[filter])}
+              </TvzText>
+            ) : null}
             <TextInput
               textContentType="none"
               autoComplete="off"
@@ -144,6 +152,14 @@ export default function ForumScreen() {
 }
 
 const styles = StyleSheet.create({
+  onderwerpen: {
+    paddingRight: spacing.screen,
+    marginBottom: spacing.sm,
+  },
+  onderwerpLabel: {
+    color: colors.primaryMid,
+    textTransform: 'lowercase',
+  },
   safeBg: {
     flex: 1,
     backgroundColor: colors.bg,

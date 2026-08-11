@@ -48,7 +48,7 @@ export function ZwevendeSchuifjes({ pad, actiefRoute }: Props) {
             onPress={() => {
               if (isActief) return;
               void haptics.selectie();
-              router.replace(schuifje.route as never);
+              router.navigate(schuifje.route as never);
             }}
             style={[styles.pil, shadows.card, isActief && styles.pilActief]}
           >

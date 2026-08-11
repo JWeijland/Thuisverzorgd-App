@@ -1,4 +1,5 @@
 import * as Location from 'expo-location';
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -46,6 +47,7 @@ import { useStatusBalk } from '@/lib/statusbalk';
  * buurt-scan of via het knopje op de kringpagina.
  */
 export function BuurtScherm() {
+  const { hulpvraag } = useLocalSearchParams<{ hulpvraag?: string }>();
   useStatusBalk('donker');
   const profile = useProfile();
   const role = profile.data?.role;
@@ -435,7 +437,7 @@ export function BuurtScherm() {
             ownLocation={ownLocation}
           />
         ) : role === 'beheerder' || role === 'hulpvrager' ? (
-          <RequesterFlow ownLocation={ownLocation} />
+          <RequesterFlow ownLocation={ownLocation} directOpenen={hulpvraag === '1'} />
         ) : null}
       </View>
     </View>

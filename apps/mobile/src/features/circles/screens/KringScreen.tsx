@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -15,7 +14,7 @@ import { useTasks } from '@/features/tasks/api';
 import { computeWorkload } from '@/features/tasks/logic';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
-import { colors, gradient, radius, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 import {
   Button,
   Card,
@@ -171,20 +170,19 @@ function KringDetail({ circleId, name }: { circleId: string; name: string }) {
 
   return (
     <View style={styles.safeBg}>
-      {/* Kringkop (handoff, scherm 07): het blauwe blok met de kringnaam en
-          twee tabjes. Berichten is geen eigen schuifje meer, maar zit hier. */}
-      <LinearGradient {...gradient} style={styles.header}>
-        <View style={styles.headerTekst}>
-          <TvzText preset="screenTitle" style={styles.headerTitle}>
-            {name}
-          </TvzText>
-          <TvzText preset="secondary" style={styles.headerSub}>
-            {isBeheerder
-              ? t('kring.subtitel', { aantal: (members.data ?? []).length })
-              : t('kring.subtitelLid', { aantal: (members.data ?? []).length })}
-          </TvzText>
-        </View>
-        <View style={styles.tabjes}>
+      {/* Kringkop: lichte kop met de kringnaam en een vierkante schuif.
+          De tweede gekleurde balk is eruit; de padheader is al gekleurd
+          (feedback Jelle 11-08). */}
+      <View style={styles.kringKop}>
+        <TvzText preset="screenTitle" style={styles.headerTitle}>
+          {name}
+        </TvzText>
+        <TvzText preset="secondary">
+          {isBeheerder
+            ? t('kring.subtitel', { aantal: (members.data ?? []).length })
+            : t('kring.subtitelLid', { aantal: (members.data ?? []).length })}
+        </TvzText>
+        <View style={styles.schuif}>
           {(['leden', 'berichten'] as const).map((tabje) => (
             <Pressable
               key={tabje}
@@ -195,18 +193,18 @@ function KringDetail({ circleId, name }: { circleId: string; name: string }) {
                 void haptics.selectie();
                 setTab(tabje);
               }}
-              style={[styles.tabje, tab === tabje && styles.tabjeActief]}
+              style={[styles.schuifVak, tab === tabje && styles.schuifVakActief]}
             >
               <TvzText
                 preset="meta"
-                style={tab === tabje ? styles.tabjeTekstActief : styles.tabjeTekst}
+                style={tab === tabje ? styles.schuifTekstActief : styles.schuifTekst}
               >
                 {t(tabje === 'leden' ? 'kring.tabLeden' : 'kring.tabBerichten')}
               </TvzText>
             </Pressable>
           ))}
         </View>
-      </LinearGradient>
+      </View>
 
       {tab === 'berichten' ? (
         <ChatView circleId={circleId} roleSuffix={roleSuffix} />
@@ -450,41 +448,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.sm,
   },
-  header: {
+  kringKop: {
     paddingHorizontal: spacing.screen,
     paddingTop: spacing.lg,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.sm,
+    gap: 2,
   },
   headerTitle: {
-    color: colors.white,
     fontSize: 22,
   },
-  headerSub: {
-    color: 'rgba(255,255,255,0.8)',
-  },
-  tabjes: {
+  schuif: {
     flexDirection: 'row',
-    gap: spacing.chipGap,
+    gap: 3,
     marginTop: spacing.md,
+    padding: 3,
+    borderRadius: radius.card,
+    backgroundColor: colors.surfaceAlt,
   },
-  tabje: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 18,
-    minHeight: 34,
+  schuifVak: {
+    flex: 1,
+    minHeight: 38,
+    alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderRadius: radius.row,
   },
-  tabjeActief: {
+  schuifVakActief: {
     backgroundColor: colors.white,
   },
-  tabjeTekst: {
-    color: colors.white,
+  schuifTekst: {
+    color: colors.inkSoft,
   },
-  tabjeTekstActief: {
+  schuifTekstActief: {
     color: colors.primary,
-  },
-  headerTekst: {
-    flex: 1,
   },
   motiefKlein: {
     marginBottom: spacing.sm,

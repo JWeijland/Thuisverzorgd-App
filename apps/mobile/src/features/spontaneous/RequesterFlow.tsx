@@ -30,13 +30,15 @@ export const REQUEST_TYPE_LABEL: Record<RequestType, string> = {
 
 type Props = {
   ownLocation: { lat: number; lon: number } | null;
+  /** Meteen het invulvenster openen, bijv. via /buurt?hulpvraag=1. */
+  directOpenen?: boolean;
 };
 
 /**
  * Directe hulp, kant van de aanvrager (screens 08/09):
  * plaatsen → aanbod → toestaan/afwijzen → onderweg → afronden; annuleren met bericht.
  */
-export function RequesterFlow({ ownLocation }: Props) {
+export function RequesterFlow({ ownLocation, directOpenen = false }: Props) {
   const circle = useMyCircle();
   const profile = useProfile();
   const updateProfile = useUpdateProfile();
@@ -45,7 +47,9 @@ export function RequesterFlow({ ownLocation }: Props) {
   const contact = useRequestContact(myRequest.data?.id, myRequest.data?.status === 'onderweg');
   const actions = useSpontaneousActions();
 
-  const [composeOpen, setComposeOpen] = useState(false);
+  // Kom je hier met een expliciete hulpvraag, dan staat het venster meteen
+  // open: dan hoef je niet nog een keer op dezelfde knop te tikken.
+  const [composeOpen, setComposeOpen] = useState(directOpenen);
   const [type, setType] = useState<RequestType>('boodschappen');
   const [customNote, setCustomNote] = useState('');
   const [address, setAddress] = useState('');

@@ -3,11 +3,9 @@ import { router } from 'expo-router';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   Car,
-  ChevronRight,
   Dog,
   Flower2,
   Hammer,
-  HeartHandshake,
   HeartPulse,
   Scissors,
   ShoppingBasket,
@@ -19,11 +17,14 @@ import {
 import { useDiensten, type Dienst } from '@/features/voorzieningen/api';
 import { euro } from '@/features/voorzieningen/slots';
 import { t } from '@/i18n';
-import { colors, gradient, radius, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 import { TvzText, tvzIn } from '@/ui';
 import Animated from 'react-native-reanimated';
 
-/** Warme foto per dienst (Pexels, zie assets/images/diensten/BRONNEN.md). */
+/** Foto van de buddy-tegel: twee mensen die samen wandelen. */
+const BUDDY_FOTO = require('../../../assets/images/diensten/buddy.jpg');
+
+/** Foto per dienst (Pexels, zie assets/images/diensten/BRONNEN.md). */
 const DIENST_FOTOS: Record<string, number> = {
   kapper: require('../../../assets/images/diensten/kapper.jpg'),
   boodschappen: require('../../../assets/images/diensten/boodschappen.jpg'),
@@ -70,10 +71,14 @@ export function Marktplaats() {
               accessibilityLabel={t('voorzien.buddyTegelTitel')}
               onPress={() => router.push('/dienst/buddy')}
             >
-              <LinearGradient {...gradient} style={styles.buddyTegel}>
-                <View style={styles.buddyIkoon}>
-                  <HeartHandshake color={colors.white} size={26} strokeWidth={2.2} />
-                </View>
+              {/* Een echte foto in plaats van een blauw vlak: je ziet meteen
+                  waar een buddy voor is (feedback Jelle 11-08). */}
+              <View style={styles.buddyTegel}>
+                <Image source={BUDDY_FOTO} style={styles.buddyFoto} resizeMode="cover" />
+                <LinearGradient
+                  colors={['transparent', 'rgba(17,38,64,0.15)', 'rgba(17,38,64,0.82)']}
+                  style={styles.buddySluier}
+                />
                 <View style={styles.buddyTekst}>
                   <View style={styles.buddyKop}>
                     <TvzText preset="cardTitle" style={styles.buddyTitel}>
@@ -89,8 +94,7 @@ export function Marktplaats() {
                     {t('voorzien.buddyTegelTekst')}
                   </TvzText>
                 </View>
-                <ChevronRight color={colors.white} size={22} strokeWidth={2.2} />
-              </LinearGradient>
+              </View>
             </Pressable>
         </Animated.View>
 
@@ -154,19 +158,24 @@ const styles = StyleSheet.create({
     gap: spacing.cardGap,
   },
   buddyTegel: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
+    height: 168,
     borderRadius: radius.tile,
-    padding: spacing.cardPadding,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
   },
-  buddyIkoon: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.card,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  buddyFoto: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  buddySluier: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '72%',
   },
   buddyTekst: {
     flex: 1,

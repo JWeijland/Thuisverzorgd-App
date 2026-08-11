@@ -14,6 +14,7 @@ import { WEEKDAY_SHORT, formatHumanDate, isoWeekDays, toDateString } from '@/lib
 import { haptics } from '@/lib/haptics';
 import { colors, hitTarget, radius, spacing } from '@/theme';
 import { Card, EmptyState, TvzText } from '@/ui';
+import { KeuzeRij } from '@/ui/KeuzeRij';
 import { Button } from '@/ui/Button';
 
 const TYPES: Task['type'][] = [
@@ -78,13 +79,28 @@ export default function TaakPlannen() {
     });
   }
 
+  // Een taak inplannen kan alleen binnen een kring: zonder kring is er
+  // niemand om hem aan te bieden. Dan is spontane hulp de weg (feedback
+  // Jelle 11-08): je vraag komt op de kaart en een vrijwilliger uit de buurt
+  // pakt hem op, ook zonder kring.
   if (!circle.isLoading && !circle.data) {
     return (
       <View style={styles.safe}>
         <PadHeader pad="regelen" actiefRoute="/regelen/planning" kruimels={[t('planner.titel')]} />
         <View style={styles.leeg}>
-          <Card>
-            <EmptyState title={t('rooster.geenKring')} body={t('rooster.geenKringTekst')} />
+          <Card style={styles.leegKaart}>
+            <EmptyState title={t('planner.geenKringTitel')} body={t('planner.geenKringTekst')} bo />
+            <Button
+              label={t('planner.vraagSpontaan')}
+              variant="cta"
+              size="lg"
+              onPress={() => router.replace('/buurt?hulpvraag=1' as never)}
+            />
+            <Button
+              label={t('planner.maakKring')}
+              variant="outline"
+              onPress={() => router.replace('/regelen/kring')}
+            />
           </Card>
         </View>
       </View>
@@ -203,44 +219,29 @@ export default function TaakPlannen() {
           {t('planner.hoeLaat')}
         </TvzText>
         <TijdPicker waarde={tijd} onChange={setTijd} />
-        <View style={styles.pillenRij}>
-          {SNELKEUZES.map((keuze) => (
-            <Pressable
-              key={keuze.tijd}
-              accessibilityRole="button"
-              onPress={() => {
-                void haptics.selectie();
-                setTijd(keuze.tijd);
-              }}
-              style={[styles.pil, tijd === keuze.tijd && styles.pilAan]}
-            >
-              <TvzText preset="meta" style={tijd === keuze.tijd ? styles.pilTekstAan : undefined}>
-                {t(keuze.labelKey)} {keuze.tijd}
-              </TvzText>
-            </Pressable>
-          ))}
+        <View style={styles.keuzes}>
+          <KeuzeRij
+            opties={SNELKEUZES.map((keuze) => ({
+              waarde: keuze.tijd,
+              label: `${t(keuze.labelKey)} ${keuze.tijd}`,
+            }))}
+            gekozen={tijd}
+            onKies={setTijd}
+          />
         </View>
 
         <TvzText preset="meta" style={styles.kop}>
           {t('planner.herhalen')}
         </TvzText>
-        <View style={styles.pillenRij}>
-          {HERHALINGEN.map((optie) => (
-            <Pressable
-              key={optie}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: herhaling === optie }}
-              onPress={() => {
-                void haptics.selectie();
-                setHerhaling(optie);
-              }}
-              style={[styles.pil, herhaling === optie && styles.pilAan]}
-            >
-              <TvzText preset="meta" style={herhaling === optie ? styles.pilTekstAan : undefined}>
-                {t(`planner.herhaling_${optie}`)}
-              </TvzText>
-            </Pressable>
-          ))}
+        <View style={styles.keuzes}>
+          <KeuzeRij
+            opties={HERHALINGEN.map((optie) => ({
+              waarde: optie,
+              label: t(`planner.herhaling_${optie}`),
+            }))}
+            gekozen={herhaling}
+            onKies={setHerhaling}
+          />
         </View>
 
         <TvzText preset="meta" style={styles.kop}>
@@ -322,6 +323,9 @@ const styles = StyleSheet.create({
   leeg: {
     padding: spacing.screen,
   },
+  leegKaart: {
+    gap: spacing.md,
+  },
   voorRij: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -374,6 +378,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.line,
+  },
+  keuzes: {
+    marginTop: spacing.xs,
   },
   raster: {
     flexDirection: 'row',
@@ -431,28 +438,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
   },
   dagNrAan: {
-    color: colors.white,
-  },
-  pillenRij: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.chipGap,
-    marginTop: spacing.cardGap,
-  },
-  pil: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 16,
-    minHeight: 40,
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.line,
-  },
-  pilAan: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  pilTekstAan: {
     color: colors.white,
   },
   wieRij: {

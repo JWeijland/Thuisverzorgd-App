@@ -108,12 +108,26 @@ export function RoosterBeheerder() {
             />
           ) : null}
 
+          {/* Zonder kring kun je geen kringtaak inplannen, maar wel spontane
+              hulp vragen: die pakt een vrijwilliger uit de buurt op, ook
+              zonder kring (feedback Jelle 11-08). */}
           {!circle.isLoading && !circle.data ? (
             <Card style={styles.section}>
-              <EmptyState title={t('rooster.geenKring')} body={t('rooster.geenKringTekst')} bo />
+              <EmptyState
+                title={t('planner.geenKringTitel')}
+                body={t('planner.geenKringTekst')}
+                bo
+              />
               <Button
-                label={t('kring.maakKnop')}
+                label={t('planner.vraagSpontaan')}
                 variant="cta"
+                size="lg"
+                onPress={() => router.navigate('/buurt?hulpvraag=1' as never)}
+              />
+              <Button
+                label={t('planner.maakKring')}
+                variant="outline"
+                style={styles.tweedeKnop}
                 onPress={() => router.navigate('/regelen/kring')}
               />
             </Card>
@@ -220,6 +234,9 @@ export function RoosterBeheerder() {
 }
 
 const styles = StyleSheet.create({
+  tweedeKnop: {
+    marginTop: spacing.sm,
+  },
   bevestiging: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -2,7 +2,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, usePathname } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
@@ -20,7 +21,7 @@ import { t } from '@/i18n';
 import { haptics } from '@/lib/haptics';
 import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, hitTarget, radius, spacing } from '@/theme';
-import { BoPeek } from '@/ui/Bo';
+import { Bo, BoPeek, type BoRol } from '@/ui/Bo';
 import { TvzText } from '@/ui/TvzText';
 
 type Props = {
@@ -72,12 +73,13 @@ export function PadHeader({
   useStatusBalk('licht');
 
   const spoor = [actief ? t(actief.labelKey) : t(padConfig.titelKey), ...kruimels];
-  // Overal een weg terug: als er niets in de stapel zit valt hij terug op
-  // het keuzescherm, zodat je nooit vastzit (wens Jelle 11-08).
+  // De pijl gaat naar de vorige pagina. Alleen als er echt niets achter je
+  // ligt valt hij terug op het keuzescherm, zodat je nooit vastzit.
   const kanTerug = router.canGoBack();
   const toonTerug = terug ?? true;
   const naam = profile.data?.name ?? '';
   const schuifjes = schuifjesVoor(padConfig, profile.data?.role);
+  const { width: breedte } = useWindowDimensions();
   const toonSpoor = toontKruimelspoor(profile.data?.role);
 
   return (
@@ -88,6 +90,13 @@ export function PadHeader({
       style={styles.balk}
       onLayout={(event) => meetHeader(event.nativeEvent.layout.height)}
     >
+      {/* Bo zit zacht in de achtergrond, zodat de balk niet één vlak groen
+          is (wens Jelle 11-08). Hij is bewust laag in contrast: het gaat om
+          de tekst erboven, niet om Bo. */}
+      <View pointerEvents="none" style={styles.boAchtergrond}>
+        <Bo width={150} rol={boRolVoor(pad)} />
+      </View>
+
       <SafeAreaView edges={['top']}>
         <View style={styles.rij1}>
           {toonTerug ? (
@@ -179,7 +188,10 @@ export function PadHeader({
                     if (isActief) return;
                     void haptics.selectie();
                     zetRichting(i);
-                    router.replace(schuifje.route as never);
+                    // navigate en niet replace: zo houdt de terugpijl een
+                    // echte geschiedenis, maar stapelt hij niet eindeloos op
+                    // (een schuifje waar je al was wordt hergebruikt).
+                    router.navigate(schuifje.route as never);
                   }}
                   style={[styles.schuifje, isActief && styles.schuifjeActief]}
                 >
@@ -201,14 +213,52 @@ export function PadHeader({
 
         {children}
       </SafeAreaView>
+
+      {/* Kleine golf onderaan: dezelfde getekende rand als in het brandbook,
+          zodat de balk geen hard vierkant blok is. */}
+      <Svg
+        width={breedte}
+        height={GOLF}
+        viewBox={`0 0 ${breedte} ${GOLF}`}
+        style={styles.golf}
+        pointerEvents="none"
+      >
+        <Path
+          d={`M0 ${GOLF * 0.55} C ${breedte * 0.2} -2, ${breedte * 0.35} ${GOLF}, ${breedte * 0.55} ${GOLF * 0.5} C ${breedte * 0.75} 0, ${breedte * 0.9} ${GOLF * 0.9} ${breedte} ${GOLF * 0.35} L ${breedte} ${GOLF} L 0 ${GOLF} Z`}
+          fill={colors.bg}
+        />
+      </Svg>
     </LinearGradient>
   );
+}
+
+/** Hoogte van de golvende onderrand. */
+const GOLF = 16;
+
+/** Bo kleurt mee met het pad, zoals overal in de app. */
+function boRolVoor(pad: PadId): BoRol {
+  if (pad === 'vrijwilliger') return 'vrijwilliger';
+  if (pad === 'weten') return 'beheerder';
+  return 'vrijwilliger';
 }
 
 const styles = StyleSheet.create({
   balk: {
     paddingHorizontal: spacing.screen,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.md + GOLF,
+    overflow: 'hidden',
+  },
+  boAchtergrond: {
+    position: 'absolute',
+    right: -34,
+    bottom: -46,
+    opacity: 0.14,
+  },
+  golf: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -1,
   },
   rij1: {
     flexDirection: 'row',

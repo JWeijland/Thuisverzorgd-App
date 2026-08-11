@@ -198,7 +198,11 @@
     "vastPersoon": "op naam",
     "openVoorKring": "open voor de kring",
     "ingepland": "{taak} staat in het rooster.",
-    "ingeplandKort": "De taak staat in het rooster."
+    "ingeplandKort": "De taak staat in het rooster.",
+    "geenKringTitel": "Nog geen hulpkring",
+    "geenKringTekst": "Een taak inplannen kan zodra je een kring hebt: dan is er iemand om hem aan te bieden. Nu al hulp nodig? Zet je vraag op de kaart, dan pakt een buddy uit de buurt hem op.",
+    "vraagSpontaan": "Vraag hulp uit de buurt",
+    "maakKring": "Begin een hulpkring"
   },
   "weekplanning": {
     "titel": "Planning maken",
@@ -466,7 +470,8 @@
     "meldenVerstuur": "Verstuur melding",
     "kiesTitel": "Met wie wil je praten?",
     "stelVraagAan": "Stel je vraag aan {naam}",
-    "geenMakelaars": "Er zijn nu geen hulpmakelaars beschikbaar. Probeer het later nog eens."
+    "geenMakelaars": "Er zijn nu geen hulpmakelaars beschikbaar. Probeer het later nog eens.",
+    "helptMetKort": "Helpt met:"
   },
   "opleiding": {
     "titel": "Opleiding",
