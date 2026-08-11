@@ -4,7 +4,12 @@ import type { Task } from '@/features/tasks/api';
 /** Label van een taak: het type, of de vrije invoer bij "Anders". */
 export function taskLabel(task: Pick<Task, 'type' | 'custom_label'>): string {
   if (task.type === 'anders' && task.custom_label) return task.custom_label;
-  return t(`planner.type${task.type.charAt(0).toUpperCase()}${task.type.slice(1)}`);
+  return taakSoortLabel(task.type);
+}
+
+/** Label van een taaksoort ("boodschappen" → "Boodschappen"). */
+export function taakSoortLabel(type: string): string {
+  return t(`planner.type${type.charAt(0).toUpperCase()}${type.slice(1)}`);
 }
 
 export type DayDot = 'open' | 'ingepland' | 'dienst';

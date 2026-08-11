@@ -2,12 +2,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   useCircleMembers,
-  useCreateCircle,
   useMyCircle,
   type Member,
 } from '@/features/circles/api';
@@ -21,15 +19,14 @@ import {
   Button,
   Card,
   EmptyState,
-  GradientHeader,
   RolChip,
-  SectionHeader,
   StatusPill,
-  TextField,
   TvzText,
 } from '@/ui';
-import { tvzIn } from '@/ui/animations';
+import { ChatView } from '@/features/circles/ChatView';
+import { useKringConcept } from '@/features/circles/kringopbouw';
 import { KringMotief } from '@/features/circles/KringMotief';
+import { haptics } from '@/lib/haptics';
 import { useStatusBalk } from '@/lib/statusbalk';
 
 const STATUS_MAP: Record<Member['status'], { key: string; kind: 'success' | 'warn' | 'info' }> = {
@@ -49,7 +46,7 @@ export function KringScreen() {
   if (circle.isLoading) return <View style={styles.safeBg} />;
 
   if (!circle.data) {
-    return isBeheerder ? <KringAanmaken /> : <KringLeeg />;
+    return isBeheerder ? <KringStart /> : <KringLeeg />;
   }
   return (
     <KringDetail
@@ -57,6 +54,29 @@ export function KringScreen() {
       name={circle.data.name}
       linkCode={circle.data.link_code}
     />
+  );
+}
+
+/**
+ * Nog geen kring: de beheerder gaat de zes stappen met Bo in (handoff §3e),
+ * in plaats van het oude scherm waar je alleen een naam invulde.
+ */
+function KringStart() {
+  const concept = useKringConcept();
+  const bezig = !!concept.data && concept.data.stap > 1;
+
+  return (
+    <View style={styles.leegWrap}>
+      <Card>
+        <EmptyState title={t('kring.startTitel')} body={t('kring.startTekst')} bo />
+        <Button
+          label={t(bezig ? 'kring.startVerder' : 'kring.startKnop')}
+          variant="cta"
+          size="lg"
+          onPress={() => router.push('/regelen/kring-opbouwen')}
+        />
+      </Card>
+    </View>
   );
 }
 
@@ -77,99 +97,6 @@ function KringLeeg() {
   );
 }
 
-/**
- * Aanmaakflow. Het beeld is het merkmotief uit het brandbook: buddy's rondom
- * één hulpvrager. Zodra de kring er is draait die kring een slag rond, en
- * schuift de koppelcode eronder in beeld.
- */
-function KringAanmaken() {
-  const createCircle = useCreateCircle();
-  const [name, setName] = useState('');
-  const [created, setCreated] = useState<{ name: string; code: string } | null>(null);
-
-  return (
-    <View style={styles.safeBg}>
-      <GradientHeader
-        title={t(created ? 'kring.gemaaktTitel' : 'kring.maakTitel')}
-        subtitle={t(created ? 'kring.gemaaktTekst' : 'kring.maakUitleg')}
-        wobbel
-      />
-
-      <ScrollView contentContainerStyle={styles.maakLijst} keyboardShouldPersistTaps="handled">
-        <View style={styles.motief}>
-          <KringMotief gevierd={!!created} />
-        </View>
-
-        {created ? (
-          <Animated.View entering={tvzIn} style={styles.maakBlok}>
-            <TvzText preset="screenTitle" style={styles.gemaaktNaam}>
-              {created.name}
-            </TvzText>
-            <Card dashed style={styles.codeCard}>
-              <TvzText preset="meta" style={styles.codeLabel}>
-                {t('kring.koppelTitel')}
-              </TvzText>
-              <TvzText preset="screenTitle" style={styles.code}>
-                {created.code}
-              </TvzText>
-              <TvzText preset="secondary" style={styles.codeUitleg}>
-                {t('kring.koppelUitleg')}
-              </TvzText>
-            </Card>
-            <Button
-              label={t('kring.naarKring')}
-              variant="cta"
-              size="lg"
-              onPress={() => setCreated(null)}
-            />
-          </Animated.View>
-        ) : (
-          <Animated.View entering={tvzIn} style={styles.maakBlok}>
-            <Card style={styles.maakKaart}>
-              <TextField
-                label={t('kring.naamLabel')}
-                placeholder={t('kring.naamPlaceholder')}
-                value={name}
-                onChangeText={setName}
-                returnKeyType="done"
-              />
-              <Button
-                label={createCircle.isPending ? t('algemeen.laden') : t('kring.maakKnop')}
-                variant="cta"
-                size="lg"
-                disabled={createCircle.isPending || name.trim().length < 3}
-                onPress={() =>
-                  createCircle.mutate(name.trim(), {
-                    onSuccess: (result) =>
-                      setCreated({ name: result.name, code: result.link_code }),
-                  })
-                }
-              />
-            </Card>
-
-            <SectionHeader title={t('kring.zoWerktTitel')} />
-            {[1, 2, 3].map((nummer) => (
-              <Card key={nummer} style={styles.stapKaart}>
-                <View style={styles.stapNr}>
-                  <TvzText preset="meta" style={styles.stapNrTekst}>
-                    {nummer}
-                  </TvzText>
-                </View>
-                <View style={styles.stapTekst}>
-                  <TvzText preset="cardTitle" style={styles.stapTitel}>
-                    {t(`kring.stap${nummer}Titel`)}
-                  </TvzText>
-                  <TvzText preset="secondary">{t(`kring.stap${nummer}Tekst`)}</TvzText>
-                </View>
-              </Card>
-            ))}
-          </Animated.View>
-        )}
-      </ScrollView>
-    </View>
-  );
-}
-
 function KringDetail({
   circleId,
   name,
@@ -182,6 +109,12 @@ function KringDetail({
   const profile = useProfile();
   const members = useCircleMembers(circleId);
   const isBeheerder = profile.data?.role === 'beheerder';
+  const [tab, setTab] = useState<'leden' | 'berichten'>('leden');
+
+  const roleSuffix = (senderId: string) => {
+    const lid = (members.data ?? []).find((item) => item.profile_id === senderId);
+    return lid?.member_role === 'beheerder' ? ` (${t('kring.rolBeheerder')})` : '';
+  };
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -192,34 +125,46 @@ function KringDetail({
 
   return (
     <View style={styles.safeBg}>
+      {/* Kringkop (handoff, scherm 07): het blauwe blok met de kringnaam en
+          twee tabjes. Berichten is geen eigen schuifje meer, maar zit hier. */}
       <LinearGradient {...gradient} style={styles.header}>
-        <SafeAreaView edges={['top']}>
-          <View style={styles.headerRij}>
+        <View style={styles.headerTekst}>
+          <TvzText preset="screenTitle" style={styles.headerTitle}>
+            {name}
+          </TvzText>
+          <TvzText preset="secondary" style={styles.headerSub}>
+            {isBeheerder
+              ? t('kring.subtitel', { aantal: (members.data ?? []).length })
+              : t('kring.subtitelLid', { aantal: (members.data ?? []).length })}
+          </TvzText>
+        </View>
+        <View style={styles.tabjes}>
+          {(['leden', 'berichten'] as const).map((tabje) => (
             <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('algemeen.terug')}
-              onPress={() => router.back()}
-              style={styles.terug}
+              key={tabje}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: tab === tabje }}
+              onPress={() => {
+                if (tab === tabje) return;
+                void haptics.selectie();
+                setTab(tabje);
+              }}
+              style={[styles.tabje, tab === tabje && styles.tabjeActief]}
             >
-              <TvzText preset="cardTitle" style={styles.terugPijl}>
-                ←
+              <TvzText
+                preset="meta"
+                style={tab === tabje ? styles.tabjeTekstActief : styles.tabjeTekst}
+              >
+                {t(tabje === 'leden' ? 'kring.tabLeden' : 'kring.tabBerichten')}
               </TvzText>
             </Pressable>
-            <View style={styles.headerTekst}>
-              <TvzText preset="screenTitle" style={styles.headerTitle}>
-                {name}
-              </TvzText>
-              <TvzText preset="secondary" style={styles.headerSub}>
-                {isBeheerder
-                  ? t('kring.subtitel', { aantal: (members.data ?? []).length })
-                  : t('kring.subtitelLid', { aantal: (members.data ?? []).length })}
-              </TvzText>
-            </View>
-          </View>
-        </SafeAreaView>
+          ))}
+        </View>
       </LinearGradient>
 
-      {
+      {tab === 'berichten' ? (
+        <ChatView circleId={circleId} roleSuffix={roleSuffix} />
+      ) : (
         <ScrollView contentContainerStyle={styles.ledenList}>
           <View style={styles.motiefKlein}>
             <KringMotief />
@@ -302,6 +247,14 @@ function KringDetail({
                 size="lg"
                 onPress={() => router.push('/uitnodigen')}
               />
+              {/* Het kleine knopje naar de kaart: sinds de herstructurering is
+                  dit de enige plek waar de volledige buurtkaart nog vandaan
+                  komt voor een beheerder (handoff §3b). */}
+              <Button
+                label={t('kring.boZoektBuddy')}
+                variant="outline"
+                onPress={() => router.push('/buurt')}
+              />
               <Card dashed style={styles.codeCardSmall}>
                 <TvzText preset="meta" style={styles.codeLabel}>
                   {t('kring.koppelTitel')}
@@ -313,7 +266,7 @@ function KringDetail({
             </>
           ) : null}
         </ScrollView>
-      }
+      )}
     </View>
   );
 }
@@ -397,32 +350,36 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: spacing.screen,
+    paddingTop: spacing.lg,
     paddingBottom: spacing.lg,
   },
   headerTitle: {
     color: colors.white,
-    fontSize: 24,
-    marginTop: spacing.sm,
+    fontSize: 22,
   },
   headerSub: {
     color: 'rgba(255,255,255,0.8)',
   },
-  headerRij: {
+  tabjes: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    marginTop: spacing.sm,
+    gap: spacing.chipGap,
+    marginTop: spacing.md,
   },
-  terug: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
+  tabje: {
+    borderRadius: radius.pill,
+    paddingHorizontal: 18,
+    minHeight: 34,
     justifyContent: 'center',
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: 'rgba(255,255,255,0.18)',
   },
-  terugPijl: {
+  tabjeActief: {
+    backgroundColor: colors.white,
+  },
+  tabjeTekst: {
     color: colors.white,
+  },
+  tabjeTekstActief: {
+    color: colors.primary,
   },
   headerTekst: {
     flex: 1,

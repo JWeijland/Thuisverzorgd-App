@@ -1,130 +1,106 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { CalendarClock, ChevronRight, Zap } from 'lucide-react-native';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, ChevronRight, MapPin, Users } from 'lucide-react-native';
 
-import { useProfile } from '@/features/onboarding/useAuth';
+import { PadHeader } from '@/features/navigatie/PadHeader';
 import { t } from '@/i18n';
-import { useStatusBalk } from '@/lib/statusbalk';
-import { colors, gradient, radius, spacing } from '@/theme';
+import { haptics } from '@/lib/haptics';
+import { colors, radius, spacing } from '@/theme';
 import { Bo, TvzBounce, TvzText } from '@/ui';
 
 /**
- * Buddy (handoff voorzieningen): gratis, vrijwillige hulp. Twee wegen:
- * via je eigen hulpkring of met een oproep op de buurtkaart.
+ * Buddy (handoff §3b): gratis, vrijwillige hulp. De vraag is niet meer "via
+ * je kring of via de kaart" maar "hoe vaak heb je hulp nodig". Bij allebei de
+ * antwoorden gaat de app daarna zelf kijken hoeveel hulp er in de buurt is
+ * (de buurt-scan), en pas daarna kies je hoe je verder gaat.
  */
 export default function BuddyScreen() {
-  const profile = useProfile();
-  useStatusBalk('licht');
-  // De beheerder plant kringtaken op de planning-tab; de hulpvrager heeft
-  // een eigen kring-tab.
-  const kringRoute = profile.data?.role === 'hulpvrager' ? '/regelen/kring' : '/regelen/planning';
+  const opties = [
+    {
+      soort: 'wekelijks',
+      icoon: CalendarClock,
+      titel: t('voorzien.buddyWekelijks'),
+      uitleg: t('voorzien.buddyWekelijksUitleg'),
+    },
+    {
+      soort: 'eenmalig',
+      icoon: Zap,
+      titel: t('voorzien.buddyEenmalig'),
+      uitleg: t('voorzien.buddyEenmaligUitleg'),
+    },
+  ] as const;
 
   return (
     <View style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <LinearGradient {...gradient} style={styles.hero}>
-          <SafeAreaView edges={['top']}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={t('algemeen.terug')}
-              onPress={() => router.back()}
-              style={styles.terug}
-            >
-              <ChevronLeft color={colors.white} size={26} strokeWidth={2.4} />
-            </Pressable>
-            <View style={styles.heroInhoud}>
-              <TvzBounce>
-                <Bo width={130} />
-              </TvzBounce>
-              <TvzText preset="screenTitle" style={styles.titel}>
-                {t('voorzien.buddyTitel')}
-              </TvzText>
-              <View style={styles.gratisPill}>
-                <TvzText preset="meta" style={styles.gratisTekst}>
-                  {t('voorzien.gratisPill')}
-                </TvzText>
-              </View>
-            </View>
-          </SafeAreaView>
-        </LinearGradient>
+      <PadHeader
+        pad="regelen"
+        actiefRoute="/regelen/voorzieningen"
+        kruimels={[t('voorzien.buddyTegelTitel')]}
+      />
 
-        <View style={styles.inhoud}>
+      <ScrollView contentContainerStyle={styles.inhoud}>
+        <View style={styles.hero}>
+          <TvzBounce>
+            <Bo width={104} />
+          </TvzBounce>
+          <TvzText preset="screenTitle" style={styles.titel}>
+            {t('voorzien.buddyTitel')}
+          </TvzText>
+          <View style={styles.gratisPill}>
+            <TvzText preset="meta" style={styles.gratisTekst}>
+              {t('voorzien.gratisPill')}
+            </TvzText>
+          </View>
           <TvzText preset="body" style={styles.uitleg}>
             {t('voorzien.buddyUitleg')}
           </TvzText>
-
-          {(
-            [
-              [Users, t('voorzien.buddyKring'), t('voorzien.buddyKringUitleg'), kringRoute],
-              [
-                MapPin,
-                t('voorzien.buddyKaart'),
-                t('voorzien.buddyKaartUitleg'),
-                '/buurt',
-              ],
-            ] as const
-          ).map(([Icon, titel, uitleg, route]) => (
-            <Pressable
-              key={titel}
-              accessibilityRole="button"
-              accessibilityLabel={titel}
-              onPress={() => router.replace(route)}
-              style={styles.optie}
-            >
-              <View style={styles.optieIkoon}>
-                <Icon color={colors.primaryMid} size={24} strokeWidth={2.2} />
-              </View>
-              <View style={styles.optieTekst}>
-                <TvzText preset="cardTitle">{titel}</TvzText>
-                <TvzText preset="secondary">{uitleg}</TvzText>
-              </View>
-              <ChevronRight color={colors.inkFaint} size={22} strokeWidth={2.2} />
-            </Pressable>
-          ))}
         </View>
+
+        {opties.map(({ soort, icoon: Icoon, titel, uitleg }) => (
+          <Pressable
+            key={soort}
+            accessibilityRole="button"
+            accessibilityLabel={titel}
+            onPress={() => {
+              void haptics.stevig();
+              router.push(`/regelen/buurt-scan?soort=${soort}`);
+            }}
+            style={styles.optie}
+          >
+            <View style={styles.optieIkoon}>
+              <Icoon color={colors.primaryMid} size={24} strokeWidth={2.2} />
+            </View>
+            <View style={styles.optieTekst}>
+              <TvzText preset="cardTitle">{titel}</TvzText>
+              <TvzText preset="secondary">{uitleg}</TvzText>
+            </View>
+            <ChevronRight color={colors.inkFaint} size={22} strokeWidth={2.2} />
+          </Pressable>
+        ))}
       </ScrollView>
     </View>
   );
 }
-
-const HERO_RADIUS = 28;
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.bg,
   },
-  scroll: {
+  inhoud: {
+    padding: spacing.screen,
+    gap: spacing.cardGap,
     paddingBottom: spacing.xxl,
   },
   hero: {
-    borderBottomLeftRadius: HERO_RADIUS,
-    borderBottomRightRadius: HERO_RADIUS,
-    paddingHorizontal: spacing.screen,
-    paddingBottom: spacing.xxl,
-  },
-  terug: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.18)',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: spacing.sm,
-  },
-  heroInhoud: {
-    alignItems: 'center',
-    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
   },
   titel: {
-    color: colors.white,
-    fontSize: 24,
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
   gratisPill: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.successBg,
     borderRadius: radius.pill,
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -133,12 +109,9 @@ const styles = StyleSheet.create({
   gratisTekst: {
     color: colors.successText,
   },
-  inhoud: {
-    padding: spacing.screen,
-    gap: spacing.cardGap,
-  },
   uitleg: {
-    marginBottom: spacing.sm,
+    textAlign: 'center',
+    marginTop: spacing.md,
   },
   optie: {
     flexDirection: 'row',

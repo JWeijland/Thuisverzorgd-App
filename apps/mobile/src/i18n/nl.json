@@ -180,7 +180,8 @@
     "typeAnders": "Anders",
     "titel": "Taak inplannen",
     "uitleg": "Zet hem in de week, de buddy’s pakken hem op",
-    "rodeDraad": "De taak komt in de week te staan; de kring en je naaste zien hem meteen."
+    "rodeDraad": "De taak komt in de week te staan; de kring en je naaste zien hem meteen.",
+    "typeKoken": "Koken of eten"
   },
   "weekplanning": {
     "titel": "Planning maken",
@@ -248,7 +249,14 @@
     "bekijkKaart": "Bekijk de kaart",
     "rolUitlegBeheerder": "Regelt en plant: het rooster, de buddy’s en de boekingen.",
     "rolUitlegVrijwilliger": "Komt langs, gratis en vrijwillig.",
-    "rolUitlegHulpvrager": "Hier draait de kring om: ziet wie er komt en kan zelf hulp vragen."
+    "rolUitlegHulpvrager": "Hier draait de kring om: ziet wie er komt en kan zelf hulp vragen.",
+    "tabLeden": "Leden",
+    "tabBerichten": "Berichten",
+    "boZoektBuddy": "Laat Bo een buddy in de buurt zoeken",
+    "startTitel": "Nog geen hulpkring",
+    "startTekst": "In zes korte stappen zet je samen met Bo een kring op rond de persoon voor wie je zorgt.",
+    "startKnop": "Begin met Bo",
+    "startVerder": "Ga verder waar je gebleven was"
   },
   "aanvraag": {
     "titelAanvraag": "Aanvraag voor de kring",
@@ -683,7 +691,11 @@
     "annuleren": "Annuleer boeking",
     "annulerenUitleg": "Gratis tot 24 uur vooraf. De aanbieder krijgt bericht.",
     "annulerenBevestig": "Ja, annuleer",
-    "annulerenTeLaat": "Annuleren kan tot 24 uur vooraf. Komt het echt niet uit? Vraag de hulpmakelaar om mee te denken."
+    "annulerenTeLaat": "Annuleren kan tot 24 uur vooraf. Komt het echt niet uit? Vraag de hulpmakelaar om mee te denken.",
+    "buddyWekelijks": "Elke week, vast moment",
+    "buddyWekelijksUitleg": "Je bouwt een hulpkring op die het samen draagt.",
+    "buddyEenmalig": "Eenmalig, nu of binnenkort",
+    "buddyEenmaligUitleg": "Je zet je vraag op de kaart en de buurt reageert."
   },
   "rolchip": {
     "beheerder": "beheerder",
@@ -848,5 +860,51 @@
     "chatNu": "Chat nu",
     "videobel": "Videobel",
     "videobelVraag": "Ik zou graag videobellen. Wanneer schikt het?"
+  },
+  "buurtScan": {
+    "kruimel": "In de buurt",
+    "bezig": "Bo kijkt in je buurt...",
+    "gevonden": "In jouw buurt zijn {buddys} buddy’s actief, verdeeld over {kringen} hulpkringen",
+    "geenBuddys": "Nog geen buddy’s gevonden bij jou in de buurt",
+    "uitlegWekelijks": "Samen met Bo zet je in zes stappen een kring op. Dat duurt een paar minuten.",
+    "uitlegEenmalig": "Je vraag komt op de kaart te staan. Buddy’s in de buurt zien hem meteen.",
+    "bouwKring": "Bouw mijn hulpkring op",
+    "zetOpKaart": "Zet mijn hulpvraag op de kaart"
+  },
+  "kringopbouw": {
+    "kruimel": "Kring opbouwen",
+    "stapVan": "Stap {stap} van {totaal}",
+    "tip1": "Fijn dat je dit oppakt. We beginnen bij de persoon om wie het gaat.",
+    "tip2": "Buddy’s zien alleen de wijk, nooit het huisnummer.",
+    "tip3": "Kies gerust ruim. Je kunt later altijd taken toevoegen of weghalen.",
+    "tip4": "Hiermee weet de kring wanneer het schikt, zonder te hoeven vragen.",
+    "tip5": "Een kring van twee is ook een kring. Begin klein.",
+    "tip6": "Ik heb een week voor je klaargezet. Probeer hem uit en pas gerust aan.",
+    "titel1": "Voor wie regel je hulp?",
+    "titel2": "Waar woont {naam}?",
+    "titel3": "Wat is er nodig?",
+    "titel4": "Wanneer schikt het?",
+    "titel5": "Wie vraag je erbij?",
+    "titel6": "De proefweek",
+    "naamLabel": "Naam",
+    "naamPlaceholder": "Bijv. Riet Jansen",
+    "relatieLabel": "Wie is dit voor jou?",
+    "relatiePlaceholder": "Bijv. mijn moeder",
+    "adresLabel": "Adres",
+    "adresPlaceholder": "Straat en huisnummer",
+    "thuisLabel": "Hoe woont hij of zij?",
+    "thuisPlaceholder": "Bijv. alleen, benedenwoning, met traplift",
+    "privacy": "Buddy’s in de buurt zien alleen de wijk. Het adres krijgen ze pas als je iemand toelaat tot de kring.",
+    "dagdelen": "Welke dagdelen schikken?",
+    "dagdeelochtend": "Ochtend",
+    "dagdeelmiddag": "Middag",
+    "dagdeelavond": "Avond",
+    "goedOmTeWeten": "Goed om te weten",
+    "goedOmTeWetenPlaceholder": "Bijv. slechthorend, houdt van tuinieren, hond in huis",
+    "uitnodigenUitleg": "Nodig mensen uit die je al kent, of laat Bo kijken wie er in de buurt wil helpen. Overslaan mag ook; je kunt later altijd iemand toevoegen.",
+    "proefweekUitleg": "Dit is het voorstel van Bo. De kring probeert deze week uit en mag taken onderling ruilen. Na zeven dagen vraagt Bo of het zo werkte.",
+    "startProefweek": "Start de proefweek",
+    "kringnaam": "Kring van {naam}",
+    "diegene": "diegene"
   }
 }
