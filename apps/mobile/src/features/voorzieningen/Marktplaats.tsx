@@ -22,8 +22,7 @@ import { useDiensten, type Dienst } from '@/features/voorzieningen/api';
 import { euro } from '@/features/voorzieningen/slots';
 import { t } from '@/i18n';
 import { colors, gradient, radius, spacing } from '@/theme';
-import { EmptyState, GradientHeader, TvzText, tvzIn } from '@/ui';
-import { TerugKop } from '@/ui/TerugKop';
+import { EmptyState, TvzText, tvzIn } from '@/ui';
 import Animated from 'react-native-reanimated';
 
 /** Warme foto per dienst (Pexels, zie assets/images/diensten/BRONNEN.md). */
@@ -52,13 +51,12 @@ const DIENST_ICONS: Record<string, LucideIcon> = {
   klusjesman: Hammer,
 };
 
-type Props = {
-  /** Als losse pagina (hulpvrager): kop met terugpijl in plaats van de gradient. */
-  terug?: boolean;
-};
-
-/** De marktplaats met hulp aan huis (laag 3): kiezen en doorklikken naar boeken. */
-export function Marktplaats({ terug = false }: Props) {
+/**
+ * Voorzieningen (handoff, scherm 03): het raster met bijna vierkante blokjes.
+ * De kop is nu de PadHeader van het hulp-pad, dus dit scherm begint direct
+ * met de tegels: Buddy uitgelicht en gratis, daarna de betaalde diensten.
+ */
+export function Marktplaats() {
   const diensten = useDiensten();
   const [zoek, setZoek] = useState('');
 
@@ -74,7 +72,7 @@ export function Marktplaats({ terug = false }: Props) {
   const buddyZichtbaar = !term || t('voorzien.buddyTegelTitel').toLowerCase().includes(term);
 
   const zoekVeld = (
-    <View style={[styles.zoekVeld, terug && styles.zoekVeldLicht]}>
+    <View style={[styles.zoekVeld, styles.zoekVeldLicht]}>
       <Search color={colors.inkFaint} size={18} strokeWidth={2.2} />
       <TextInput
         value={zoek}
@@ -90,16 +88,7 @@ export function Marktplaats({ terug = false }: Props) {
 
   return (
     <View style={styles.safe}>
-      {terug ? (
-        <>
-          <TerugKop titel={t('voorzien.titel')} sub={t('voorzien.betaalNa')} />
-          <View style={styles.zoekLos}>{zoekVeld}</View>
-        </>
-      ) : (
-        <GradientHeader title={t('voorzien.titel')} subtitle={t('voorzien.subtitel')} wobbel bo>
-          {zoekVeld}
-        </GradientHeader>
-      )}
+      <View style={styles.zoekLos}>{zoekVeld}</View>
 
       <ScrollView contentContainerStyle={styles.lijst}>
         {buddyZichtbaar ? (
@@ -222,7 +211,7 @@ const styles = StyleSheet.create({
   },
   lijst: {
     padding: spacing.screen,
-    paddingBottom: 110,
+    paddingBottom: spacing.xxl,
     gap: spacing.cardGap,
   },
   buddyTegel: {

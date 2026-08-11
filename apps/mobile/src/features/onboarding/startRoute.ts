@@ -14,9 +14,9 @@ export function getStartRoute(hasSession: boolean, profile: ProfileGate): string
   // iemand), daarna kiest de gebruiker een rol.
   if (!profile || profile.role === null) return '/verhaal';
   if (profile.role === 'vrijwilliger' && !profile.id_verified) return '/id-en-foto';
-  // Ontwerp 4.0: de beheerder start op Steun (laag 1, het hart van de app);
-  // buddy en hulpvrager starten op hun eigen invulling van de rooster-tab
-  // (Taken respectievelijk Vandaag).
-  if (profile.role === 'beheerder') return '/steun';
-  return '/rooster';
+  // De tabbalk is weg (handoff-voorzieningen): beheerder en hulpvrager kiezen
+  // eerst een pad, de vrijwilliger slaat dat keuzescherm over en landt direct
+  // op de kaart met hulpvragen.
+  if (profile.role === 'vrijwilliger') return '/vrijwilliger/buurt';
+  return '/pad';
 }

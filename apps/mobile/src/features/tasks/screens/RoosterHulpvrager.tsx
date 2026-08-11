@@ -13,7 +13,8 @@ import { useBoekingen } from '@/features/voorzieningen/api';
 import { t } from '@/i18n';
 import { formatHumanDate, formatTime, greetingKey, isoWeekDays, toDateString } from '@/lib/dates';
 import { colors, radius, shadows, spacing } from '@/theme';
-import { Button, Card, EmptyState, GradientHeader, PulseDot, TvzText } from '@/ui';
+import { Button, Card, EmptyState, PulseDot, TvzText } from '@/ui';
+import { PaginaKop } from '@/ui/PaginaKop';
 
 /**
  * Rooster · hulpvrager (screen 24): grote weergave. "Anna is nu bij je" met
@@ -62,14 +63,12 @@ export function RoosterHulpvrager() {
 
   return (
     <View style={styles.safe}>
-      {/* Zelfde kop als bij de vrijwilliger en de beheerder: golvende onderrand
-          en het groene streepje. De uitlogknop hangt hier, want dit scherm
-          heeft bewust geen profieltab. */}
-      <GradientHeader
-        title={t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
-        subtitle={formatHumanDate(now)}
-        wobbel
-        right={<UitlogKnop />}
+      {/* Handoff, scherm 05: begroeting en datum op de lichte pagina; de
+          gekleurde balk erboven is de PadHeader. */}
+      <PaginaKop
+        titel={t(`rooster.${greetingKey(now.getHours())}`, { naam: firstName })}
+        sub={formatHumanDate(now)}
+        rechts={<UitlogKnop />}
       />
       <ScrollView contentContainerStyle={styles.container}>
         {current?.claimer ? (
@@ -174,7 +173,7 @@ export function RoosterHulpvrager() {
               label={t('rooster.vraagHulp')}
               variant="cta"
               size="lg"
-              onPress={() => router.navigate('/voorzien')}
+              onPress={() => router.navigate('/regelen/voorzieningen')}
             />
           </Card>
         ) : null}
@@ -187,7 +186,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   container: {
     padding: spacing.screen,
-    paddingBottom: 110,
+    paddingBottom: spacing.xxl,
   },
   nowCard: {
     backgroundColor: colors.white,

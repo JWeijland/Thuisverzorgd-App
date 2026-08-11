@@ -83,7 +83,7 @@ export default function VulDeWeekScreen() {
           <Button
             label={t('vulWeek.dienstKnop')}
             variant="outline"
-            onPress={() => router.navigate('/voorzien')}
+            onPress={() => router.navigate('/regelen/voorzieningen')}
             style={styles.knop}
           />
         </Card>

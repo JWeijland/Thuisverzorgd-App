@@ -9,10 +9,25 @@ import { parseDateString } from '@/lib/dates';
 import { supabase } from '@/lib/supabase';
 
 /** tvz://rooster → /rooster (voor navigatie vanuit een melding). */
+/**
+ * De routes zijn met de herstructurering verhuisd (geen tabbalk meer), maar
+ * meldingen die al verstuurd zijn en de edge functions gebruiken nog de oude
+ * namen. Die vertalen we hier, zodat oude pushberichten blijven werken.
+ */
+const OUDE_ROUTES: Record<string, string> = {
+  rooster: '/regelen/planning',
+  steun: '/weten/wegwijzer',
+  kring: '/regelen/kring',
+  voorzien: '/regelen/voorzieningen',
+  forum: '/weten/forum',
+  hulpmakelaar: '/weten/zorgmakelaars',
+  'wegwijzer-lijst': '/weten/wegwijzer',
+};
+
 export function deeplinkToPath(deeplink: string | null | undefined): string {
   if (!deeplink) return '/inbox';
   const path = deeplink.replace(/^tvz:\/\//, '').replace(/^\/+/, '');
-  return `/${path}`;
+  return OUDE_ROUTES[path] ?? `/${path}`;
 }
 
 Notifications.setNotificationHandler({

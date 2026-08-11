@@ -806,5 +806,47 @@
     "rolHulpvragerTekst": "Hier draait de kring om: ziet wie er komt en kan zelf om hulp vragen.",
     "rodeDraad": "Alles wat jullie regelen, gratis of betaald, komt samen in één week.",
     "deAppIn": "De app in"
+  },
+  "paden": {
+    "keuzeTitel": "Waar kan Bo je mee helpen?",
+    "keuzeSub": "Kies een kant. Je kunt altijd wisselen via Bo bovenin.",
+    "gegevens": "Mijn gegevens en instellingen",
+    "naarKeuze": "Terug naar de keuze",
+    "naarProfiel": "Mijn gegevens",
+    "weten": {
+      "titel": "Ik wil het weten",
+      "sub": "Wegwijzer, forum en zorgmakelaars",
+      "uitleg": "De wegwijzer met alles over zorgen voor een naaste, het forum met lotgenoten, en zorgmakelaars die met je meedenken.",
+      "wegwijzer": "Wegwijzer",
+      "forum": "Forum",
+      "zorgmakelaars": "Zorgmakelaars"
+    },
+    "regelen": {
+      "titel": "Ik wil hulp regelen",
+      "sub": "Buddy’s, voorzieningen en je kring",
+      "uitleg": "Buddy’s uit de buurt in je hulpkring, en voorzieningen als kapper of tuinman direct in de planning.",
+      "voorzieningen": "Voorzieningen",
+      "planning": "Mijn planning",
+      "kring": "Mijn kring"
+    },
+    "vrijwilliger": {
+      "titel": "Helpen in de buurt",
+      "sub": "Je taken, de kaart en steun voor jezelf",
+      "uitleg": "Zie wie er hulp zoekt bij jou in de buurt en pak op wat jou past.",
+      "buurt": "In de buurt",
+      "taken": "Mijn taken",
+      "steun": "Steun"
+    }
+  },
+  "wegwijzerPad": {
+    "vandaag": "Vandaag:",
+    "vandaagRegel": "{naam} komt om {tijd} voor {taak}",
+    "naarRooster": "Rooster →",
+    "heroTitel": "Kom je er even niet uit?",
+    "heroOnline1": "1 hulpmakelaar uit je buurt is online",
+    "heroOnline": "{aantal} hulpmakelaars uit je buurt zijn online",
+    "chatNu": "Chat nu",
+    "videobel": "Videobel",
+    "videobelVraag": "Ik zou graag videobellen. Wanneer schikt het?"
   }
 }

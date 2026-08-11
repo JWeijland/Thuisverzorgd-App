@@ -55,7 +55,7 @@ export default function BuddyVragenScreen() {
             label={t('buddyVragen.klaarKnop')}
             variant="cta"
             size="lg"
-            onPress={() => router.navigate('/rooster')}
+            onPress={() => router.navigate('/regelen/planning')}
             style={styles.klaarKnop}
           />
         </View>

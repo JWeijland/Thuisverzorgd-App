@@ -64,7 +64,7 @@ export function SteunHub() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={t('steunHub.weekTitel')}
-              onPress={() => router.navigate('/rooster')}
+              onPress={() => router.navigate('/regelen/planning')}
               style={styles.weekKop}
             >
               <TvzText preset="cardTitle">{t('steunHub.weekTitel')}</TvzText>
@@ -88,7 +88,7 @@ export function SteunHub() {
 
         <SectionHeader title={t('steunHub.kiesTitel')} />
 
-        <Pressable accessibilityRole="button" onPress={() => router.push('/wegwijzer-lijst')}>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/weten/wegwijzer')}>
           <Card style={styles.tegel}>
             <View style={[styles.tegelIcoon, { backgroundColor: colors.tintBlue }]}>
               <Compass color={colors.primaryMid} size={22} strokeWidth={2.2} />
@@ -101,7 +101,7 @@ export function SteunHub() {
           </Card>
         </Pressable>
 
-        <Pressable accessibilityRole="button" onPress={() => router.push('/hulpmakelaar')}>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/weten/zorgmakelaars')}>
           <Card style={styles.tegel}>
             <View style={[styles.tegelIcoon, { backgroundColor: '#EFE6F7' }]}>
               <HeartHandshake color="#6B4E93" size={22} strokeWidth={2.2} />
@@ -119,7 +119,7 @@ export function SteunHub() {
           </Card>
         </Pressable>
 
-        <Pressable accessibilityRole="button" onPress={() => router.push('/forum')}>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/weten/forum')}>
           <Card style={styles.tegel}>
             <View style={[styles.tegelIcoon, { backgroundColor: colors.warnBg }]}>
               <MessagesSquare color={colors.warnText} size={22} strokeWidth={2.2} />

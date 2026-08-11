@@ -172,7 +172,7 @@ export function TaskBanner() {
           accessibilityRole="button"
           onPress={() => {
             close();
-            router.navigate('/rooster');
+            router.navigate('/regelen/planning');
           }}
           hitSlop={8}
           style={styles.roosterLink}

@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import {
   Bookmark,
@@ -45,7 +45,7 @@ function openModule(id: string) {
  */
 export function vraagAanMakelaar(vraag?: string) {
   router.push({
-    pathname: '/hulpmakelaar',
+    pathname: '/weten/zorgmakelaars',
     params: vraag ? { vraag } : {},
   });
 }
@@ -56,7 +56,7 @@ export function vraagAanMakelaar(vraag?: string) {
  * "mantelwoning" en krijgt het onderwerp dat daarover gaat. Vind je het
  * antwoord niet, dan stap je onderaan door naar een hulpmakelaar.
  */
-export function WegwijzerLijst() {
+export function WegwijzerLijst({ kop }: { kop?: ReactNode }) {
   const [term, setTerm] = useState('');
   const [thema, setThema] = useState<string | null>(null);
   const zoekterm = useDebounced(term);
@@ -124,6 +124,9 @@ export function WegwijzerLijst() {
       </View>
 
       <ScrollView contentContainerStyle={styles.list} keyboardShouldPersistTaps="handled">
+        {/* Alles boven de kennisbank (vandaag-strip, makelaar-blok) scrolt mee,
+            zodat de pagina één doorlopend geheel blijft. */}
+        {!zoekt && kop ? kop : null}
         {zoekt ? (
           <>
             {(suggesties.data ?? []).length > 0 ? (

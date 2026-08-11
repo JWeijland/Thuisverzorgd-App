@@ -24,7 +24,7 @@ export function LerenScherm() {
       />
       <OpleidingenLijst
         footer={
-          <Pressable accessibilityRole="button" onPress={() => router.push('/forum')}>
+          <Pressable accessibilityRole="button" onPress={() => router.push('/weten/forum')}>
             <Card style={styles.forumTegel}>
               <View style={styles.forumIcoon}>
                 <MessagesSquare color={colors.warnText} size={22} strokeWidth={2.2} />

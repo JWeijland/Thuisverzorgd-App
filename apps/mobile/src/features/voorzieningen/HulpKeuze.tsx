@@ -9,7 +9,7 @@ import { Card, GradientHeader, Pill, TvzText } from '@/ui';
 /**
  * Hulp-tab van de hulpvrager (ontwerp 4.0): één vraag per scherm, op
  * ouderen-maat. Kies gratis een buddy of betaalde hulp aan huis; de
- * flows zelf zijn eigen pagina's (/buddy-vragen en /diensten).
+ * flows zelf zijn eigen pagina's (/buddy-vragen en /regelen/voorzieningen).
  */
 export function HulpKeuze() {
   return (
@@ -49,7 +49,7 @@ export function HulpKeuze() {
           </Card>
         </Pressable>
 
-        <Pressable accessibilityRole="button" onPress={() => router.push('/diensten')}>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/regelen/voorzieningen')}>
           <Card style={[styles.kaart, styles.kaartDienst]}>
             <View style={styles.kop}>
               <View style={[styles.icoon, styles.icoonDienst]}>

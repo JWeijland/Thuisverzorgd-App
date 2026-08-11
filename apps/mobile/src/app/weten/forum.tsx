@@ -16,10 +16,9 @@ import { useForumActions, usePosts, type ForumTag } from '@/features/forum/api';
 import { TAGS, TAG_LABEL } from '@/features/forum/tags';
 import { t } from '@/i18n';
 import { useKeyboardOpen } from '@/lib/keyboard';
-import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, radius, spacing } from '@/theme';
 import { Card, Chip, EmptyState, Pill, TvzText } from '@/ui';
-import { TerugKop } from '@/ui/TerugKop';
+import { PadHeader } from '@/features/navigatie/PadHeader';
 
 function timeAgo(iso: string): string {
   const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
@@ -30,9 +29,8 @@ function timeAgo(iso: string): string {
   return `${Math.floor(hours / 24)} d`;
 }
 
-/** Forum als eigen pagina (laag 1): vragen lezen en stellen, één functie. */
+/** Forum: het tweede schuifje van het weet-pad. Vragen lezen en stellen. */
 export default function ForumScreen() {
-  useStatusBalk('donker');
   const [filter, setFilter] = useState<ForumTag | null>(null);
   const [quick, setQuick] = useState('');
   const keyboardOpen = useKeyboardOpen();
@@ -53,7 +51,7 @@ export default function ForumScreen() {
 
   return (
     <View style={styles.safeBg}>
-      <TerugKop titel={t('steun.tabForum')} sub={t('steun.subtitel')} />
+      <PadHeader pad="weten" />
       <KeyboardAvoidingView
         style={styles.fill}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

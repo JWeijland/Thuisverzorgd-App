@@ -36,12 +36,12 @@ export default function BevestigdScreen() {
           label={t('voorzien.naarRooster')}
           variant="cta"
           size="lg"
-          onPress={() => router.replace('/(tabs)/rooster')}
+          onPress={() => router.replace('/regelen/planning')}
         />
         <Button
           label={t('voorzien.verderKijken')}
           variant="outline"
-          onPress={() => router.replace('/(tabs)/voorzien')}
+          onPress={() => router.replace('/regelen/voorzieningen')}
         />
       </View>
     </SafeAreaView>

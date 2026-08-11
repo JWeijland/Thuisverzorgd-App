@@ -4,7 +4,6 @@ import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useMyCircle } from '@/features/circles/api';
 import { KringBalk } from '@/features/circles/KringBalk';
 import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
-import { EigenFotoKnop } from '@/features/avatars/EigenFotoKnop';
 import { InboxBell } from '@/features/notifications/InboxBell';
 import { cancelTaskReminder, scheduleTaskReminder } from '@/features/notifications/push';
 import { useTaskRpc, useTasks, type Task } from '@/features/tasks/api';
@@ -20,10 +19,10 @@ import {
   Button,
   Card,
   EmptyState,
-  GradientHeader,
   SectionHeader,
   TvzText,
 } from '@/ui';
+import { PaginaKop } from '@/ui/PaginaKop';
 
 /** Rooster · vrijwilliger (screen 19): teller, weekstrip, aannemen en afronden met logboekje. */
 export function RoosterVrijwilliger() {
@@ -67,27 +66,22 @@ export function RoosterVrijwilliger() {
 
   return (
     <View style={styles.safe}>
-      <GradientHeader
-        title={`Hoi ${firstName}.`}
-        subtitle={formatHumanDate(now)}
-        wobbel
-        right={
-          <View style={styles.headerActies}>
+      <PaginaKop
+        titel={`Hoi ${firstName}.`}
+        sub={formatHumanDate(now)}
+        rechts={
+          <>
             {circle.data ? <KringBerichtenKnop circleId={circle.data.id} /> : null}
             <InboxBell />
-            <EigenFotoKnop />
-          </View>
+          </>
         }
-      >
-        {circle.data ? (
-          <View style={styles.kringBalkWrap}>
-            <KringBalk circleId={circle.data.id} name={circle.data.name} onDark />
-          </View>
-        ) : null}
-      </GradientHeader>
+      />
       <ScrollView contentContainerStyle={styles.container}>
         {circle.data ? (
           <>
+            <View style={styles.kringBalkWrap}>
+              <KringBalk circleId={circle.data.id} name={circle.data.name} />
+            </View>
             {geholpen > 0 ? (
               <Card style={styles.teller}>
                 <TvzText preset="secondary" style={styles.tellerTekst}>
@@ -196,15 +190,10 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   container: {
     padding: spacing.screen,
-    paddingBottom: 110,
-  },
-  headerActies: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
+    paddingBottom: spacing.xxl,
   },
   kringBalkWrap: {
-    marginTop: spacing.md,
+    marginBottom: spacing.md,
   },
   list: {
     marginTop: spacing.md,

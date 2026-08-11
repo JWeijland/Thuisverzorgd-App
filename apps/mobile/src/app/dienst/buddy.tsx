@@ -19,7 +19,7 @@ export default function BuddyScreen() {
   useStatusBalk('licht');
   // De beheerder plant kringtaken op de planning-tab; de hulpvrager heeft
   // een eigen kring-tab.
-  const kringRoute = profile.data?.role === 'hulpvrager' ? '/(tabs)/kring' : '/(tabs)/rooster';
+  const kringRoute = profile.data?.role === 'hulpvrager' ? '/regelen/kring' : '/regelen/planning';
 
   return (
     <View style={styles.safe}>
@@ -62,7 +62,7 @@ export default function BuddyScreen() {
                 MapPin,
                 t('voorzien.buddyKaart'),
                 t('voorzien.buddyKaartUitleg'),
-                '/(tabs)/buurt',
+                '/buurt',
               ],
             ] as const
           ).map(([Icon, titel, uitleg, route]) => (

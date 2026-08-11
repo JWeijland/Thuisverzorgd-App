@@ -1,104 +1,95 @@
 import { create } from 'zustand';
 
+import type { PadId } from '@/features/navigatie/paden';
+
 export type WalkthroughRole = 'beheerder' | 'vrijwilliger' | 'hulpvrager';
 
 export type WalkthroughStep = {
   titleKey: string;
   textKey: string;
-  /** Tabnaam waar het wolkje naar wijst; de positie hangt af van de rol. */
-  tab: string;
+  /** Het pad waar deze stap in speelt; bepaalt de kleur van de header. */
+  pad: PadId;
+  /** Route van het schuifje waar het wolkje naar wijst. */
   route: string;
 };
 
 /**
- * Rondleiding per rol (ontwerp 4.0): de wolkjes volgen de tabvolgorde van de
- * rol, beginnend op het startscherm. Beheerder 5 stappen, vrijwilliger 4,
- * hulpvrager 4. Elke stap wijst naar een tab die deze rol écht heeft.
- * Overslaan kan altijd (eis handoff).
+ * Rondleiding per rol. De tabbalk bestaat niet meer, dus de wolkjes wijzen
+ * nu omhoog naar de schuifjes in de header. Beheerder en hulpvrager beginnen
+ * bij het weet-pad en eindigen in het regel-pad; de vrijwilliger blijft in
+ * zijn eigen drie schuifjes. Overslaan kan altijd (eis handoff).
  */
 export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
   beheerder: [
     {
       titleKey: 'rondleiding.beheerder4Titel',
       textKey: 'rondleiding.beheerder4Tekst',
-      tab: 'steun',
-      route: '/steun',
-    },
-    {
-      titleKey: 'rondleiding.beheerder1Titel',
-      textKey: 'rondleiding.beheerder1Tekst',
-      tab: 'rooster',
-      route: '/rooster',
-    },
-    {
-      titleKey: 'rondleiding.beheerder2Titel',
-      textKey: 'rondleiding.beheerder2Tekst',
-      tab: 'buurt',
-      route: '/buurt',
+      pad: 'weten',
+      route: '/weten/wegwijzer',
     },
     {
       titleKey: 'rondleiding.beheerderVoorzienTitel',
       textKey: 'rondleiding.beheerderVoorzienTekst',
-      tab: 'voorzien',
-      route: '/voorzien',
+      pad: 'regelen',
+      route: '/regelen/voorzieningen',
     },
     {
-      titleKey: 'rondleiding.beheerder5Titel',
-      textKey: 'rondleiding.beheerder5Tekst',
-      tab: 'profiel',
-      route: '/profiel',
+      titleKey: 'rondleiding.beheerder1Titel',
+      textKey: 'rondleiding.beheerder1Tekst',
+      pad: 'regelen',
+      route: '/regelen/planning',
+    },
+    {
+      titleKey: 'rondleiding.beheerder2Titel',
+      textKey: 'rondleiding.beheerder2Tekst',
+      pad: 'regelen',
+      route: '/regelen/kring',
     },
   ],
   vrijwilliger: [
     {
-      titleKey: 'rondleiding.vrijwilliger1Titel',
-      textKey: 'rondleiding.vrijwilliger1Tekst',
-      tab: 'rooster',
-      route: '/rooster',
-    },
-    {
       titleKey: 'rondleiding.vrijwilliger2Titel',
       textKey: 'rondleiding.vrijwilliger2Tekst',
-      tab: 'buurt',
-      route: '/buurt',
+      pad: 'vrijwilliger',
+      route: '/vrijwilliger/buurt',
+    },
+    {
+      titleKey: 'rondleiding.vrijwilliger1Titel',
+      textKey: 'rondleiding.vrijwilliger1Tekst',
+      pad: 'vrijwilliger',
+      route: '/vrijwilliger/taken',
     },
     {
       titleKey: 'rondleiding.vrijwilliger3Titel',
       textKey: 'rondleiding.vrijwilliger3Tekst',
-      tab: 'steun',
-      route: '/steun',
-    },
-    {
-      titleKey: 'rondleiding.vrijwilliger4Titel',
-      textKey: 'rondleiding.vrijwilliger4Tekst',
-      tab: 'profiel',
-      route: '/profiel',
+      pad: 'vrijwilliger',
+      route: '/vrijwilliger/steun',
     },
   ],
   hulpvrager: [
     {
       titleKey: 'rondleiding.hulpvrager1Titel',
       textKey: 'rondleiding.hulpvrager1Tekst',
-      tab: 'rooster',
-      route: '/rooster',
+      pad: 'regelen',
+      route: '/regelen/planning',
     },
     {
       titleKey: 'rondleiding.hulpvragerVoorzienTitel',
       textKey: 'rondleiding.hulpvragerVoorzienTekst',
-      tab: 'voorzien',
-      route: '/voorzien',
+      pad: 'regelen',
+      route: '/regelen/voorzieningen',
     },
     {
       titleKey: 'rondleiding.hulpvragerSteunTitel',
       textKey: 'rondleiding.hulpvragerSteunTekst',
-      tab: 'steun',
-      route: '/steun',
+      pad: 'weten',
+      route: '/weten/wegwijzer',
     },
     {
       titleKey: 'rondleiding.hulpvrager2Titel',
       textKey: 'rondleiding.hulpvrager2Tekst',
-      tab: 'kring',
-      route: '/kring',
+      pad: 'regelen',
+      route: '/regelen/kring',
     },
   ],
 };
@@ -107,6 +98,16 @@ type WalkthroughState = {
   active: boolean;
   step: number;
   role: WalkthroughRole | null;
+  /**
+   * Waar staat elk schuifje op het scherm? De header meet dat zelf op, zodat
+   * het pijltje van het wolkje echt onder het juiste schuifje uitkomt in
+   * plaats van op een geschatte plek.
+   */
+  schuifjeX: Record<string, number>;
+  /** Onderkant van de headerbalk; daar begint het wolkje. */
+  headerHoogte: number;
+  meetSchuifje: (route: string, midden: number) => void;
+  meetHeader: (hoogte: number) => void;
   start: (role: WalkthroughRole) => void;
   next: () => void;
   stop: () => void;
@@ -116,6 +117,15 @@ export const useWalkthrough = create<WalkthroughState>((set, get) => ({
   active: false,
   step: 0,
   role: null,
+  schuifjeX: {},
+  headerHoogte: 0,
+  meetSchuifje: (route, midden) =>
+    set((state) =>
+      state.schuifjeX[route] === midden
+        ? state
+        : { schuifjeX: { ...state.schuifjeX, [route]: midden } },
+    ),
+  meetHeader: (hoogte) => set((state) => (state.headerHoogte === hoogte ? state : { headerHoogte: hoogte })),
   start: (role) => set({ active: true, step: 0, role }),
   next: () => {
     const { step, role } = get();

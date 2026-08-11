@@ -1,60 +1,64 @@
-# Thuisverzorgd — Voorzieningen-concept & mascotte Bo
-Handoff voor Claude Code · augustus 2026 · bron: `TVZ App v2.dc.html` (Claude Design)
+# Thuisverzorgd — twee paden, mascotte Bo & voorzieningen
+Handoff voor Claude Code · augustus 2026 · bron: `TVZ App v3.dc.html` (Claude Design)
 
-## 1. Het vernieuwde app-idee
-Thuisverzorgd is een alles-in-één app voor mantelzorgers en zorgzoekenden:
-1. **Geïnformeerd raken** via de Steun-pagina (kennisbank, stappenplannen, forum).
-2. **Alles regelen** via Voorzieningen: commerciële diensten aan huis én gratis vrijwillige hulp (Buddy) in één marktplaats.
-3. **Vastlopen? Mens erbij**: mantelzorgmakelaar uit de buurt, direct via chat of videobellen vanuit Steun.
-4. Hulpkringen + rooster blijven bestaan; het "vrijwilliger op bezoek"-idee is nu één van de voorzieningen i.p.v. de kern.
+## 1. Het idee
+Thuisverzorgd doet twee dingen, en de app vraagt bij het openen welke van de twee je nu nodig hebt:
+1. **Ik wil het weten** — de wegwijzer met alles over mantelzorg, het forum met lotgenoten, en zorgmakelaars die met je meedenken.
+2. **Ik wil hulp regelen** — buddy's uit de buurt in een hulpkring, en voorzieningen (kapper, tuinman, boodschappen…) direct in de planning.
 
-**Abonnement (€4,99) is volledig verwijderd.** Geen ledenlimiet, geen upgrade-schermen, geen IAP. Verdienmodel: transactiefee op geboekte diensten.
+Geen abonnement, geen IAP. Verdienmodel: transactiefee op geboekte voorzieningen.
 
-## 2. Navigatie
-Tabbalk beheerder & hulpvrager: **Steun (home) · Voorzien · Buurt · Kring · Profiel**
-Tabbalk vrijwilliger: **Rooster · Buurt · Kring · Steun · Profiel** (ongewijzigd takengericht)
-Na login/rolkeuze landt een beheerder/hulpvrager op Steun.
+## 2. Navigatie (nieuw)
+**De tabbalk onderin is verdwenen.** In plaats daarvan:
+- **Keuzescherm** als eerste scherm na inloggen: twee grote gekleurde kaarten + Bo.
+- **Vaste header per pad** met: terugpijl (per stap), **Bo-knop** (altijd terug naar het keuzescherm), titel, avatar rechtsboven (profiel/instellingen), **kruimelspoor** met bolletjes (bijv. `Voorzieningen › Buddy › In de buurt`), en daaronder **schuifjes** (horizontale chips) voor de secties van dat pad.
+- Info-pad schuifjes: **Wegwijzer · Forum · Zorgmakelaars**
+- Hulp-pad schuifjes: **Voorzieningen · Mijn planning · Mijn kring · Berichten**
+- Vrijwilliger: **In de buurt · Mijn taken · Steun** (slaat het keuzescherm over, landt direct op de kaart)
 
-## 3. Steun (home)
-Header: blauwe gradient (#112F50→#2A6CB0), subnav-chips: Kennisbank · Stappenplannen · Forum · Makelaar. Bo (mascotte) piept over de rechterrand van de header.
-- **Vandaag-strip** bovenaan (alleen zorg-rollen): "Vandaag: Tim komt om 10:00" → link naar rooster.
-- **Makelaar-hero** (gradientkaart): "Kom je er even niet uit?", avatars van 3 online makelaars, knoppen **Chat nu** en **Videobel** (opent callscherm, callRole `mk`).
-- **Kennisbank**: 6 onderwerpen (WMO & regelingen, Dementie, Respijtzorg, Geldzaken, Wonen & veiligheid, Zorg voor jezelf) → artikellijst → leesbaar artikel ("gecheckt door een hulpmakelaar"). Onder het artikel: chat-CTA.
-- **Meest gelezen**: 3 directe artikel-links met onderwerp-tag.
-- **Stappenplannen**: uitklapbare kaarten met genummerde stappen (WMO aanvragen · 5 stappen, Dementie eerste stappen · 4, Respijtzorg regelen · 3) + "Hulp bij dit stappenplan" → makelaar-chat.
-- Forum en makelaar-chat: zoals bestaand.
+## 3. Kleuren
+| | achtergrond | header |
+|---|---|---|
+| Info-pad | #F5F8FC | gradient #1A4878 → #2A6CB0 |
+| Hulp-pad | #FFF8F8 | gradient #E85050 → #C9382F |
+| Vrijwilliger | #F5F8FC | gradient #112F50 → #2A6CB0 |
 
-## 4. Voorzieningen (marktplaats)
-Zelfde blauwe header ("Hulp aan huis, in een paar tikken geregeld." + zoekbalk + Bo-peek). Grid van bijna-vierkante blokjes, 2 kolommen:
-- **Buddy** — uitgelichte gradient-tegel, GRATIS/vrijwillig. Flow: uitleg → "Vraag via je hulpkring" (→ Kring) of "Zet een oproep op de buurtkaart" (→ kaart, directe-hulp compose).
-- Betaald: Kapper aan huis (€29, Samira), Boodschappen (€7, Buurtsuper Daan), Maaltijden (€9, Keuken van Truus), Schoonmaak (€22/u, Helder Thuis), Tuinman (€35/u, Groenwerk Ali), Massage & fysio (€45, Fysio de Pijp), Vervoer (€12, Rijd mee met Rob), Hond uitlaten (€10, Waf & Wandel), Klusjesman (€30/u, Klussen met Kees).
-Alle aanbieders zijn **gelieerd aan Thuisverzorgd** (gescreend, vaste gezichten). Betalen gebeurt altijd in de app.
+Koraalrood #E85050 op zachtroze #FFF8F8 is de nieuwe hulp-kleur (uit de aangeleverde screenshots). Groen #8DC93F blijft accent voor "gratis/vrijwillig".
 
-### Dienst-detail (redesign, zie prototype)
-Geen blokjes/pillen maar een zachte, persoonlijke pagina:
-- Lichtblauw hero-vlak (#E9F1FA, ronde onderhoeken 28px): grote ronde aanbieder-avatar met witte rand, dienstnaam, "met Samira · 1,2 km", sterren + rating + aantal beoordelingen, handgeschreven notitie (Caveat) over de aanbieder.
-- Sectie "Wat kun je verwachten": korte omschrijving + regel "± 45 min · bij jou thuis · gelieerd aan Thuisverzorgd".
-- "Wanneer komt Samira?": tijdsloten als radio-lijst met hairlines (eerste slot label "snelst"), géén chips.
-- Zwevende prijskaart onderaan: prijs groot, "Betaal na het bezoek · gratis annuleren tot 24 u", knop **"Boek di 10:00"** (label volgt gekozen slot).
+## 4. Info-pad
+- **Wegwijzer**: makelaar-hero bovenaan (3 online, Chat nu / Videobel), kennisbank met 6 onderwerpen → artikellijst → artikel, en "Meest gelezen".
+- **Stappenplannen** (WMO aanvragen, dementie eerste stappen, respijtzorg) als uitklapbare stappen, met "Hulp bij dit stappenplan" → makelaar.
+- **Forum**: ongewijzigd. **Zorgmakelaars**: chat + videobellen (echt belscherm).
 
-### Boeken & betalen
-Detail → Afrekenen (overzicht dienst/moment/aanbieder/totaal; Apple Pay + iDEAL; bedrag pas afgeschreven ná bezoek; gratis annuleren tot 24 u) → Bevestiging met Bo + groen vinkje: afspraak komt in het rooster, aanbieder krijgt bericht. Geboekte diensten verschijnen in het rooster naast kringtaken.
+## 5. Hulp-pad
+- **Voorzieningen**: raster van bijna-vierkante blokjes. Buddy is de uitgelichte tegel (gratis), daarnaast 9 betaalde diensten (kapper €29, boodschappen €7, maaltijden €9, schoonmaak €22/u, tuinman €35/u, massage €45, vervoer €12, hond uitlaten €10, klusjesman €30/u). Alle aanbieders zijn gelieerd aan Thuisverzorgd; betalen gebeurt in de app.
+- **Dienst-detail**: lichtblauw hero-vlak, ronde aanbieder-avatar, sterren + beoordelingen, handgeschreven notitie, "wat kun je verwachten", tijdsloten als radio-lijst, zwevende prijskaart met "Boek di 10:00" → afrekenen (Apple Pay/iDEAL, pas afgeschreven na bezoek) → bevestiging met Bo → staat in de planning.
+- **Buddy-flow**: Buddy-tegel → keuze *Elke week, vast moment* of *Eenmalig, nu of binnenkort* → **buurt-scan**: de app gaat automatisch naar een kaart met een laadindicator ("Bo kijkt in je buurt…") en meldt daarna "14 buddy's actief, verdeeld over 4 hulpkringen" → dan of de kringopbouw, of de hulpvraag op de kaart.
+- De kaart is dus **niet meer prominent**: je komt er via de buddy-scan, of via het kleine knopje "Laat Bo een buddy in de buurt zoeken" op de kringpagina.
 
-## 5. Mascotte Bo
-Bestanden: `mascot/bo.svg` (heel, zwaaiend) en `mascot/bo-peek.svg` (kop + handjes over een rand).
-- **Wie**: Bo, een vriendelijk rond wezentje (à la bol.com-mascotte) met crème buik, blosjes, groot ogenpaar en een blaadje-spruitje op het hoofd (groei/zorg).
-- **Look**: 3D-gevoel door radiale gradients, glans-highlight linksboven en zachte slagschaduw. Kleuren zijn bewust "echter"/warmer dan de UI-palette: groen #C8EC90→#8CC64B→#619A2E, buik #FFF9EC→#F1DDBD, blosjes #F5A78F, ogen #223349. UI-kleuren blijven de brandkleuren; alleen Bo gebruikt dit warmere palet.
-- **Plekken in het prototype** (uitbreidbaar): welkomstscherm (groot, zachtjes deinend), rondleiding-wolkje (Bo zit bovenop de tooltip), header van Steun én Voorzieningen (peek), boekingsbevestiging (Bo + vinkje-badge), lege hulpkring-staat, Buddy-pagina (hero).
-- **Meer ideeën voor de build**: pull-to-refresh-animatie, lege staten (geen berichten/taken), push-notificatie-icoon, laadscherm, foutmeldingen ("Bo vindt de verbinding niet"), onboarding-slides, sticker in kring-chat na afgeronde taak.
-- **Regels**: Bo wijst en moedigt aan, maar staat nooit op betaal-/juridische schermen als afleiding; max. 1 Bo per scherm; nooit uitgerekt; altijd de SVG-bestanden gebruiken.
+### Hulpkring opbouwen — 6 stappen (samen met Bo)
+Elke stap: Bo-tip in een kaartje, één vraag, en de voortgang in het kruimelspoor.
+1. **Voor wie** — naam + relatie
+2. **Adres & thuissituatie** — met privacynotitie (buddy's zien alleen de wijk)
+3. **Wat is er nodig** — taken aanvinken
+4. **Voorkeuren** — dagdelen + "goed om te weten"
+5. **Mensen uitnodigen** — bekenden uitnodigen + Bo laten zoeken
+6. **Proefweek** — Bo's voorstel-rooster; de kring test het een week, mag taken ruilen, en bevestigt daarna (na 7 dagen vraagt Bo of het werkte)
 
-## 6. Verwijderd
-- Abonnementscherm, "Upgraden"-kaart in Profiel, panel-chip Abonnement, "Gratis tot 2 vrijwilligers"-limiet (uitnodigen is onbeperkt), `startSubscribed`-prop, IAP.
+## 6. Vrijwilliger
+Landt direct op de kaart (geen keuzescherm, geen tabbalk). **Kring-rondjes rechtsonder gestapeld**: één rondje per kring waar hij lid van is, tikken opent die kring; word je lid van nog een kring, komt er een rondje bij. Vrijwilligers kunnen **geen** directe hulp aanvragen — die verlenen ze zelf — maar zien wel de hulpvragen van anderen.
 
-## 7. Implementatienotities (Expo + Supabase)
-- Tabellen: `services` (naam, prijs, eenheid, aanbieder, rating, omschrijving, duur), `bookings` (user, service, slot, status: geboekt/afgerond/geannuleerd, betaalstatus), `providers` (gelieerd, verificatie), `articles`/`guides` (kennisbank + stappenplannen, met onderwerp-taxonomie), bestaande kring/rooster-tabellen blijven.
-- Betalingen: Stripe (iDEAL + Apple Pay), charge pas na afronding bezoek (capture-later), gratis annuleren tot 24 u.
-- Boekingen voeden het bestaande rooster; notificatie naar aanbieder en kring.
-- Videobellen makelaar: bestaande call-infra hergebruiken (callRole `mk`).
-- Tabbalk per rol renderen; Steun als initial route voor zorg-rollen.
-- Bo-SVG's als assets bundelen; peek-variant absoluut gepositioneerd t.o.v. headers.
+## 7. Mascotte Bo
+`mascot/bo.svg` (heel) en `mascot/bo-peek.svg` (kop over een rand).
+- Rond wezentje met crème buik, blosjes en een blaadje-spruitje. 3D-gevoel via radiale gradients, glans linksboven en zachte slagschaduw. Warmer/"echter" palet dan de UI: #C8EC90 → #8CC64B → #619A2E, buik #FFF9EC → #F1DDBD, blosjes #F5A78F, ogen #223349.
+- **Plekken**: welkomstscherm, keuzescherm, de Bo-knop in elke header (terug naar de twee paden), elke stap van de kringopbouw, de buurt-scan, de boekingsbevestiging, lege hulpkring-staat, buddy-pagina.
+- **Meer ideeën**: pull-to-refresh, lege staten, push-icoon, laadscherm, foutmeldingen, sticker in de kring-chat na een afgeronde taak.
+- **Regels**: max 1 Bo per scherm, nooit uitgerekt, niet op betaalschermen als afleiding.
+
+## 8. Implementatienotities (Expo + Supabase)
+- Navigatie: geen bottom tabs. Root stack = `PathChooser` → `InfoStack` / `HulpStack` / `VolunteerStack`. Header is één component dat pad-kleur, kruimelspoor (uit de routestack) en de schuifjes rendert. Bo-knop popt naar `PathChooser`.
+- Tabellen: `services`, `providers`, `bookings` (slot, status, betaalstatus), `articles`/`guides`, `circles` + `circle_members` + `tasks`, `help_requests` (directe hulp), `brokers` (makelaars, online-status).
+- Kringopbouw als wizard-state in één record (`circle_drafts`), stap 6 genereert voorstel-taken met `proposed = true`; na 7 dagen een bevestigingsprompt.
+- Betalingen: Stripe (iDEAL + Apple Pay), capture-later, gratis annuleren tot 24 u.
+- Buurt-scan: aggregaatquery (aantal buddy's + kringen binnen radius), bewust met korte laadanimatie.
+- Bo-SVG's als assets bundelen.

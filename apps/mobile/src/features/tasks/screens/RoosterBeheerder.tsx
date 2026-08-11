@@ -11,9 +11,7 @@ import {
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useMyCircle } from '@/features/circles/api';
-import { KringBalk } from '@/features/circles/KringBalk';
 import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
-import { EigenFotoKnop } from '@/features/avatars/EigenFotoKnop';
 import { InboxBell } from '@/features/notifications/InboxBell';
 import { useTaskLogs, useTaskRpc, useTasks } from '@/features/tasks/api';
 import { taskLabel } from '@/features/tasks/logic';
@@ -23,9 +21,17 @@ import { useProfile } from '@/features/onboarding/useAuth';
 import { GeboekteDiensten } from '@/features/voorzieningen/GeboekteDiensten';
 import { useBoekingen } from '@/features/voorzieningen/api';
 import { t } from '@/i18n';
-import { formatTime, isoWeekDays, isoWeekNumber, toDateString } from '@/lib/dates';
+import {
+  formatHumanDate,
+  formatTime,
+  greetingKey,
+  isoWeekDays,
+  isoWeekNumber,
+  toDateString,
+} from '@/lib/dates';
 import { colors, spacing } from '@/theme';
-import { Button, Card, EmptyState, GradientHeader, PulseDot, SectionHeader, TvzText } from '@/ui';
+import { Button, Card, EmptyState, PulseDot, SectionHeader, TvzText } from '@/ui';
+import { PaginaKop } from '@/ui/PaginaKop';
 
 /**
  * Kring-tab · beheerder (ontwerp 4.0): de week van de kring. Eén functie:
@@ -43,6 +49,8 @@ export function RoosterBeheerder() {
   const { cancel } = useTaskRpc(circle.data?.id);
   const [selectedDay, setSelectedDay] = useState<string | undefined>();
 
+  const voornaam = profile.data?.name.split(' ')[0] ?? '';
+
   const todayKey = toDateString(now);
   const todayTask = (tasks.data ?? []).find(
     (task) => task.date === todayKey && task.status === 'ingepland' && task.claimer,
@@ -59,30 +67,18 @@ export function RoosterBeheerder() {
 
   return (
     <View style={styles.safe}>
-      <GradientHeader
-        title={circle.data?.name ?? t('tabs.kring')}
-        subtitle={t('rooster.kringSub')}
-        wobbel
-        right={
-          <View style={styles.headerActies}>
+      {/* Handoff, scherm 05: de planning begint met een begroeting en de datum
+          van vandaag; de gekleurde balk erboven is de PadHeader. */}
+      <PaginaKop
+        titel={t(`rooster.${greetingKey(new Date().getHours())}`, { naam: voornaam })}
+        sub={formatHumanDate(new Date())}
+        rechts={
+          <>
             {circle.data ? <KringBerichtenKnop circleId={circle.data.id} /> : null}
             <InboxBell />
-            <EigenFotoKnop />
-          </View>
+          </>
         }
-      >
-        {circle.data ? (
-          <View style={styles.kringBalkWrap}>
-            <KringBalk
-              circleId={circle.data.id}
-              name={circle.data.name}
-              linkCode={circle.data.link_code}
-              isBeheerder
-              onDark
-            />
-          </View>
-        ) : null}
-      </GradientHeader>
+      />
       <KeyboardAvoidingView
         style={styles.fill}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -94,7 +90,7 @@ export function RoosterBeheerder() {
               <Button
                 label={t('kring.maakKnop')}
                 variant="cta"
-                onPress={() => router.navigate('/kring')}
+                onPress={() => router.navigate('/regelen/kring')}
               />
             </Card>
           ) : null}
@@ -214,18 +210,10 @@ const styles = StyleSheet.create({
   fill: { flex: 1 },
   container: {
     padding: spacing.screen,
-    paddingBottom: 110,
+    paddingBottom: spacing.xxl,
   },
   section: {
     marginBottom: spacing.lg,
-  },
-  headerActies: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  kringBalkWrap: {
-    marginTop: spacing.md,
   },
   vulKaart: {
     marginTop: spacing.md,

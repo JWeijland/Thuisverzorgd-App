@@ -3,9 +3,13 @@ import { categoryEnabled, NOTIFICATION_CATEGORIES } from '@/features/notificatio
 
 describe('deeplinkToPath', () => {
   it('vertaalt tvz://-deeplinks naar routes', () => {
-    expect(deeplinkToPath('tvz://rooster')).toBe('/rooster');
     expect(deeplinkToPath('tvz://buurt')).toBe('/buurt');
     expect(deeplinkToPath('tvz://inbox')).toBe('/inbox');
+  });
+  it('vertaalt de oude routenamen naar de nieuwe paden', () => {
+    expect(deeplinkToPath('tvz://rooster')).toBe('/regelen/planning');
+    expect(deeplinkToPath('tvz://kring')).toBe('/regelen/kring');
+    expect(deeplinkToPath('tvz://steun')).toBe('/weten/wegwijzer');
   });
   it('valt terug op de inbox', () => {
     expect(deeplinkToPath(null)).toBe('/inbox');

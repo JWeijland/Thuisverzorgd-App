@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import {
   WALKTHROUGH_STEPS,
@@ -9,7 +9,7 @@ import {
   type WalkthroughRole,
 } from '@/features/onboarding/walkthrough';
 import { t } from '@/i18n';
-import { tabCenterX, visibleTabs } from '@/ui/TabBar';
+import { spacing } from '@/theme';
 import { Coachmark } from '@/ui';
 
 const seenKey = (uid: string) => `walkthrough-gezien-${uid}`;
@@ -20,12 +20,14 @@ type Props = {
 };
 
 /**
- * Rondleiding: Caveat-wolkjes met pijltje naar de echte tabknoppen.
+ * Rondleiding: Caveat-wolkjes met een pijltje omhoog naar het schuifje waar
+ * de stap over gaat. De header meet zelf op waar de schuifjes staan, dus het
+ * pijltje klopt ook als de labels langer of korter zijn.
  * Start één keer na registratie; overslaan kan altijd.
  */
 export function WalkthroughOverlay({ uid, role }: Props) {
-  const { active, step, role: activeRole, start, next, stop } = useWalkthrough();
-  const { width } = useWindowDimensions();
+  const { active, step, role: activeRole, schuifjeX, headerHoogte, start, next, stop } =
+    useWalkthrough();
 
   useEffect(() => {
     if (!uid || !role) return;
@@ -47,14 +49,13 @@ export function WalkthroughOverlay({ uid, role }: Props) {
   const current = active ? steps[step] : undefined;
 
   useEffect(() => {
-    // Stap 0 wijst naar het rooster, waar de gebruiker al staat: niet navigeren.
-    if (!current || step === 0) return;
+    if (!current) return;
     try {
-      router.navigate(current.route as never);
+      router.replace(current.route as never);
     } catch {
-      // navigatie is best effort; het wolkje wijst hoe dan ook naar de juiste tab
+      // navigatie is best effort; het wolkje wijst hoe dan ook naar het juiste schuifje
     }
-  }, [current, step]);
+  }, [current]);
 
   if (!active || !current || !uid) return null;
 
@@ -62,21 +63,20 @@ export function WalkthroughOverlay({ uid, role }: Props) {
     AsyncStorage.setItem(seenKey(uid!), 'ja').catch(() => {});
   }
 
-  // Het pijltje wijst naar de tab zoals die er voor déze rol staat.
-  const tabs = visibleTabs(activeRole);
-  const tabIndex = Math.max(tabs.indexOf(current.tab), 0);
-  const arrowX = tabCenterX(tabIndex, width, tabs.length);
+  // Zolang de header nog niet is opgemeten wijst het pijltje naar links,
+  // waar het eerste schuifje hoe dan ook staat.
+  const midden = schuifjeX[current.route] ?? spacing.screen + 40;
 
   return (
-    <View pointerEvents="box-none" style={styles.overlay}>
+    <View pointerEvents="box-none" style={[styles.overlay, { paddingTop: headerHoogte + 8 }]}>
       <Coachmark
         title={t(current.titleKey)}
         body={t(current.textKey)}
         step={step + 1}
         totalSteps={steps.length}
         bo
-        arrow="down"
-        arrowOffset={arrowX - 20 - 10}
+        arrow="up"
+        arrowOffset={midden - spacing.screen - 10}
         onNext={() => {
           if (step + 1 >= steps.length) markSeen();
           next();
@@ -98,10 +98,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
   },
   coachmark: {
-    marginHorizontal: 20,
-    marginBottom: 92,
+    marginHorizontal: spacing.screen,
   },
 });

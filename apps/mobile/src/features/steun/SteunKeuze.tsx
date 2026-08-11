@@ -21,7 +21,7 @@ export function SteunKeuze() {
         boRol="hulpvrager"
       />
       <ScrollView contentContainerStyle={styles.lijst}>
-        <Pressable accessibilityRole="button" onPress={() => router.push('/hulpmakelaar')}>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/weten/zorgmakelaars')}>
           <Card style={styles.kaart}>
             <View style={styles.kop}>
               <TvzText preset="screenTitle" style={styles.kaartTitel}>
@@ -41,7 +41,7 @@ export function SteunKeuze() {
           </Card>
         </Pressable>
 
-        <Pressable accessibilityRole="button" onPress={() => router.push('/wegwijzer-lijst')}>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/weten/wegwijzer')}>
           <Card style={styles.kaart}>
             <View style={styles.kop}>
               <View style={styles.icoon}>

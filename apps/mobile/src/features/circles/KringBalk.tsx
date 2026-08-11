@@ -35,7 +35,7 @@ export function KringBalk({ circleId, name, onDark = false }: Props) {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={t('kring.bekijkLeden')}
-      onPress={() => router.push('/kring')}
+      onPress={() => router.push('/regelen/kring')}
       style={[styles.balk, onDark ? styles.balkDark : styles.balkLight]}
     >
       {gezicht?.profile ? (

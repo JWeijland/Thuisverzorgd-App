@@ -27,6 +27,7 @@ import { useInvite, useMyCircle } from '@/features/circles/api';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { useOpenRequests, type OpenRequest } from '@/features/spontaneous/api';
 import { REQUEST_TYPE_LABEL, RequesterFlow } from '@/features/spontaneous/RequesterFlow';
+import { ZwevendeSchuifjes } from '@/features/navigatie/ZwevendeSchuifjes';
 import { VolunteerFlow } from '@/features/spontaneous/VolunteerFlow';
 import { countInRegion, DEFAULT_REGION, formatDistance, haversineKm, type LatLng } from '@/lib/geo';
 import { useKeyboard } from '@/lib/keyboard';
@@ -35,8 +36,15 @@ import { colors, radius, shadows, spacing } from '@/theme';
 import { BottomSheet, Button, Chip, TvzText } from '@/ui';
 import { useStatusBalk } from '@/lib/statusbalk';
 
-/** Buurt (screens 08/20/21): kaart met kringen, buddy's en directe hulpvragen. */
-export default function BuurtScreen() {
+/**
+ * Buurt (handoff, scherm 08): kaart met kringen, buddy's en directe hulpvragen.
+ *
+ * Voor de vrijwilliger is dit het startscherm: dan geen zoekbalk en geen
+ * gekleurde kop, alleen de drie schuifjes die als losse witte pillen over de
+ * kaart zweven. Beheerder en hulpvrager komen hier alleen nog via de
+ * buurt-scan of via het knopje op de kringpagina.
+ */
+export function BuurtScherm() {
   useStatusBalk('donker');
   const profile = useProfile();
   const role = profile.data?.role;
@@ -192,7 +200,8 @@ export default function BuurtScreen() {
       </TvzMap>
 
       <SafeAreaView edges={['top']} pointerEvents="box-none" style={styles.topLayer}>
-        {!isHulpvrager ? (
+        {isVolunteer ? <ZwevendeSchuifjes pad="vrijwilliger" /> : null}
+        {!isHulpvrager && !isVolunteer ? (
           <View style={[styles.search, shadows.card]}>
             <Search color={colors.inkFaint} size={18} strokeWidth={2.2} />
             <TextInput

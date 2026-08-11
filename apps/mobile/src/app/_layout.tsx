@@ -17,7 +17,9 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { NotificationGateway } from '@/features/notifications/NotificationGateway';
+import { AppRondleiding } from '@/features/onboarding/AppRondleiding';
 import { AuthProvider } from '@/features/onboarding/useAuth';
+import { TaskBanner } from '@/features/tasks/TaskBanner';
 import { queryClient } from '@/lib/queryClient';
 import { TextScaleProvider } from '@/theme';
 import { ErrorBoundary } from '@/ui/ErrorBoundary';
@@ -54,6 +56,10 @@ export default function RootLayout() {
             <StatusBar style="light" />
             <NotificationGateway />
             <Stack screenOptions={{ headerShown: false }} />
+            {/* Stonden vroeger in de tabbalk-layout; die bestaat niet meer,
+                dus ze hangen nu boven de hele app. */}
+            <TaskBanner />
+            <AppRondleiding />
           </TextScaleProvider>
         </AuthProvider>
       </QueryClientProvider>

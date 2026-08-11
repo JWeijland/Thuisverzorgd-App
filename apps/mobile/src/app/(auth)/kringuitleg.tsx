@@ -12,9 +12,9 @@ const ROLLEN: BoRol[] = ['beheerder', 'vrijwilliger', 'hulpvrager'];
 
 /** Startscherm van elke rol na de rolkeuze. */
 const START: Record<BoRol, string> = {
-  beheerder: '/steun',
-  vrijwilliger: '/rooster',
-  hulpvrager: '/rooster',
+  beheerder: '/pad',
+  vrijwilliger: '/vrijwilliger/buurt',
+  hulpvrager: '/pad',
 };
 
 /**
