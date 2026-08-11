@@ -10,7 +10,7 @@ zichtbaar merklogo zijn bewust vermeden.
 
 | Bestand | Pexels-foto | Wat je ziet |
 | --- | --- | --- |
-| buddy.jpg | pexels.com/photo/7551593 | buddy brengt boodschappen langs, beiden lachend (liggend, 1200×560) |
+| buddy.jpg | pexels.com/photo/8899984 | buddy op bezoek: samen op de bank, beiden lachend (liggend, 1200×620) |
 | kapper.jpg | pexels.com/photo/8468148 | kappersschaar op haar |
 | boodschappen.jpg | pexels.com/photo/8900041 | boodschappentassen met groente |
 | maaltijden.jpg | pexels.com/photo/38343260 | warm bord eten |

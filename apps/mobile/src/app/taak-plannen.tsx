@@ -1,13 +1,13 @@
 import { router } from 'expo-router';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react-native';
+import { AlertTriangle, ChevronLeft, ChevronRight, X } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useCircleMembers, useMyCircle } from '@/features/circles/api';
 import { PadHeader } from '@/features/navigatie/PadHeader';
-import { useCreateTask, type NewTask, type Task } from '@/features/tasks/api';
-import { taakSoortLabel } from '@/features/tasks/logic';
+import { useCreateTask, useTasks, type NewTask, type Task } from '@/features/tasks/api';
+import { overlappendeTaken, taakSoortLabel } from '@/features/tasks/logic';
 import { TijdPicker } from '@/features/tasks/TijdPicker';
 import { t } from '@/i18n';
 import { WEEKDAY_SHORT, formatHumanDate, isoWeekDays, toDateString } from '@/lib/dates';
@@ -63,6 +63,15 @@ export default function TaakPlannen() {
     !!circle.data && !maakTaak.isPending && (type !== 'anders' || eigenLabel.trim().length > 0);
 
   const samenvatting = `${type === 'anders' && eigenLabel.trim() ? eigenLabel.trim() : taakSoortLabel(type)} · ${formatHumanDate(dag)} · ${tijd}`;
+
+  // Botst dit met wat er al staat? Dan zeggen we het meteen, niet pas in het
+  // rooster (wens Jelle 11-08). Tegenhouden doen we niet: soms wil je het.
+  const dagSleutel = toDateString(dag);
+  const bestaande = useTasks(circle.data?.id, dagen[0]!, dagen[6]!);
+  const botst = overlappendeTaken([
+    ...(bestaande.data ?? []),
+    { id: 'nieuw', date: dagSleutel, time: tijd, status: 'open' } as Task,
+  ]).has('nieuw');
 
   function opslaan() {
     if (!magOpslaan) return;
@@ -291,6 +300,15 @@ export default function TaakPlannen() {
         ))}
       </ScrollView>
 
+      {botst ? (
+        <View style={styles.botsing}>
+          <AlertTriangle color={colors.warnText} size={15} strokeWidth={2.4} />
+          <TvzText preset="meta" style={styles.botsingTekst}>
+            {t('planner.overlapHint')}
+          </TvzText>
+        </View>
+      ) : null}
+
       <View style={styles.balk}>
         <View style={styles.balkTekst}>
           <TvzText preset="cardTitle" numberOfLines={1}>
@@ -477,6 +495,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderTopWidth: 1,
     borderTopColor: colors.line,
+  },
+  // Boven de vaste balk, over de volle breedte: je ziet hem terwijl je de
+  // tijd nog aan het kiezen bent.
+  botsing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.warnBg,
+    paddingHorizontal: spacing.screen,
+    paddingVertical: spacing.sm,
+  },
+  botsingTekst: {
+    flex: 1,
+    color: colors.warnText,
   },
   balkTekst: {
     flex: 1,

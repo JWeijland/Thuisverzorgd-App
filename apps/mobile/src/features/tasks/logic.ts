@@ -56,3 +56,49 @@ export function computeWorkload(
   }
   return [...counts.values()].sort((a, b) => b.count - a.count);
 }
+
+/** Hoe lang een taak ongeveer duurt; hetzelfde als "± 1 uur" in de rooster-rij. */
+export const TAAK_DUUR_MIN = 60;
+
+function minutenVanaf(tijd: string): number {
+  const [uur, minuut] = tijd.split(':');
+  return Number(uur) * 60 + Number(minuut ?? 0);
+}
+
+/**
+ * Taken die elkaar in de tijd overlappen (wens Jelle 11-08): twee dingen op
+ * dezelfde dag binnen een uur van elkaar kunnen niet allebei door dezelfde
+ * persoon gedaan worden, en ook voor de hulpvrager is het te veel tegelijk.
+ * Geeft de ids terug van elke taak die met minstens één andere botst.
+ *
+ * `boekingen` zijn geboekte voorzieningen als {id, date, time}: een klusjesman
+ * en een buddy tegelijk over de vloer is net zo goed dubbel geboekt.
+ */
+export function overlappendeTaken(
+  taken: Pick<Task, 'id' | 'date' | 'time' | 'status'>[],
+  boekingen: { id: string; date: string; time: string }[] = [],
+): Set<string> {
+  const items = [
+    ...taken
+      .filter((taak) => taak.status !== 'geannuleerd' && taak.status !== 'gedaan')
+      .map((taak) => ({ id: taak.id, date: taak.date, start: minutenVanaf(taak.time) })),
+    ...boekingen.map((boeking) => ({
+      id: boeking.id,
+      date: boeking.date,
+      start: minutenVanaf(boeking.time),
+    })),
+  ];
+
+  const botsend = new Set<string>();
+  for (let i = 0; i < items.length; i += 1) {
+    for (let j = i + 1; j < items.length; j += 1) {
+      const a = items[i]!;
+      const b = items[j]!;
+      if (a.date !== b.date) continue;
+      if (Math.abs(a.start - b.start) >= TAAK_DUUR_MIN) continue;
+      botsend.add(a.id);
+      botsend.add(b.id);
+    }
+  }
+  return botsend;
+}

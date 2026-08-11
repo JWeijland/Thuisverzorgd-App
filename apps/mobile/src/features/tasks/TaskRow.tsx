@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, View } from 'react-native';
+import { AlertTriangle } from 'lucide-react-native';
 
 import { taskStart, type Task } from '@/features/tasks/api';
 import { useNow } from '@/lib/useNow';
@@ -17,6 +18,8 @@ type Props = {
   onBuddyPool?: (task: Task) => void;
   /** Beheerder: taak intrekken (de aannemer krijgt automatisch een melding). */
   onCancelTask?: (task: Task) => void;
+  /** Deze taak valt samen met iets anders op dezelfde dag. */
+  overlapt?: boolean;
 };
 
 /** Eén roosterrij: daglabel links, taak + tijd + wie, status of actie rechts. */
@@ -28,6 +31,7 @@ export function TaskRow({
   onComplete,
   onBuddyPool,
   onCancelTask,
+  overlapt = false,
 }: Props) {
   const now = useNow();
   const date = parseDateString(task.date);
@@ -96,6 +100,16 @@ export function TaskRow({
         <TvzText preset="secondary">
           {formatTime(task.time)} · {who}
         </TvzText>
+        {/* Twee dingen tegelijk gepland: dat zie je anders pas op de dag zelf
+            (wens Jelle 11-08). */}
+        {overlapt ? (
+          <View style={styles.overlap}>
+            <AlertTriangle color={colors.warnText} size={12} strokeWidth={2.4} />
+            <TvzText preset="meta" style={styles.overlapTekst}>
+              {t('rooster.overlapPill')}
+            </TvzText>
+          </View>
+        ) : null}
       </View>
       {right}
       {isBeheerder && onCancelTask && task.status !== 'gedaan' ? (
@@ -135,6 +149,20 @@ const styles = StyleSheet.create({
   },
   dayDate: {
     fontSize: 11.5,
+  },
+  overlap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 4,
+    backgroundColor: colors.warnBg,
+    borderRadius: radius.pill,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginTop: 4,
+  },
+  overlapTekst: {
+    color: colors.warnText,
   },
   info: {
     flex: 1,

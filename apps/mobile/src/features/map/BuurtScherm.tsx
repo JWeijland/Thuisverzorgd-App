@@ -1,5 +1,5 @@
 import * as Location from 'expo-location';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -505,14 +505,23 @@ function BuddyKaart({
     <View style={[styles.kringKaart, shadows.card]}>
       <View style={styles.kringKop}>
         <ProfileAvatar name={buddy.voornaam} avatarPath={buddy.avatar_path} size={40} />
-        <View style={styles.kringKopText}>
+        {/* Tik op de naam om zijn profiel te lezen (wens Jelle 11-08). */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${buddy.voornaam}, ${t('buddyZoeken.bekijkProfiel')}`}
+          onPress={() => router.push(`/regelen/buddy/${buddy.id}`)}
+          style={styles.kringKopText}
+        >
           <TvzText preset="cardTitle">{buddy.voornaam}</TvzText>
           <TvzText preset="secondary" style={styles.kringMeta}>
             {[t('buurt.buddyLabel'), afstand ? t('buurt.afstandVanJou', { afstand }) : null]
               .filter(Boolean)
               .join(' · ')}
           </TvzText>
-        </View>
+          <TvzText preset="meta" style={styles.profielLink}>
+            {t('buddyZoeken.bekijkProfiel')}
+          </TvzText>
+        </Pressable>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('algemeen.sluiten')}
@@ -695,6 +704,10 @@ const styles = StyleSheet.create({
   },
   kringMeta: {
     fontSize: 13,
+  },
+  profielLink: {
+    color: colors.primaryMid,
+    marginTop: 2,
   },
   kringKnop: {
     marginTop: spacing.md,

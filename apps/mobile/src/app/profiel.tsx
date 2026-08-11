@@ -49,6 +49,11 @@ export default function ProfielScreen() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
   const [photoOpen, setPhotoOpen] = useState(false);
+  // null = nog niet zelf getypt; dan geldt wat er op het profiel staat.
+  const [eigenBio, setEigenBio] = useState<string | null>(null);
+  const [bioBewaard, setBioBewaard] = useState(false);
+  const bio = eigenBio ?? p?.bio ?? '';
+  const setBio = setEigenBio;
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState(false);
   const [roleOpen, setRoleOpen] = useState(false);
@@ -284,6 +289,36 @@ export default function ProfielScreen() {
                   />
                 </ScrollView>
               </View>
+            </Card>
+
+            {/* Je eigen woorden staan op je buddykaartje: een beheerder leest
+                dit voordat hij je bij iemand thuis uitnodigt (wens Jelle
+                11-08). */}
+            <Card style={styles.card}>
+              <TvzText preset="cardTitle">{t('profiel.bioTitel')}</TvzText>
+              <TvzText preset="secondary">{t('profiel.bioUitleg')}</TvzText>
+              <TextField
+                label={t('profiel.bioTitel')}
+                placeholder={t('profiel.bioPlaceholder')}
+                value={bio}
+                onChangeText={(tekst) => {
+                  setBioBewaard(false);
+                  setBio(tekst);
+                }}
+                multiline
+              />
+              <Button
+                label={bioBewaard ? t('profiel.bioBewaard') : t('profiel.bioBewaren')}
+                variant={bioBewaard ? 'outline' : 'cta'}
+                disabled={bioBewaard || update.isPending || bio.trim() === (p?.bio ?? '')}
+                onPress={() => {
+                  update.mutate(
+                    { bio: bio.trim() || null },
+                    { onSuccess: () => setBioBewaard(true) },
+                  );
+                }}
+                style={styles.bioKnop}
+              />
             </Card>
 
             <Card style={styles.card}>
@@ -815,6 +850,11 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 22,
+  },
+  bioKnop: {
+    marginTop: spacing.sm,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 22,
   },
   card: {
     marginBottom: spacing.md,

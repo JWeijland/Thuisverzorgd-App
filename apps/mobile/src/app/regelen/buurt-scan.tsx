@@ -4,12 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { BuddyMetFoto } from '@/features/map/BuddyMetFoto';
-import {
-  KringMarker,
-  OwnLocationMarker,
-  TvzMap,
-  type TvzMapHandle,
-} from '@/features/map/TvzMap';
+import { OwnLocationMarker, TvzMap, type TvzMapHandle } from '@/features/map/TvzMap';
 import { useBuurtScan } from '@/features/map/useBuurtScan';
 import { PadHeader } from '@/features/navigatie/PadHeader';
 import { t } from '@/i18n';
@@ -58,19 +53,12 @@ export default function BuurtScan() {
 
       <View style={styles.kaartWrap}>
         <View style={styles.kaart}>
-          {/* De buddy's en kringen die Bo vindt staan ook echt op de kaart:
-              de telling zegt hoeveel, de kaart laat zien waar (wens Jelle
-              11-08). Zodra we de locatie hebben, kijkt de kaart daarheen. */}
+          {/* De buddy's die Bo vindt staan ook echt op de kaart: de telling
+              zegt hoeveel, de kaart laat zien waar (wens Jelle 11-08). De
+              hulpkringen van anderen horen hier niet: die gaan je als
+              beheerder niets aan. Zodra we de locatie hebben, kijkt de kaart
+              daarheen. */}
           <TvzMap ref={kaart} initialRegion={DEFAULT_REGION}>
-            {scan.kringLijst.map((kring) => (
-              <KringMarker
-                key={kring.id}
-                lat={kring.lat}
-                lon={kring.lon}
-                naam={kring.name}
-                plekkenVrij={kring.plekken_vrij}
-              />
-            ))}
             {scan.buddyLijst.map((buddy) => (
               <BuddyMetFoto key={buddy.id} buddy={buddy} />
             ))}
@@ -95,10 +83,9 @@ export default function BuurtScan() {
               <TvzText preset="cardTitle" style={styles.midden}>
                 {scan.buddys === 0
                   ? t('buurtScan.geenBuddys')
-                  : t('buurtScan.gevonden', {
-                      buddys: scan.buddys,
-                      kringen: scan.kringen,
-                    })}
+                  : scan.buddys === 1
+                    ? t('buurtScan.gevonden1')
+                    : t('buurtScan.gevonden', { buddys: scan.buddys })}
               </TvzText>
               <TvzText preset="secondary" style={styles.midden}>
                 {wekelijks ? t('buurtScan.uitlegWekelijks') : t('buurtScan.uitlegEenmalig')}

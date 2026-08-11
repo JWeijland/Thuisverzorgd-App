@@ -1,13 +1,14 @@
 import { router } from 'expo-router';
+import { ChevronRight, Map } from 'lucide-react-native';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useBestMatches, useInvite, useMyCircle } from '@/features/circles/api';
 import { PadHeader } from '@/features/navigatie/PadHeader';
 import { t } from '@/i18n';
 import { haptics } from '@/lib/haptics';
-import { colors, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 import { Bo, Button, Card, EmptyState, TvzBounce, TvzText } from '@/ui';
 
 /**
@@ -46,6 +47,28 @@ export default function BuddyZoeken() {
       />
 
       <ScrollView contentContainerStyle={styles.inhoud}>
+        {/* De kaart is de leukste manier om te kijken wie er in de buurt
+            woont, dus die staat bovenaan als een groot vierkant vlak in
+            plaats van een smal knopje onderaan (wens Jelle 11-08). */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('buddyZoeken.opDeKaart')}
+          onPress={() => {
+            void haptics.tik();
+            router.push('/buurt');
+          }}
+          style={styles.kaartKnop}
+        >
+          <View style={styles.kaartIcoon}>
+            <Map color={colors.primary} size={24} strokeWidth={2.2} />
+          </View>
+          <View style={styles.kaartTekst}>
+            <TvzText preset="cardTitle">{t('buddyZoeken.opDeKaart')}</TvzText>
+            <TvzText preset="secondary">{t('buddyZoeken.opDeKaartUitleg')}</TvzText>
+          </View>
+          <ChevronRight color={colors.inkFaint} size={22} strokeWidth={2.2} />
+        </Pressable>
+
         <View style={styles.tip}>
           <TvzBounce>
             <Bo width={62} />
@@ -69,7 +92,14 @@ export default function BuddyZoeken() {
           const isGevraagd = gevraagd.includes(match.id);
           return (
             <Card key={match.id} style={styles.kaart}>
-              <View style={styles.rij}>
+              {/* Tik op de naam om zijn profiel te lezen voordat je hem bij
+                  iemand thuis uitnodigt (wens Jelle 11-08). */}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${match.voornaam}, ${t('buddyZoeken.bekijkProfiel')}`}
+                onPress={() => router.push(`/regelen/buddy/${match.id}`)}
+                style={styles.rij}
+              >
                 <ProfileAvatar name={match.voornaam} avatarPath={match.avatar_path} size={48} />
                 <View style={styles.tekst}>
                   <TvzText preset="cardTitle">
@@ -83,8 +113,12 @@ export default function BuddyZoeken() {
                     })}
                     {match.waardering ? ` · ★ ${match.waardering}` : ''}
                   </TvzText>
+                  <TvzText preset="meta" style={styles.profielLink}>
+                    {t('buddyZoeken.bekijkProfiel')}
+                  </TvzText>
                 </View>
-              </View>
+                <ChevronRight color={colors.inkFaint} size={20} strokeWidth={2.2} />
+              </Pressable>
               <Button
                 label={isGevraagd ? t('buddyZoeken.gevraagd') : t('buddyZoeken.vraagBuddy')}
                 variant={isGevraagd ? 'outline' : 'cta'}
@@ -100,12 +134,6 @@ export default function BuddyZoeken() {
             <EmptyState title={t('buddyZoeken.leegTitel')} body={t('buddyZoeken.leegTekst')} />
           </Card>
         ) : null}
-
-        <Button
-          label={t('buddyZoeken.opDeKaart')}
-          variant="outline"
-          onPress={() => router.push('/buurt')}
-        />
       </ScrollView>
     </View>
   );
@@ -120,6 +148,29 @@ const styles = StyleSheet.create({
     padding: spacing.screen,
     gap: spacing.cardGap,
     paddingBottom: spacing.xxl,
+  },
+  kaartKnop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: radius.tile,
+    padding: spacing.cardPadding,
+  },
+  kaartIcoon: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.card,
+    backgroundColor: colors.tintBlue,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  kaartTekst: {
+    flex: 1,
+  },
+  profielLink: {
+    color: colors.primaryMid,
+    marginTop: 2,
   },
   tip: {
     flexDirection: 'row',

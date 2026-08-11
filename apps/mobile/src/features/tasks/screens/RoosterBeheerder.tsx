@@ -9,18 +9,19 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { X } from 'lucide-react-native';
+import { AlertTriangle, X } from 'lucide-react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useMyCircle } from '@/features/circles/api';
 import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
 import { InboxBell } from '@/features/notifications/InboxBell';
 import { useTaskLogs, useTaskRpc, useTasks } from '@/features/tasks/api';
-import { taskLabel } from '@/features/tasks/logic';
+import { overlappendeTaken, taskLabel } from '@/features/tasks/logic';
 import { TaskRow } from '@/features/tasks/TaskRow';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { GeboekteDiensten } from '@/features/voorzieningen/GeboekteDiensten';
+import { useBoekingen } from '@/features/voorzieningen/api';
 import { t } from '@/i18n';
 import {
   formatHumanDate,
@@ -30,7 +31,7 @@ import {
   isoWeekNumber,
   toDateString,
 } from '@/lib/dates';
-import { colors, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 import { Button, Card, EmptyState, PulseDot, SectionHeader, TvzText } from '@/ui';
 import { PaginaKop } from '@/ui/PaginaKop';
 
@@ -67,6 +68,22 @@ export function RoosterBeheerder() {
   // Tik op Ma/Di/Wo in de weekstrip = alleen de taken van die dag bekijken.
   const visibleTasks = (tasks.data ?? []).filter(
     (task) => !selectedDay || task.date === selectedDay,
+  );
+
+  // Twee dingen tegelijk in de agenda: dat wil je zien vóór de dag zelf (wens
+  // Jelle 11-08). Geboekte diensten tellen mee, want ook dan staat er iemand
+  // voor de deur.
+  const boekingen = useBoekingen();
+  const botsingen = overlappendeTaken(
+    tasks.data ?? [],
+    (boekingen.data ?? []).map((boeking) => {
+      const moment = new Date(boeking.slot_at);
+      return {
+        id: boeking.id,
+        date: toDateString(moment),
+        time: `${String(moment.getHours()).padStart(2, '0')}:${String(moment.getMinutes()).padStart(2, '0')}`,
+      };
+    }),
   );
 
 
@@ -190,12 +207,21 @@ export function RoosterBeheerder() {
               </View>
 
               <View style={styles.list}>
+                {botsingen.size > 0 ? (
+                  <View style={styles.overlapBanner}>
+                    <AlertTriangle color={colors.warnText} size={17} strokeWidth={2.4} />
+                    <TvzText preset="secondary" style={styles.overlapTekst}>
+                      {t('rooster.overlapWaarschuwing')}
+                    </TvzText>
+                  </View>
+                ) : null}
                 {visibleTasks.map((task) => (
                   <TaskRow
                     key={task.id}
                     task={task}
                     myId={profile.data?.id}
                     isBeheerder
+                    overlapt={botsingen.has(task.id)}
                     onCancelTask={(item) => cancel.mutate(item.id)}
                   />
                 ))}
@@ -235,6 +261,18 @@ export function RoosterBeheerder() {
 }
 
 const styles = StyleSheet.create({
+  overlapBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.warnBg,
+    borderRadius: radius.row,
+    padding: spacing.md,
+  },
+  overlapTekst: {
+    flex: 1,
+    color: colors.warnText,
+  },
   tweedeKnop: {
     marginTop: spacing.sm,
   },

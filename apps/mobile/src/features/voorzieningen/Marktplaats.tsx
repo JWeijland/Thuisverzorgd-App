@@ -11,7 +11,7 @@ import { colors, radius, spacing } from '@/theme';
 import { TvzText, tvzIn } from '@/ui';
 import Animated from 'react-native-reanimated';
 
-/** Foto van de buddy-tegel: twee mensen die samen wandelen. */
+/** Foto van de buddy-tegel: een buddy op bezoek, samen op de bank. */
 const BUDDY_FOTO = require('../../../assets/images/diensten/buddy.jpg');
 
 /** Foto per dienst (Pexels, zie assets/images/diensten/BRONNEN.md). */
@@ -156,10 +156,10 @@ const styles = StyleSheet.create({
     gap: spacing.cardGap,
   },
   // Buddy is de belangrijkste voorziening van de app, dus de tegel is een
-  // brede banner met een echte foto. De verhouding volgt de foto (1200×560),
+  // brede banner met een echte foto. De verhouding volgt de foto (1200×620),
   // zodat er niets wordt uitgerekt of afgesneden.
   buddyTegel: {
-    aspectRatio: 1200 / 560,
+    aspectRatio: 1200 / 620,
     borderRadius: radius.tile,
     overflow: 'hidden',
     justifyContent: 'flex-end',

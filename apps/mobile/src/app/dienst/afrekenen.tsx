@@ -8,7 +8,7 @@ import { useCreateBoeking, useDiensten } from '@/features/voorzieningen/api';
 import { euro, slotLabel } from '@/features/voorzieningen/slots';
 import { t } from '@/i18n';
 import { useStatusBalk } from '@/lib/statusbalk';
-import { colors, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 import { Button, Card, TvzText } from '@/ui';
 
 type Betaalwijze = 'apple_pay' | 'ideal';
@@ -126,10 +126,13 @@ export default function AfrekenenScreen() {
       </ScrollView>
 
       <View style={styles.voet}>
+        {/* Even vierkant als de boek-knop op de dienstpagina (wens Jelle
+            11-08): dit is het einde van dezelfde handeling. */}
         <Button
           label={boek.isPending ? t('algemeen.laden') : t('voorzien.bevestigBoeking')}
           variant="cta"
           size="lg"
+          style={styles.bevestigKnop}
           disabled={boek.isPending}
           onPress={bevestig}
         />
@@ -160,6 +163,9 @@ function OverzichtRij({
 }
 
 const styles = StyleSheet.create({
+  bevestigKnop: {
+    borderRadius: radius.card,
+  },
   safe: {
     flex: 1,
     backgroundColor: colors.bg,

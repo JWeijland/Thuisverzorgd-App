@@ -116,6 +116,8 @@
     "goedenavond": "Goedenavond, {naam}",
     "weekTitel": "Rooster · week {week}",
     "dezeWeek": "Deze week",
+    "overlapPill": "Botst",
+    "overlapWaarschuwing": "Let op: er staan afspraken tegelijk gepland. Tik op een dag om te kijken.",
     "taakInplannen": "+ Taak inplannen",
     "sluitTaakplanner": "Sluit taakplanner",
     "komtVandaagOm": "Buddy · komt vandaag om {tijd}",
@@ -173,6 +175,7 @@
     "elkeWeek": "Elke week",
     "andersPlaceholder": "Wat is er nodig?",
     "zetInRooster": "Zet in het rooster",
+    "overlapHint": "Op dit moment staat er al iets. Inplannen mag, maar het loopt door elkaar.",
     "heleWeek": "Hele week plannen →",
     "typeBoodschappen": "Boodschappen",
     "typeWandelen": "Wandelen",
@@ -353,6 +356,11 @@
     "straalKeuze": "Binnen {afstand}",
     "beschikbaarheid": "Mijn beschikbaarheid",
     "beschikbaarheidUitleg": "Kies een week en vink aan op welke dagen je kunt. Het rooster stelt je alleen taken voor op die dagen.",
+    "bioTitel": "Over jou",
+    "bioUitleg": "Een paar zinnen over wie je bent en waarom je helpt. Beheerders lezen dit voordat ze je uitnodigen.",
+    "bioPlaceholder": "Bijv. Ik woon om de hoek, werk parttime en help graag met boodschappen of een wandeling.",
+    "bioBewaard": "Opgeslagen",
+    "bioBewaren": "Bewaar",
     "dezeWeek": "Deze week (wk {week})",
     "weekLabel": "Wk {week}",
     "afwezig": "Even afwezig",
@@ -725,10 +733,10 @@
     "annulerenUitleg": "Gratis tot 24 uur vooraf. De aanbieder krijgt bericht.",
     "annulerenBevestig": "Ja, annuleer",
     "annulerenTeLaat": "Annuleren kan tot 24 uur vooraf. Komt het echt niet uit? Vraag de hulpmakelaar om mee te denken.",
-    "buddyWekelijks": "Elke week, vast moment",
-    "buddyWekelijksUitleg": "Je bouwt een hulpkring op die het samen draagt.",
-    "buddyEenmalig": "Eenmalig, nu of binnenkort",
-    "buddyEenmaligUitleg": "Je zet je vraag op de kaart en de buurt reageert."
+    "buddyWekelijks": "Vaste hulp via je hulpkring",
+    "buddyWekelijksUitleg": "Elke week een vast moment, gedragen door je eigen kring.",
+    "buddyEenmalig": "Spontane hulp",
+    "buddyEenmaligUitleg": "Eenmalig, nu of binnenkort. De buurt reageert op je vraag."
   },
   "rolchip": {
     "beheerder": "beheerder",
@@ -894,12 +902,13 @@
   "buurtScan": {
     "kruimel": "In de buurt",
     "bezig": "Bo kijkt in je buurt...",
-    "gevonden": "In jouw buurt zijn {buddys} buddy’s actief, verdeeld over {kringen} hulpkringen",
+    "gevonden": "In jouw buurt zijn {buddys} buddy’s actief",
     "geenBuddys": "Nog geen buddy’s gevonden bij jou in de buurt",
     "uitlegWekelijks": "Samen met Bo zet je in zes stappen een kring op. Dat duurt een paar minuten.",
     "uitlegEenmalig": "Je vraag komt op de kaart te staan. Buddy’s in de buurt zien hem meteen.",
     "bouwKring": "Bouw mijn hulpkring op",
-    "zetOpKaart": "Zet mijn hulpvraag op de kaart"
+    "zetOpKaart": "Zet mijn hulpvraag op de kaart",
+    "gevonden1": "In jouw buurt is 1 buddy actief"
   },
   "kringopbouw": {
     "kruimel": "Kring opbouwen",
@@ -947,7 +956,9 @@
     "gevraagd": "Gevraagd",
     "leegTitel": "Nog niemand gevonden",
     "leegTekst": "Er is nu geen buddy in je buurt die past bij deze kring. Bo blijft kijken; probeer het over een paar dagen nog eens.",
-    "opDeKaart": "Bekijk de buurt op de kaart"
+    "opDeKaart": "Bekijk buddy’s op de buurtkaart",
+    "opDeKaartUitleg": "Zie meteen wie er bij jou in de buurt woont.",
+    "bekijkProfiel": "Bekijk profiel"
   },
   "mijnCode": {
     "label": "Jouw code",
@@ -968,5 +979,21 @@
     "foutGeenHulpvrager": "Deze code hoort bij iemand die zelf hulp geeft. Nodig die persoon uit als buddy.",
     "foutAlInKring": "Deze persoon hoort al bij een andere hulpkring.",
     "foutEigenCode": "Dit is je eigen code. Vraag de code van de persoon voor wie je zorgt."
+  },
+  "buddyProfiel": {
+    "kruimel": "Buddy",
+    "titel": "Over {naam}",
+    "geenTekst": "{naam} heeft nog niets over zichzelf geschreven.",
+    "takenLabel": "taken gedaan",
+    "taakLabel": "taak gedaan",
+    "kringenLabel": "hulpkringen",
+    "kringLabel": "hulpkring",
+    "waarderingLabel": "waardering",
+    "geenWaardering": "nog geen",
+    "beoordelingen": "op {aantal} beoordelingen",
+    "geenBeoordelingen": "nog geen beoordelingen",
+    "gecontroleerd": "Identiteit gecontroleerd",
+    "beschikbaar": "Meestal beschikbaar",
+    "nietGevonden": "Deze buddy is niet meer zichtbaar."
   }
 }

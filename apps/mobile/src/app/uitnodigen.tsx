@@ -1,21 +1,21 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { useInvite, useMyCircle } from '@/features/circles/api';
+import { PadHeader } from '@/features/navigatie/PadHeader';
 import { t } from '@/i18n';
 import { colors, spacing } from '@/theme';
 import { Button, TextField, TvzText } from '@/ui';
-import { useStatusBalk } from '@/lib/statusbalk';
 
 /**
  * Buddy uitnodigen die je al kent: op e-mailadres of TVZ-ID. Onbekende
  * buddy's uit de buurt stelt Bo voor op /regelen/buddy-zoeken; die twee
  * dingen stonden eerst door elkaar op deze pagina (feedback Jelle 11-08).
+ *
+ * De pagina hoort bij het hulp-pad en houdt daarom de groene kop; hij sprong
+ * eerder uit de kleur van de route (feedback Jelle 11-08).
  */
 export default function UitnodigenScreen() {
-  useStatusBalk('donker');
   const circle = useMyCircle();
   const invite = useInvite(circle.data?.id);
   const [target, setTarget] = useState('');
@@ -44,12 +44,13 @@ export default function UitnodigenScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
+      <PadHeader
+        pad="regelen"
+        actiefRoute="/regelen/kring"
+        kruimels={[t('uitnodigen.titel')]}
+      />
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back}>
-          <TvzText preset="cardTitle">←</TvzText>
-        </Pressable>
-        <TvzText preset="screenTitle">{t('uitnodigen.titel')}</TvzText>
         <TvzText preset="secondary" style={styles.uitleg}>
           {t('uitnodigen.uitleg')}
         </TvzText>
@@ -85,7 +86,7 @@ export default function UitnodigenScreen() {
         />
 
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -98,17 +99,7 @@ const styles = StyleSheet.create({
     padding: spacing.screen,
     paddingBottom: 60,
   },
-  back: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.surfaceAlt,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.lg,
-  },
   uitleg: {
-    marginTop: spacing.xs,
     marginBottom: spacing.xl,
   },
   feedbackOk: {

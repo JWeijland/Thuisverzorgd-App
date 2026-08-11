@@ -24,16 +24,19 @@ export const text = {
   screenTitle: {
     fontFamily: fonts.headingBold,
     fontSize: 27,
+    lineHeight: 36,
     color: colors.ink,
   },
   sectionTitle: {
     fontFamily: fonts.heading,
     fontSize: 17,
+    lineHeight: 24,
     color: colors.primary,
   },
   cardTitle: {
     fontFamily: fonts.heading,
     fontSize: 17,
+    lineHeight: 24,
     color: colors.ink,
   },
   body: {
@@ -57,6 +60,9 @@ export const text = {
   meta: {
     fontFamily: fonts.heading,
     fontSize: 12.5,
+    // Baloo 2 heeft hoge cijfers; zonder expliciete regelhoogte knipt iOS de
+    // bovenkant van bijvoorbeeld een 7 in een prijs af (feedback Jelle 11-08).
+    lineHeight: 18,
     color: colors.inkSoft,
   },
   button: {

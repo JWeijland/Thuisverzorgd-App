@@ -82,8 +82,10 @@ export default function DienstDetail() {
                   })}
                 </TvzText>
               </View>
-              <TvzText preset="hand" style={styles.notitie}>
-                {dienst.provider.note}
+              {/* Gewoon leesbare tekst: het handschriftlettertype maakte het
+                  onrustig (feedback Jelle 11-08). */}
+              <TvzText preset="body" style={styles.notitie}>
+                “{dienst.provider.note}”
               </TvzText>
             </View>
           </SafeAreaView>
@@ -144,10 +146,13 @@ export default function DienstDetail() {
           <TvzText preset="secondary" style={styles.betaalNa}>
             {t('voorzien.betaalNa')}
           </TvzText>
+          {/* Vierkanter dan een gewone pill: dit is de handeling waar de hele
+              pagina om draait (wens Jelle 11-08). */}
           <Button
             label={t('voorzien.boekSlot', { moment: slot.label })}
             variant="cta"
             size="lg"
+            style={styles.boekKnop}
             onPress={() =>
               router.push({
                 pathname: '/dienst/afrekenen',
@@ -218,7 +223,8 @@ const styles = StyleSheet.create({
   notitie: {
     marginTop: spacing.md,
     textAlign: 'center',
-    color: colors.primary,
+    color: colors.inkSoft,
+    fontStyle: 'italic',
   },
   inhoud: {
     padding: spacing.screen,
@@ -292,12 +298,15 @@ const styles = StyleSheet.create({
   },
   prijsRij: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'flex-end',
     gap: spacing.sm,
   },
+  // Regelhoogte ruim boven de tekengrootte: anders sneuvelt de bovenkant van
+  // de cijfers (feedback Jelle 11-08).
   prijs: {
     fontFamily: fonts.headingExtra,
     fontSize: 28,
+    lineHeight: 38,
     color: colors.ink,
   },
   prijsEenheid: {
@@ -306,5 +315,8 @@ const styles = StyleSheet.create({
   betaalNa: {
     marginTop: 2,
     marginBottom: spacing.md,
+  },
+  boekKnop: {
+    borderRadius: radius.card,
   },
 });

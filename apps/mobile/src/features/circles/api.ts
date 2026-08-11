@@ -233,9 +233,42 @@ export type BuddyCard = {
   waardering: number | null;
   kringen: number;
   avatar_path: string | null;
+  /** Korte beschrijving in eigen woorden; leeg als hij niets heeft ingevuld. */
+  bio: string | null;
   /** Afstand tot de kring in km; null als een van beide locaties ontbreekt. */
   afstand_km: number | null;
 };
+
+/** Het buddykaartje zoals je het op zijn eigen pagina ziet. */
+export type BuddyProfiel = {
+  id: string;
+  voornaam: string;
+  city: string | null;
+  bio: string | null;
+  helped_count: number;
+  waardering: number | null;
+  beoordelingen: number;
+  kringen: number;
+  avatar_path: string | null;
+  id_verified: boolean;
+  availability: string[];
+};
+
+/**
+ * Eén buddy bekijken voordat je hem uitnodigt (wens Jelle 11-08). Alleen wat
+ * hij zelf openbaar heeft gemaakt: geen adres, geen telefoonnummer.
+ */
+export function useBuddyProfiel(buddyId: string | undefined) {
+  return useQuery({
+    queryKey: ['buddy-profiel', buddyId],
+    enabled: !!buddyId,
+    queryFn: async (): Promise<BuddyProfiel | null> => {
+      const { data, error } = await supabase.rpc('buddy_profiel', { p_buddy: buddyId! });
+      if (error) throw error;
+      return ((data ?? [])[0] as BuddyProfiel | undefined) ?? null;
+    },
+  });
+}
 
 /**
  * Buddy's om uit te nodigen. Server-side gefilterd op hun eigen hulpstraal:
