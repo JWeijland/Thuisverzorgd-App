@@ -22,6 +22,8 @@ export type KringAntwoorden = {
   code?: string;
   /** Stap 4: wat de kring verder moet weten. */
   goedOmTeWeten?: string;
+  /** Stap 6: één eerste taak, als je die al weet. Mag leeg blijven. */
+  eersteTaak?: TaakSoort;
 };
 
 export type KringConcept = {
@@ -86,49 +88,6 @@ export function useWisKringConcept() {
 }
 
 /**
- * Start de proefweek: het voorstel van Bo gaat als taken de kring in en de
- * teller van zeven dagen begint te lopen. De taken staan open, zodat de kring
- * ze in die week kan oppakken en ruilen.
- */
-export function useStartProefweek() {
-  const { session } = useSession();
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      circleId,
-      taken,
-    }: {
-      circleId: string;
-      taken: { type: TaakSoort; date: string; time: string }[];
-    }) => {
-      if (taken.length > 0) {
-        const { error } = await supabase.from('tasks').insert(
-          taken.map((taak) => ({
-            circle_id: circleId,
-            type: taak.type,
-            date: taak.date,
-            time: taak.time,
-            recurrence: 'wekelijks' as const,
-            status: 'open' as const,
-            created_by: session!.user.id,
-          })),
-        );
-        if (error) throw error;
-      }
-      const { error: kringError } = await supabase
-        .from('circles')
-        .update({ trial_started_at: new Date().toISOString() })
-        .eq('id', circleId);
-      if (kringError) throw kringError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-circle'] });
-      queryClient.invalidateQueries({ queryKey: ['tasks'] });
-    },
-  });
-}
-
-/**
  * Koppelt de persoon voor wie je zorgt aan je kring met zijn eigen code
  * (feedback Jelle 11-08). De oudere leest die code voor; jij vult hem in.
  */
@@ -159,14 +118,3 @@ export function koppelFoutTekst(fout: unknown): string {
   return 'mijnCode.foutOnbekend';
 }
 
-/** Bevestigt na de proefweek dat het rooster werkte. */
-export function useBevestigProefweek() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (circleId: string) => {
-      const { error } = await supabase.rpc('bevestig_proefweek', { p_circle: circleId });
-      if (error) throw error;
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['my-circle'] }),
-  });
-}

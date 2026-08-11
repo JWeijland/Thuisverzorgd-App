@@ -16,17 +16,16 @@ import {
   useBewaarKringConcept,
   useKoppelNaaste,
   useKringConcept,
-  useStartProefweek,
   useWisKringConcept,
   type KringAntwoorden,
   type TaakSoort,
 } from '@/features/circles/kringopbouw';
 import { AdresVeld } from '@/features/circles/AdresVeld';
-import { voorstelRooster } from '@/features/circles/voorstelRooster';
 import { PadHeader } from '@/features/navigatie/PadHeader';
+import { useCreateTask } from '@/features/tasks/api';
 import { taakSoortLabel } from '@/features/tasks/logic';
 import { t } from '@/i18n';
-import { formatHumanDate, formatTime } from '@/lib/dates';
+import { toDateString } from '@/lib/dates';
 import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme';
 import { Bo, Button, Card, TextField, TvzText } from '@/ui';
@@ -71,8 +70,8 @@ function Wizard({
   const bewaar = useBewaarKringConcept();
   const wis = useWisKringConcept();
   const maakKring = useCreateCircle();
-  const startProefweek = useStartProefweek();
   const koppelNaaste = useKoppelNaaste();
+  const maakTaak = useCreateTask(undefined);
   const [stap, setStap] = useState(beginStap);
   const [antwoorden, setAntwoorden] = useState<KringAntwoorden>(beginAntwoorden);
 
@@ -95,6 +94,44 @@ function Wizard({
   function vorige() {
     void haptics.tik();
     setStap((huidig) => Math.max(1, huidig - 1));
+  }
+
+  /**
+   * De kring aanmaken. Eén eerste taak is optioneel: soms weet je al wat er
+   * moet gebeuren, vaak nog niet. Zonder taak is de kring net zo goed af
+   * (wens Jelle 11-08).
+   */
+  async function afronden(metTaak: boolean) {
+    const naam = antwoorden.naam?.trim();
+    if (!naam || maakKring.isPending) return;
+    void haptics.voltooid();
+    const kring = await maakKring.mutateAsync(
+      t('kringopbouw.kringnaam', { naam: naam.split(' ')[0]! }),
+    );
+
+    if (metTaak && antwoorden.eersteTaak) {
+      const morgen = new Date();
+      morgen.setDate(morgen.getDate() + 1);
+      await maakTaak
+        .mutateAsync({
+          circleId: kring.id,
+          type: antwoorden.eersteTaak,
+          date: toDateString(morgen),
+          time: '10:00',
+          recurrence: 'eenmalig',
+        })
+        .catch(() => {});
+    }
+
+    // De code is optioneel: heeft de naaste de app nog niet, dan koppelt de
+    // beheerder hem later vanaf de kringpagina.
+    const code = antwoorden.code?.trim();
+    if (code) {
+      await koppelNaaste.mutateAsync({ circleId: kring.id, code }).catch(() => {});
+    }
+
+    wis.mutate();
+    router.replace('/regelen/planning');
   }
 
   const magVerder =
@@ -259,28 +296,14 @@ function Wizard({
           ) : null}
 
           {stap === 6 ? (
-            <Proefweek
-              antwoorden={antwoorden}
-              bezig={maakKring.isPending || startProefweek.isPending}
-              onStart={async (rooster) => {
-                const naam = antwoorden.naam?.trim();
-                if (!naam) return;
-                void haptics.voltooid();
-                const kring = await maakKring.mutateAsync(
-                  t('kringopbouw.kringnaam', { naam: naam.split(' ')[0]! }),
-                );
-                await startProefweek.mutateAsync({ circleId: kring.id, taken: rooster });
-              // De code is optioneel: heeft de naaste de app nog niet, dan
-              // koppelt de beheerder hem later vanaf de kringpagina.
-              const code = antwoorden.code?.trim();
-              if (code) {
-                await koppelNaaste.mutateAsync({ circleId: kring.id, code }).catch(() => {});
-              }
-                wis.mutate();
-                router.replace('/regelen/planning');
-              }}
+            <EersteTaak
+              gekozen={antwoorden.eersteTaak}
+              onKies={(eersteTaak) => zet({ eersteTaak })}
+              bezig={maakKring.isPending}
+              onKlaar={afronden}
             />
           ) : null}
+
         </ScrollView>
 
         <View style={styles.balk}>
@@ -309,47 +332,65 @@ function Wizard({
 }
 
 /**
- * Stap 6: het voorstel van Bo, zodat je ziet wat je start voordat je start.
- * De taken gaan als concept naar de kring en worden pas echt zichtbaar als
- * de proefweek begint.
+ * Stap 6: hoogstens één eerste taak. Geen voorgesteld rooster meer: dat vulde
+ * de week met dingen die niemand had gevraagd (feedback Jelle 11-08). Weet je
+ * al wat er morgen moet gebeuren, zet het erin; zo niet, dan ga je gewoon
+ * door en plan je later vanuit de planning.
  */
-function Proefweek({
-  antwoorden,
+function EersteTaak({
+  gekozen,
+  onKies,
   bezig,
-  onStart,
+  onKlaar,
 }: {
-  antwoorden: KringAntwoorden;
+  gekozen?: TaakSoort;
+  onKies: (taak: TaakSoort | undefined) => void;
   bezig: boolean;
-  onStart: (rooster: ReturnType<typeof voorstelRooster>) => void;
+  onKlaar: (metTaak: boolean) => void;
 }) {
-  const rooster = voorstelRooster(antwoorden, new Date());
-
   return (
-    <Card style={styles.kaart}>
-      <TvzText preset="body">{t('kringopbouw.proefweekUitleg')}</TvzText>
-      <View style={styles.rooster}>
-        {rooster.map((taak) => (
-          <View key={`${taak.type}-${taak.date}`} style={styles.roosterRij}>
-            <TvzText preset="cardTitle" style={styles.roosterTaak}>
-              {taakSoortLabel(taak.type)}
-            </TvzText>
-            <TvzText preset="secondary">
-              {formatHumanDate(new Date(taak.date))} · {formatTime(taak.time)}
-            </TvzText>
-          </View>
-        ))}
+    <>
+      <View style={styles.raster}>
+        {TAKEN.map((taak) => {
+          const aan = gekozen === taak;
+          return (
+            <Pressable
+              key={taak}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: aan }}
+              accessibilityLabel={taakSoortLabel(taak)}
+              onPress={() => {
+                void haptics.selectie();
+                onKies(aan ? undefined : taak);
+              }}
+              style={[styles.blokje, aan && styles.blokjeAan]}
+            >
+              <TvzText preset="cardTitle">{taakSoortLabel(taak)}</TvzText>
+            </Pressable>
+          );
+        })}
       </View>
+
+      <TvzText preset="secondary" style={styles.eersteTaakUitleg}>
+        {gekozen ? t('kringopbouw.eersteTaakWanneer') : t('kringopbouw.eersteTaakUitleg')}
+      </TvzText>
+
       <Button
-        label={t('kringopbouw.startProefweek')}
+        label={t('kringopbouw.kringAanmaken')}
         variant="cta"
         size="lg"
-        disabled={bezig || rooster.length === 0}
-        onPress={() => onStart(rooster)}
+        disabled={bezig || !gekozen}
+        onPress={() => onKlaar(true)}
       />
-    </Card>
+      <Button
+        label={t('kringopbouw.zonderTaak')}
+        variant="outline"
+        disabled={bezig}
+        onPress={() => onKlaar(false)}
+      />
+    </>
   );
 }
-
 const styles = StyleSheet.create({
   codeTip: {
     color: colors.inkFaint,
@@ -384,6 +425,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tintBlue,
     borderRadius: radius.row,
     padding: spacing.md,
+  },
+  eersteTaakUitleg: {
+    marginBottom: spacing.sm,
   },
   raster: {
     flexDirection: 'row',

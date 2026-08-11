@@ -120,13 +120,18 @@ export type NewTask = {
   status?: Task['status'];
 };
 
+/**
+ * Een taak aanmaken. De kring komt normaal uit de hook, maar mag per aanroep
+ * worden meegegeven: bij het opbouwen van een kring bestaat die kring pas
+ * nadat de hook al is aangemaakt.
+ */
 export function useCreateTask(circleId: string | undefined) {
   const { session } = useSession();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (task: NewTask) => {
+    mutationFn: async ({ circleId: eigenKring, ...task }: NewTask & { circleId?: string }) => {
       const { error } = await supabase.from('tasks').insert({
-        circle_id: circleId!,
+        circle_id: eigenKring ?? circleId!,
         created_by: session!.user.id,
         ...task,
       });

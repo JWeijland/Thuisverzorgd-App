@@ -13,7 +13,6 @@ import { X } from 'lucide-react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useMyCircle } from '@/features/circles/api';
-import { ProefweekTerugblik } from '@/features/circles/ProefweekTerugblik';
 import { KringBerichtenKnop } from '@/features/circles/KringBerichtenKnop';
 import { InboxBell } from '@/features/notifications/InboxBell';
 import { useTaskLogs, useTaskRpc, useTasks } from '@/features/tasks/api';
@@ -99,15 +98,6 @@ export function RoosterBeheerder() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          {circle.data ? (
-            <ProefweekTerugblik
-              circleId={circle.data.id}
-              gestartOp={circle.data.trial_started_at ?? null}
-              bevestigdOp={circle.data.trial_confirmed_at ?? null}
-              nu={now}
-            />
-          ) : null}
-
           {/* Zonder kring kun je geen kringtaak inplannen, maar wel spontane
               hulp vragen: die pakt een vrijwilliger uit de buurt op, ook
               zonder kring (feedback Jelle 11-08). */}

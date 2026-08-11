@@ -1,8 +1,15 @@
 import { useLocalSearchParams, router } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
-import { TvzMap } from '@/features/map/TvzMap';
+import { BuddyMetFoto } from '@/features/map/BuddyMetFoto';
+import {
+  KringMarker,
+  OwnLocationMarker,
+  TvzMap,
+  type TvzMapHandle,
+} from '@/features/map/TvzMap';
 import { useBuurtScan } from '@/features/map/useBuurtScan';
 import { PadHeader } from '@/features/navigatie/PadHeader';
 import { t } from '@/i18n';
@@ -21,6 +28,25 @@ export default function BuurtScan() {
   const { soort } = useLocalSearchParams<{ soort?: string }>();
   const wekelijks = soort !== 'eenmalig';
   const scan = useBuurtScan();
+  const kaart = useRef<TvzMapHandle>(null);
+
+  // Zodra de locatie binnen is, schuift de kaart naar je eigen buurt; anders
+  // kijk je naar het midden van het land en zie je de markers niet. Eén keer,
+  // daarna mag je zelf rondkijken.
+  const gericht = useRef(false);
+  useEffect(() => {
+    if (gericht.current || !scan.locatie) return;
+    gericht.current = true;
+    kaart.current?.animateToRegion(
+      {
+        latitude: scan.locatie.lat,
+        longitude: scan.locatie.lon,
+        latitudeDelta: 0.08,
+        longitudeDelta: 0.06,
+      },
+      600,
+    );
+  }, [scan.locatie]);
 
   return (
     <View style={styles.safe}>
@@ -32,7 +58,26 @@ export default function BuurtScan() {
 
       <View style={styles.kaartWrap}>
         <View style={styles.kaart}>
-          <TvzMap initialRegion={DEFAULT_REGION} />
+          {/* De buddy's en kringen die Bo vindt staan ook echt op de kaart:
+              de telling zegt hoeveel, de kaart laat zien waar (wens Jelle
+              11-08). Zodra we de locatie hebben, kijkt de kaart daarheen. */}
+          <TvzMap ref={kaart} initialRegion={DEFAULT_REGION}>
+            {scan.kringLijst.map((kring) => (
+              <KringMarker
+                key={kring.id}
+                lat={kring.lat}
+                lon={kring.lon}
+                naam={kring.name}
+                plekkenVrij={kring.plekken_vrij}
+              />
+            ))}
+            {scan.buddyLijst.map((buddy) => (
+              <BuddyMetFoto key={buddy.id} buddy={buddy} />
+            ))}
+            {scan.locatie ? (
+              <OwnLocationMarker lat={scan.locatie.lat} lon={scan.locatie.lon} />
+            ) : null}
+          </TvzMap>
         </View>
         <View pointerEvents="box-none" style={styles.overlay}>
           {scan.bezig ? (

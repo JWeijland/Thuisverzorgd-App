@@ -5,8 +5,8 @@ import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MapPin, Search, Zap } from 'lucide-react-native';
 
-import { useAvatarUrl } from '@/features/avatars/api';
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
+import { BuddyMetFoto } from '@/features/map/BuddyMetFoto';
 import {
   useMapBuddies,
   useMapCircles,
@@ -17,7 +17,6 @@ import {
   type MapCircle,
 } from '@/features/map/api';
 import {
-  BuddyMarker,
   KringMarker,
   OwnLocationMarker,
   RequestMarker,
@@ -691,19 +690,6 @@ function HulpvraagKaart({
 }
 
 /** Buddy-marker die zelf de profielfoto uit de privé-bucket ophaalt. */
-function BuddyMetFoto({ buddy, onPress }: { buddy: MapBuddy; onPress: () => void }) {
-  const url = useAvatarUrl(buddy.avatar_path);
-  return (
-    <BuddyMarker
-      lat={buddy.lat}
-      lon={buddy.lon}
-      voornaam={buddy.voornaam}
-      onPress={onPress}
-      uri={url.data ?? undefined}
-    />
-  );
-}
-
 const styles = StyleSheet.create({
   fill: {
     flex: 1,

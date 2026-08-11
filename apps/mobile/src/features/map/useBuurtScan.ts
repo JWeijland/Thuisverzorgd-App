@@ -1,7 +1,7 @@
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
 
-import { useMapBuddies, useMapCircles } from '@/features/map/api';
+import { useMapBuddies, useMapCircles, type MapBuddy, type MapCircle } from '@/features/map/api';
 import { haversineKm, type LatLng } from '@/lib/geo';
 
 /** Binnen hoeveel kilometer telt "in jouw buurt"? */
@@ -14,6 +14,12 @@ export type BuurtScan = {
   bezig: boolean;
   buddys: number;
   kringen: number;
+  /** De buddy's zelf, zodat de kaart ze kan tekenen. */
+  buddyLijst: MapBuddy[];
+  /** De kringen zelf, voor dezelfde reden. */
+  kringLijst: MapCircle[];
+  /** Waar de kaart naartoe moet kijken; null zolang er geen locatie is. */
+  locatie: LatLng | null;
 };
 
 /**
@@ -69,5 +75,8 @@ export function useBuurtScan(): BuurtScan {
     bezig: !tijdOm || !locatieKlaar || kringen.isLoading || buddys.isLoading,
     buddys: buddysDichtbij.length,
     kringen: kringenDichtbij.length,
+    buddyLijst: buddysDichtbij,
+    kringLijst: kringenDichtbij,
+    locatie,
   };
 }
