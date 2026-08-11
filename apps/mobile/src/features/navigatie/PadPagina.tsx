@@ -1,6 +1,11 @@
-import type { ReactNode } from 'react';
-import { StyleSheet } from 'react-native';
-import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated';
+import { useEffect, type ReactNode } from 'react';
+import { StyleSheet, useWindowDimensions } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { create } from 'zustand';
 
 import { colors } from '@/theme';
@@ -34,23 +39,33 @@ const DUUR = 220;
 /**
  * De inhoud van een pagina binnen een pad. Schuift bij binnenkomst de kant op
  * die past bij het schuifje dat je aantikte.
+ *
+ * Bewust met een eigen translateX en niet met een `entering`-animatie van
+ * Reanimated: die rekent vanaf de rand van het scherm, waardoor de inhoud
+ * tijdens de overgang over de header heen kon lopen. Deze variant raakt de
+ * layout niet aan, dus de pagina blijft altijd netjes onder de schuifjes.
  */
 export function PadPagina({ children }: { children: ReactNode }) {
   const richting = useSchuifRichting((state) => state.richting);
-  return (
-    <Animated.View
-      key={`pad-${richting}`}
-      entering={(richting === 1 ? SlideInRight : SlideInLeft).duration(DUUR)}
-      style={styles.vlak}
-    >
-      {children}
-    </Animated.View>
-  );
+  const { width } = useWindowDimensions();
+  const verschuiving = useSharedValue(richting * width * 0.25);
+
+  useEffect(() => {
+    verschuiving.value = withTiming(0, { duration: DUUR, easing: Easing.out(Easing.cubic) });
+  }, [verschuiving]);
+
+  const beweging = useAnimatedStyle(() => ({
+    transform: [{ translateX: verschuiving.value }],
+  }));
+
+  return <Animated.View style={[styles.vlak, beweging]}>{children}</Animated.View>;
 }
 
 const styles = StyleSheet.create({
   vlak: {
     flex: 1,
     backgroundColor: colors.bg,
+    // De pagina beweegt binnen zijn eigen vlak; niets steekt eroverheen.
+    overflow: 'hidden',
   },
 });

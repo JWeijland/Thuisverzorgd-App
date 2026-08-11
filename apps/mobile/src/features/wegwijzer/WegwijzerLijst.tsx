@@ -97,36 +97,35 @@ export function WegwijzerLijst({ kop }: { kop?: ReactNode }) {
 
   return (
     <View style={styles.fill}>
-      <View style={styles.zoekbalk}>
-        <Search color={colors.inkFaint} size={19} strokeWidth={2.2} />
-        <TextInput
-          textContentType="none"
-          autoComplete="off"
-          value={term}
-          onChangeText={setTerm}
-          placeholder={t('wegwijzer.zoekPlaceholder')}
-          placeholderTextColor={colors.inkFaint}
-          style={styles.zoekveld}
-          autoCorrect={false}
-          returnKeyType="search"
-          accessibilityLabel={t('wegwijzer.zoekPlaceholder')}
-        />
-        {term.length > 0 ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('wegwijzer.wissen')}
-            onPress={() => setTerm('')}
-            hitSlop={10}
-          >
-            <X color={colors.inkSoft} size={18} strokeWidth={2.4} />
-          </Pressable>
-        ) : null}
-      </View>
-
       <ScrollView contentContainerStyle={styles.list} keyboardShouldPersistTaps="handled">
         {/* Alles boven de kennisbank (vandaag-strip, makelaar-blok) scrolt mee,
             zodat de pagina één doorlopend geheel blijft. */}
         {!zoekt && kop ? kop : null}
+        <View style={styles.zoekbalk}>
+          <Search color={colors.inkFaint} size={19} strokeWidth={2.2} />
+          <TextInput
+            textContentType="none"
+            autoComplete="off"
+            value={term}
+            onChangeText={setTerm}
+            placeholder={t('wegwijzer.zoekPlaceholder')}
+            placeholderTextColor={colors.inkFaint}
+            style={styles.zoekveld}
+            autoCorrect={false}
+            returnKeyType="search"
+            accessibilityLabel={t('wegwijzer.zoekPlaceholder')}
+          />
+          {term.length > 0 ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('wegwijzer.wissen')}
+              onPress={() => setTerm('')}
+              hitSlop={10}
+            >
+              <X color={colors.inkSoft} size={18} strokeWidth={2.4} />
+            </Pressable>
+          ) : null}
+        </View>
         {zoekt ? (
           <>
             {(suggesties.data ?? []).length > 0 ? (
@@ -502,8 +501,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     paddingHorizontal: 16,
     minHeight: 48,
-    marginHorizontal: spacing.screen,
-    marginTop: spacing.lg,
+    marginBottom: spacing.md,
   },
   zoekveld: {
     flex: 1,
