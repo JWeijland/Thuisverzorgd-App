@@ -8,7 +8,8 @@ import { KringMotief } from '@/features/circles/KringMotief';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
-import { Button, Card, EmptyState, GradientHeader, RolChip, TvzText } from '@/ui';
+import { Button, Card, EmptyState, RolChip, TvzText } from '@/ui';
+import { PaginaKop } from '@/ui/PaginaKop';
 
 /**
  * Mijn kring (hulpvrager, ontwerp 4.0): het scherm dat de rollen uitlegt.
@@ -26,13 +27,8 @@ export function MijnKring() {
 
   return (
     <View style={styles.safe}>
-      <GradientHeader
-        title={t('mijnKring.titel')}
-        subtitle={t('mijnKring.uitleg')}
-        wobbel
-        bo
-        boRol="hulpvrager"
-      />
+      {/* De gekleurde kop is nu de PadHeader van het hulp-pad. */}
+      <PaginaKop titel={t('mijnKring.titel')} sub={t('mijnKring.uitleg')} />
       <ScrollView contentContainerStyle={styles.lijst}>
         {!circle.isLoading && !circle.data ? (
           <Card>

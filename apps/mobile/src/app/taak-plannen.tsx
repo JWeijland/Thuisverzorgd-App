@@ -16,7 +16,14 @@ import { colors, hitTarget, radius, spacing } from '@/theme';
 import { Card, EmptyState, TvzText } from '@/ui';
 import { Button } from '@/ui/Button';
 
-const TYPES: Task['type'][] = ['boodschappen', 'wandelen', 'vervoer', 'koken', 'gezelschap', 'anders'];
+const TYPES: Task['type'][] = [
+  'boodschappen',
+  'wandelen',
+  'vervoer',
+  'koken',
+  'gezelschap',
+  'anders',
+];
 
 const SNELKEUZES = [
   { labelKey: 'planner.ochtend', tijd: '09:00' },
@@ -66,13 +73,9 @@ export default function TaakPlannen() {
       time: tijd,
       recurrence: herhaling,
     };
-    maakTaak.mutate(
-      wie ? { ...taak, claimed_by: wie, status: 'ingepland' } : taak,
-      {
-        onSuccess: () =>
-          router.replace(`/regelen/planning?ingepland=${toDateString(dag)}` as never),
-      },
-    );
+    maakTaak.mutate(wie ? { ...taak, claimed_by: wie, status: 'ingepland' } : taak, {
+      onSuccess: () => router.replace(`/regelen/planning?ingepland=${toDateString(dag)}` as never),
+    });
   }
 
   if (!circle.isLoading && !circle.data) {
@@ -294,7 +297,8 @@ export default function TaakPlannen() {
           </TvzText>
           {herhaling !== 'eenmalig' ? (
             <TvzText preset="meta">
-              {t(`planner.herhaling_${herhaling}`)} · {wie ? t('planner.vastPersoon') : t('planner.openVoorKring')}
+              {t(`planner.herhaling_${herhaling}`)} ·{' '}
+              {wie ? t('planner.vastPersoon') : t('planner.openVoorKring')}
             </TvzText>
           ) : null}
         </View>

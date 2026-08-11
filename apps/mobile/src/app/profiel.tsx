@@ -212,7 +212,7 @@ export default function ProfielScreen() {
 
   return (
     <View style={styles.safe}>
-      <GradientHeader title={t('profiel.titel')} subtitle={t('profiel.subtitel')} wobbel />
+      <GradientHeader title={t('profiel.titel')} subtitle={t('profiel.subtitel')} wobbel terug />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <Pressable

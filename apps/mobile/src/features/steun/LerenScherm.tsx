@@ -5,7 +5,8 @@ import { ChevronRight, MessagesSquare } from 'lucide-react-native';
 import { OpleidingenLijst } from '@/features/learning/OpleidingenLijst';
 import { t } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
-import { Card, GradientHeader, TvzText } from '@/ui';
+import { Card, TvzText } from '@/ui';
+import { PaginaKop } from '@/ui/PaginaKop';
 
 /**
  * Leren: de steun-tab van de buddy (ontwerp 4.0). Korte opleidingen die
@@ -15,13 +16,9 @@ import { Card, GradientHeader, TvzText } from '@/ui';
 export function LerenScherm() {
   return (
     <View style={styles.safe}>
-      <GradientHeader
-        title={t('leren.titel')}
-        subtitle={t('leren.uitleg')}
-        wobbel
-        bo
-        boRol="vrijwilliger"
-      />
+      {/* De gekleurde kop is nu de PadHeader van het vrijwilligerspad; hier
+          blijft alleen de lichte paginakop over. */}
+      <PaginaKop titel={t('leren.titel')} sub={t('leren.uitleg')} />
       <OpleidingenLijst
         footer={
           <Pressable accessibilityRole="button" onPress={() => router.push('/weten/forum')}>

@@ -54,7 +54,12 @@ export default function VerhaalScreen() {
         </Card>
 
         <View style={styles.voet}>
-          <Button label={t('algemeen.verder')} variant="cta" size="lg" onPress={() => router.replace('/rolkeuze')} />
+          <Button
+            label={t('algemeen.verder')}
+            variant="cta"
+            size="lg"
+            onPress={() => router.replace('/rolkeuze')}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>

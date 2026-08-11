@@ -37,7 +37,10 @@ export default function PadKeuze() {
           <Bo width={78} />
         </View>
 
-        <PadKaart pad={PADEN.weten} icoon={<BookOpen color={colors.white} size={20} strokeWidth={2.3} />} />
+        <PadKaart
+          pad={PADEN.weten}
+          icoon={<BookOpen color={colors.white} size={20} strokeWidth={2.3} />}
+        />
         <PadKaart
           pad={PADEN.regelen}
           icoon={<HeartHandshake color={colors.white} size={20} strokeWidth={2.3} />}

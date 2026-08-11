@@ -1,9 +1,12 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import { ArrowLeft } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
+import { t } from '@/i18n';
 import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, gradient, spacing } from '@/theme';
 import { BoPeek, type BoRol } from '@/ui/Bo';
@@ -22,6 +25,8 @@ type Props = {
   bo?: boolean;
   /** Rolkleur van Bo (ontwerp 4.0); zonder rol blijft Bo groen. */
   boRol?: BoRol;
+  /** Terugpijl linksboven; elke pagina hoort een weg terug te hebben. */
+  terug?: boolean;
 };
 
 const WAVE_HEIGHT = 18;
@@ -31,7 +36,16 @@ const WAVE_HEIGHT = 18;
  * dezelfde afmetingen (schermpadding, titel 24, subtitel). Met `wobbel` krijgt
  * hij de getekende onderrand en het groene streepje uit ontwerp 1a.
  */
-export function GradientHeader({ title, subtitle, right, children, wobbel = false, bo, boRol }: Props) {
+export function GradientHeader({
+  title,
+  subtitle,
+  right,
+  children,
+  wobbel = false,
+  bo,
+  boRol,
+  terug = false,
+}: Props) {
   const { width } = useWindowDimensions();
   // Op de blauwe kop moeten klok, wifi en batterij wit zijn. Elk scherm met
   // deze kop regelt dat zo vanzelf.
@@ -41,6 +55,16 @@ export function GradientHeader({ title, subtitle, right, children, wobbel = fals
     <LinearGradient {...gradient} style={[styles.header, wobbel && styles.headerWobbel]}>
       <SafeAreaView edges={['top']}>
         <View style={styles.titleRow}>
+          {terug ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('algemeen.terug')}
+              onPress={() => (router.canGoBack() ? router.back() : router.replace('/pad'))}
+              style={styles.terug}
+            >
+              <ArrowLeft color={colors.white} size={20} strokeWidth={2.4} />
+            </Pressable>
+          ) : null}
           <View style={styles.titleWrap}>
             <TvzText preset="screenTitle" style={styles.title}>
               {title}
@@ -109,6 +133,15 @@ const styles = StyleSheet.create({
   },
   titleWrap: {
     flex: 1,
+  },
+  terug: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    marginTop: spacing.sm,
   },
   title: {
     color: colors.white,

@@ -187,11 +187,16 @@ export type BrokerMessage = {
  * Eigen chat ophalen of aanmaken. Met `brokerId` is het gesprek gericht aan
  * die ene makelaar; zonder keuze is het de algemene wachtrij.
  */
+/**
+ * Het gesprek met één hulpmakelaar. Zonder gekozen makelaar wordt er bewust
+ * geen gesprek aangemaakt: je stelt je vraag altijd aan één persoon, nooit
+ * aan alle makelaars tegelijk (wens Jelle 11-08).
+ */
 export function useMyBrokerChat(brokerId: string | null = null) {
   const { session } = useSession();
   return useQuery({
     queryKey: ['broker-chat', session?.user.id, brokerId],
-    enabled: !!session,
+    enabled: !!session && !!brokerId,
     queryFn: async (): Promise<string> => {
       const { data, error } = await supabase.rpc('ensure_broker_chat', { p_broker: brokerId });
       if (error) throw error;

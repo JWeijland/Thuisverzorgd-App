@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { KringScreen } from '@/features/circles/screens/KringScreen';
 import { MijnKring } from '@/features/circles/screens/MijnKring';
 import { PadHeader } from '@/features/navigatie/PadHeader';
+import { PadPagina } from '@/features/navigatie/PadPagina';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { colors } from '@/theme';
 
@@ -16,7 +17,7 @@ export default function Kring() {
   return (
     <View style={styles.safe}>
       <PadHeader pad="regelen" />
-      {profile.data?.role === 'hulpvrager' ? <MijnKring /> : <KringScreen />}
+      <PadPagina>{profile.data?.role === 'hulpvrager' ? <MijnKring /> : <KringScreen />}</PadPagina>
     </View>
   );
 }

@@ -19,6 +19,7 @@ import { useKeyboardOpen } from '@/lib/keyboard';
 import { colors, radius, spacing } from '@/theme';
 import { Card, Chip, EmptyState, Pill, TvzText } from '@/ui';
 import { PadHeader } from '@/features/navigatie/PadHeader';
+import { PadPagina } from '@/features/navigatie/PadPagina';
 
 function timeAgo(iso: string): string {
   const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
@@ -52,90 +53,92 @@ export default function ForumScreen() {
   return (
     <View style={styles.safeBg}>
       <PadHeader pad="weten" />
-      <KeyboardAvoidingView
-        style={styles.fill}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView contentContainerStyle={styles.list}>
-          <View style={styles.chips}>
-            <Chip
-              label={t('steun.tagAlles')}
-              selected={filter === null}
-              onPress={() => setFilter(null)}
-            />
-            {TAGS.map((tag) => (
+      <PadPagina>
+        <KeyboardAvoidingView
+          style={styles.fill}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <ScrollView contentContainerStyle={styles.list}>
+            <View style={styles.chips}>
               <Chip
-                key={tag.key}
-                label={t(tag.labelKey)}
-                selected={filter === tag.key}
-                onPress={() => setFilter(tag.key)}
+                label={t('steun.tagAlles')}
+                selected={filter === null}
+                onPress={() => setFilter(null)}
               />
-            ))}
-          </View>
+              {TAGS.map((tag) => (
+                <Chip
+                  key={tag.key}
+                  label={t(tag.labelKey)}
+                  selected={filter === tag.key}
+                  onPress={() => setFilter(tag.key)}
+                />
+              ))}
+            </View>
 
-          {!posts.isLoading && (posts.data ?? []).length === 0 ? (
-            <Card>
-              <EmptyState title={t('steun.leegTitel')} body={t('steun.leegTekst')} />
-            </Card>
-          ) : null}
-          {(posts.data ?? []).map((post) => (
-            <Pressable
-              key={post.id}
-              accessibilityRole="button"
-              onPress={() => router.push({ pathname: '/forum/[id]', params: { id: post.id } })}
-            >
-              <Card style={styles.postCard}>
-                <View style={styles.postKop}>
-                  <ProfileAvatar name={post.voornaam} avatarPath={post.avatar_path} size={36} />
-                  <View style={styles.postKopText}>
-                    <View style={styles.postMeta}>
-                      <TvzText preset="meta" style={styles.metaText}>
-                        {post.voornaam}
-                        {post.city ? ` · ${post.city}` : ''} · {timeAgo(post.created_at)}
-                      </TvzText>
-                      <Pill label={t(TAG_LABEL[post.tag])} />
-                    </View>
-                    <TvzText preset="cardTitle" style={styles.postTitle}>
-                      {post.title}
-                    </TvzText>
-                    <TvzText preset="secondary">
-                      {post.antwoorden === 0
-                        ? t('steun.nogGeen')
-                        : post.antwoorden === 1
-                          ? t('steun.antwoord1')
-                          : t('steun.antwoorden', { aantal: post.antwoorden })}
-                    </TvzText>
-                  </View>
-                </View>
+            {!posts.isLoading && (posts.data ?? []).length === 0 ? (
+              <Card>
+                <EmptyState title={t('steun.leegTitel')} body={t('steun.leegTekst')} />
               </Card>
-            </Pressable>
-          ))}
-        </ScrollView>
+            ) : null}
+            {(posts.data ?? []).map((post) => (
+              <Pressable
+                key={post.id}
+                accessibilityRole="button"
+                onPress={() => router.push({ pathname: '/forum/[id]', params: { id: post.id } })}
+              >
+                <Card style={styles.postCard}>
+                  <View style={styles.postKop}>
+                    <ProfileAvatar name={post.voornaam} avatarPath={post.avatar_path} size={36} />
+                    <View style={styles.postKopText}>
+                      <View style={styles.postMeta}>
+                        <TvzText preset="meta" style={styles.metaText}>
+                          {post.voornaam}
+                          {post.city ? ` · ${post.city}` : ''} · {timeAgo(post.created_at)}
+                        </TvzText>
+                        <Pill label={t(TAG_LABEL[post.tag])} />
+                      </View>
+                      <TvzText preset="cardTitle" style={styles.postTitle}>
+                        {post.title}
+                      </TvzText>
+                      <TvzText preset="secondary">
+                        {post.antwoorden === 0
+                          ? t('steun.nogGeen')
+                          : post.antwoorden === 1
+                            ? t('steun.antwoord1')
+                            : t('steun.antwoorden', { aantal: post.antwoorden })}
+                      </TvzText>
+                    </View>
+                  </View>
+                </Card>
+              </Pressable>
+            ))}
+          </ScrollView>
 
-        {/* Typebalk: de gekozen categorie staat als pil vóór het veld. */}
-        <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
-          {filter ? <Pill label={t(TAG_LABEL[filter])} /> : null}
-          <TextInput
-            textContentType="none"
-            autoComplete="off"
-            value={quick}
-            onChangeText={setQuick}
-            placeholder={t('steun.forumSnelPlaceholder')}
-            placeholderTextColor={colors.inkFaint}
-            style={styles.input}
-            onSubmitEditing={submitQuick}
-            returnKeyType="send"
-          />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('steun.plaatsVraag')}
-            onPress={submitQuick}
-            style={styles.sendButton}
-          >
-            <Send color={colors.white} size={18} strokeWidth={2.2} />
-          </Pressable>
-        </View>
-      </KeyboardAvoidingView>
+          {/* Typebalk: de gekozen categorie staat als pil vóór het veld. */}
+          <View style={[styles.inputRow, keyboardOpen && styles.inputRowKeyboard]}>
+            {filter ? <Pill label={t(TAG_LABEL[filter])} /> : null}
+            <TextInput
+              textContentType="none"
+              autoComplete="off"
+              value={quick}
+              onChangeText={setQuick}
+              placeholder={t('steun.forumSnelPlaceholder')}
+              placeholderTextColor={colors.inkFaint}
+              style={styles.input}
+              onSubmitEditing={submitQuick}
+              returnKeyType="send"
+            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('steun.plaatsVraag')}
+              onPress={submitQuick}
+              style={styles.sendButton}
+            >
+              <Send color={colors.white} size={18} strokeWidth={2.2} />
+            </Pressable>
+          </View>
+        </KeyboardAvoidingView>
+      </PadPagina>
     </View>
   );
 }

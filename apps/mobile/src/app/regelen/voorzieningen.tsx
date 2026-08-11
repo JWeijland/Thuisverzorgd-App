@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { PadHeader } from '@/features/navigatie/PadHeader';
+import { PadPagina } from '@/features/navigatie/PadPagina';
 import { Marktplaats } from '@/features/voorzieningen/Marktplaats';
 import { colors } from '@/theme';
 
@@ -13,7 +14,9 @@ export default function Voorzieningen() {
   return (
     <View style={styles.safe}>
       <PadHeader pad="regelen" />
-      <Marktplaats />
+      <PadPagina>
+        <Marktplaats />
+      </PadPagina>
     </View>
   );
 }

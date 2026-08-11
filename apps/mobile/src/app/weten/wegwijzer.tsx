@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { useMyCircle } from '@/features/circles/api';
 import { PadHeader } from '@/features/navigatie/PadHeader';
+import { PadPagina } from '@/features/navigatie/PadPagina';
 import { useTasks } from '@/features/tasks/api';
 import { taskLabel } from '@/features/tasks/logic';
 import { MakelaarHero } from '@/features/wegwijzer/MakelaarHero';
@@ -57,7 +58,9 @@ export default function Wegwijzer() {
   return (
     <View style={styles.safe}>
       <PadHeader pad="weten" />
-      <WegwijzerLijst kop={kop} />
+      <PadPagina>
+        <WegwijzerLijst kop={kop} />
+      </PadPagina>
     </View>
   );
 }

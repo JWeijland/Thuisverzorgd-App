@@ -1,6 +1,14 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { useCreateCircle } from '@/features/circles/api';
 import {
@@ -9,10 +17,10 @@ import {
   useKringConcept,
   useStartProefweek,
   useWisKringConcept,
-  type Dagdeel,
   type KringAntwoorden,
   type TaakSoort,
 } from '@/features/circles/kringopbouw';
+import { AdresVeld } from '@/features/circles/AdresVeld';
 import { voorstelRooster } from '@/features/circles/voorstelRooster';
 import { PadHeader } from '@/features/navigatie/PadHeader';
 import { taakSoortLabel } from '@/features/tasks/logic';
@@ -23,7 +31,6 @@ import { colors, radius, spacing } from '@/theme';
 import { Bo, Button, Card, TextField, TvzText } from '@/ui';
 
 const TAKEN: TaakSoort[] = ['boodschappen', 'wandelen', 'vervoer', 'koken', 'gezelschap', 'anders'];
-const DAGDELEN: Dagdeel[] = ['ochtend', 'middag', 'avond'];
 
 /**
  * Kring opbouwen in zes stappen met Bo (handoff §3e). Elke stap is één vraag,
@@ -40,7 +47,11 @@ export default function KringOpbouwen() {
   if (concept.isLoading) {
     return (
       <View style={styles.safe}>
-        <PadHeader pad="regelen" actiefRoute="/regelen/kring" kruimels={[t('kringopbouw.kruimel')]} />
+        <PadHeader
+          pad="regelen"
+          actiefRoute="/regelen/kring"
+          kruimels={[t('kringopbouw.kruimel')]}
+        />
       </View>
     );
   }
@@ -69,9 +80,7 @@ function Wizard({
 
   function toggle<T>(lijst: T[] | undefined, waarde: T): T[] {
     const huidig = lijst ?? [];
-    return huidig.includes(waarde)
-      ? huidig.filter((item) => item !== waarde)
-      : [...huidig, waarde];
+    return huidig.includes(waarde) ? huidig.filter((item) => item !== waarde) : [...huidig, waarde];
   }
 
   function verder() {
@@ -87,176 +96,185 @@ function Wizard({
   }
 
   const magVerder =
-    stap === 1 ? !!antwoorden.naam?.trim() : stap === 3 ? (antwoorden.taken ?? []).length > 0 : true;
+    stap === 1
+      ? !!antwoorden.naam?.trim()
+      : stap === 3
+        ? (antwoorden.taken ?? []).length > 0
+        : true;
 
   return (
     <View style={styles.safe}>
       <PadHeader
         pad="regelen"
         actiefRoute="/regelen/kring"
-        kruimels={[t('kringopbouw.kruimel'), t('kringopbouw.stapVan', { stap, totaal: KRINGOPBOUW_STAPPEN })]}
-        terug={false}
+        kruimels={[
+          t('kringopbouw.kruimel'),
+          t('kringopbouw.stapVan', { stap, totaal: KRINGOPBOUW_STAPPEN }),
+        ]}
       />
 
-      <ScrollView contentContainerStyle={styles.inhoud} keyboardShouldPersistTaps="handled">
-        <View style={styles.tip}>
-          <Bo width={54} />
-          <TvzText preset="body" style={styles.tipTekst}>
-            {t(`kringopbouw.tip${stap}`)}
-          </TvzText>
-        </View>
-
-        <TvzText preset="screenTitle">{t(`kringopbouw.titel${stap}`, { naam: antwoorden.naam?.split(' ')[0] ?? t('kringopbouw.diegene') })}</TvzText>
-
-        {stap === 1 ? (
-          <Card style={styles.kaart}>
-            <TextField
-              label={t('kringopbouw.naamLabel')}
-              value={antwoorden.naam ?? ''}
-              onChangeText={(naam) => zet({ naam })}
-              placeholder={t('kringopbouw.naamPlaceholder')}
-            />
-            <TextField
-              label={t('kringopbouw.relatieLabel')}
-              value={antwoorden.relatie ?? ''}
-              onChangeText={(relatie) => zet({ relatie })}
-              placeholder={t('kringopbouw.relatiePlaceholder')}
-            />
-          </Card>
-        ) : null}
-
-        {stap === 2 ? (
-          <Card style={styles.kaart}>
-            <TextField
-              label={t('kringopbouw.adresLabel')}
-              value={antwoorden.adres ?? ''}
-              onChangeText={(adres) => zet({ adres })}
-              placeholder={t('kringopbouw.adresPlaceholder')}
-            />
-            <TextField
-              label={t('kringopbouw.thuisLabel')}
-              value={antwoorden.thuissituatie ?? ''}
-              onChangeText={(thuissituatie) => zet({ thuissituatie })}
-              placeholder={t('kringopbouw.thuisPlaceholder')}
-            />
-            <View style={styles.privacy}>
-              <TvzText preset="secondary">{t('kringopbouw.privacy')}</TvzText>
-            </View>
-          </Card>
-        ) : null}
-
-        {stap === 3 ? (
-          <View style={styles.raster}>
-            {TAKEN.map((taak) => {
-              const aan = (antwoorden.taken ?? []).includes(taak);
-              return (
-                <Pressable
-                  key={taak}
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: aan }}
-                  accessibilityLabel={taakSoortLabel(taak)}
-                  onPress={() => {
-                    void haptics.selectie();
-                    zet({ taken: toggle(antwoorden.taken, taak) });
-                  }}
-                  style={[styles.blokje, aan && styles.blokjeAan]}
-                >
-                  <TvzText preset="cardTitle">{taakSoortLabel(taak)}</TvzText>
-                </Pressable>
-              );
-            })}
-          </View>
-        ) : null}
-
-        {stap === 4 ? (
-          <Card style={styles.kaart}>
-            <TvzText preset="cardTitle">{t('kringopbouw.dagdelen')}</TvzText>
-            <View style={styles.pillenRij}>
-              {DAGDELEN.map((dagdeel) => {
-                const aan = (antwoorden.dagdelen ?? []).includes(dagdeel);
-                return (
-                  <Pressable
-                    key={dagdeel}
-                    accessibilityRole="checkbox"
-                    accessibilityState={{ checked: aan }}
-                    accessibilityLabel={t(`kringopbouw.dagdeel${dagdeel}`)}
-                    onPress={() => {
-                      void haptics.selectie();
-                      zet({ dagdelen: toggle(antwoorden.dagdelen, dagdeel) });
-                    }}
-                    style={[styles.pil, aan && styles.pilAan]}
-                  >
-                    <TvzText preset="meta" style={aan ? styles.pilTekstAan : undefined}>
-                      {t(`kringopbouw.dagdeel${dagdeel}`)}
-                    </TvzText>
-                  </Pressable>
-                );
-              })}
-            </View>
-            <TvzText preset="cardTitle" style={styles.blokKop}>
-              {t('kringopbouw.goedOmTeWeten')}
+      <KeyboardAvoidingView
+        style={styles.fill}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.inhoud}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+        >
+          <View style={styles.tip}>
+            <Bo width={54} />
+            <TvzText preset="body" style={styles.tipTekst}>
+              {t(`kringopbouw.tip${stap}`)}
             </TvzText>
-            <TextInput
-              value={antwoorden.goedOmTeWeten ?? ''}
-              onChangeText={(goedOmTeWeten) => zet({ goedOmTeWeten })}
-              placeholder={t('kringopbouw.goedOmTeWetenPlaceholder')}
-              placeholderTextColor={colors.inkFaint}
-              multiline
-              style={styles.vrijVeld}
-            />
-          </Card>
-        ) : null}
+          </View>
 
-        {stap === 5 ? (
-          <Card style={styles.kaart}>
-            <TvzText preset="body">{t('kringopbouw.uitnodigenUitleg')}</TvzText>
+          <TvzText preset="screenTitle">
+            {t(`kringopbouw.titel${stap}`, {
+              naam: antwoorden.naam?.split(' ')[0] ?? t('kringopbouw.diegene'),
+            })}
+          </TvzText>
+
+          {stap === 1 ? (
+            <Card style={styles.kaart}>
+              <TextField
+                label={t('kringopbouw.naamLabel')}
+                value={antwoorden.naam ?? ''}
+                onChangeText={(naam) => zet({ naam })}
+                placeholder={t('kringopbouw.naamPlaceholder')}
+              />
+              <TextField
+                label={t('kringopbouw.relatieLabel')}
+                value={antwoorden.relatie ?? ''}
+                onChangeText={(relatie) => zet({ relatie })}
+                placeholder={t('kringopbouw.relatiePlaceholder')}
+              />
+            </Card>
+          ) : null}
+
+          {stap === 2 ? (
+            <Card style={styles.kaart}>
+              <AdresVeld
+                label={t('kringopbouw.adresLabel')}
+                waarde={antwoorden.adres ?? ''}
+                onChange={(adres) => zet({ adres })}
+                placeholder={t('kringopbouw.adresPlaceholder')}
+              />
+              <View style={styles.privacy}>
+                <TvzText preset="secondary">{t('kringopbouw.privacy')}</TvzText>
+              </View>
+            </Card>
+          ) : null}
+
+          {stap === 3 ? (
+            <>
+              <View style={styles.raster}>
+                {TAKEN.map((taak) => {
+                  const aan = (antwoorden.taken ?? []).includes(taak);
+                  return (
+                    <Pressable
+                      key={taak}
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: aan }}
+                      accessibilityLabel={taakSoortLabel(taak)}
+                      onPress={() => {
+                        void haptics.selectie();
+                        zet({ taken: toggle(antwoorden.taken, taak) });
+                      }}
+                      style={[styles.blokje, aan && styles.blokjeAan]}
+                    >
+                      <TvzText preset="cardTitle">{taakSoortLabel(taak)}</TvzText>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              {(antwoorden.taken ?? []).includes('anders') ? (
+                <Card style={styles.kaart}>
+                  <TvzText preset="cardTitle">{t('kringopbouw.andersTitel')}</TvzText>
+                  <TvzText preset="secondary">{t('kringopbouw.andersUitleg')}</TvzText>
+                  <TextInput
+                    value={antwoorden.andereTaken ?? ''}
+                    onChangeText={(andereTaken) => zet({ andereTaken })}
+                    placeholder={t('kringopbouw.andersPlaceholder')}
+                    placeholderTextColor={colors.inkFaint}
+                    multiline
+                    style={styles.vrijVeld}
+                  />
+                </Card>
+              ) : null}
+            </>
+          ) : null}
+
+          {stap === 4 ? (
+            <Card style={styles.kaart}>
+              <TvzText preset="secondary">{t('kringopbouw.goedOmTeWetenUitleg')}</TvzText>
+              <TextInput
+                value={antwoorden.goedOmTeWeten ?? ''}
+                onChangeText={(goedOmTeWeten) => zet({ goedOmTeWeten })}
+                placeholder={t('kringopbouw.goedOmTeWetenPlaceholder')}
+                placeholderTextColor={colors.inkFaint}
+                multiline
+                style={styles.vrijVeld}
+              />
+            </Card>
+          ) : null}
+
+          {stap === 5 ? (
+            <Card style={styles.kaart}>
+              <TvzText preset="body">{t('kringopbouw.uitnodigenUitleg')}</TvzText>
+              <Button
+                label={t('kring.uitnodigen')}
+                variant="outline"
+                onPress={() => router.push('/uitnodigen')}
+              />
+              <Button
+                label={t('kring.boZoektBuddy')}
+                variant="outline"
+                onPress={() => router.push('/regelen/buddy-zoeken')}
+              />
+            </Card>
+          ) : null}
+
+          {stap === 6 ? (
+            <Proefweek
+              antwoorden={antwoorden}
+              bezig={maakKring.isPending || startProefweek.isPending}
+              onStart={async (rooster) => {
+                const naam = antwoorden.naam?.trim();
+                if (!naam) return;
+                void haptics.voltooid();
+                const kring = await maakKring.mutateAsync(
+                  t('kringopbouw.kringnaam', { naam: naam.split(' ')[0]! }),
+                );
+                await startProefweek.mutateAsync({ circleId: kring.id, taken: rooster });
+                wis.mutate();
+                router.replace('/regelen/planning');
+              }}
+            />
+          ) : null}
+        </ScrollView>
+
+        <View style={styles.balk}>
+          {stap > 1 ? (
             <Button
-              label={t('kring.uitnodigen')}
+              label={t('algemeen.terug')}
               variant="outline"
-              onPress={() => router.push('/uitnodigen')}
+              style={styles.balkKnop}
+              onPress={vorige}
             />
+          ) : null}
+          {stap < KRINGOPBOUW_STAPPEN ? (
             <Button
-              label={t('kring.boZoektBuddy')}
-              variant="outline"
-              onPress={() => router.push('/buurt')}
+              label={t('algemeen.volgende')}
+              variant="cta"
+              size="lg"
+              disabled={!magVerder}
+              style={styles.balkKnop}
+              onPress={verder}
             />
-          </Card>
-        ) : null}
-
-        {stap === 6 ? (
-          <Proefweek
-            antwoorden={antwoorden}
-            bezig={maakKring.isPending || startProefweek.isPending}
-            onStart={async (rooster) => {
-              const naam = antwoorden.naam?.trim();
-              if (!naam) return;
-              void haptics.voltooid();
-              const kring = await maakKring.mutateAsync(
-                t('kringopbouw.kringnaam', { naam: naam.split(' ')[0]! }),
-              );
-              await startProefweek.mutateAsync({ circleId: kring.id, taken: rooster });
-              wis.mutate();
-              router.replace('/regelen/planning');
-            }}
-          />
-        ) : null}
-      </ScrollView>
-
-      <View style={styles.balk}>
-        {stap > 1 ? (
-          <Button label={t('algemeen.terug')} variant="outline" style={styles.balkKnop} onPress={vorige} />
-        ) : null}
-        {stap < KRINGOPBOUW_STAPPEN ? (
-          <Button
-            label={t('algemeen.volgende')}
-            variant="cta"
-            size="lg"
-            disabled={!magVerder}
-            style={styles.balkKnop}
-            onPress={verder}
-          />
-        ) : null}
-      </View>
+          ) : null}
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -304,6 +322,9 @@ function Proefweek({
 }
 
 const styles = StyleSheet.create({
+  fill: {
+    flex: 1,
+  },
   safe: {
     flex: 1,
     backgroundColor: colors.bg,

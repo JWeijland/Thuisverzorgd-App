@@ -22,9 +22,10 @@ import {
 } from '@/features/forum/api';
 import { useSession } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
+import { haptics } from '@/lib/haptics';
 import { useKeyboardOpen } from '@/lib/keyboard';
 import { colors, gradient, radius, shadows, spacing } from '@/theme';
-import { Avatar, BottomSheet, Button, Chip, Pill, PulseDot, TvzText } from '@/ui';
+import { BottomSheet, Button, Chip, Pill, PulseDot, TvzText } from '@/ui';
 
 const START_QUESTIONS = ['steun.startvraag1', 'steun.startvraag2', 'steun.startvraag3'];
 
@@ -79,6 +80,20 @@ export function BrokerChat({ startVraag }: { startVraag?: string } = {}) {
         ? t('steun.online1')
         : t('steun.onlineMeer', { aantal: online });
 
+  if (!gekozen) {
+    return (
+      <MakelaarKiezer
+        makelaars={makelaars.data ?? []}
+        onlineIds={onlineIds}
+        onlineText={onlineText}
+        onKies={setGekozen}
+        onProfiel={setProfiel}
+        profiel={profiel}
+        onSluitProfiel={() => setProfiel(null)}
+      />
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       style={styles.fill}
@@ -109,39 +124,7 @@ export function BrokerChat({ startVraag }: { startVraag?: string } = {}) {
             </TvzText>
           </Pressable>
         </View>
-      ) : (
-        <View style={styles.statusRow}>
-          <View style={styles.avatars}>
-            {(makelaars.data ?? []).length > 0
-              ? makelaars.data!.slice(0, 3).map((makelaar, i) => (
-                  <View
-                    key={makelaar.id}
-                    style={[styles.avatarWrap, { marginLeft: i === 0 ? 0 : -10 }]}
-                  >
-                    <ProfileAvatar
-                      name={makelaar.voornaam}
-                      avatarPath={makelaar.avatar_path}
-                      size={30}
-                      backgroundColor={i === 2 ? colors.accent : undefined}
-                    />
-                  </View>
-                ))
-              : ['M', 'S', 'J'].map((letter, i) => (
-                  <View key={letter} style={[styles.avatarWrap, { marginLeft: i === 0 ? 0 : -10 }]}>
-                    <Avatar
-                      name={letter}
-                      size={30}
-                      backgroundColor={i === 2 ? colors.accent : undefined}
-                    />
-                  </View>
-                ))}
-          </View>
-          <TvzText preset="meta" style={styles.statusText}>
-            {onlineText}
-          </TvzText>
-          {online > 0 ? <PulseDot size={7} /> : null}
-        </View>
-      )}
+      ) : null}
 
       <View style={styles.fill}>
         <ScrollView ref={scrollRef} contentContainerStyle={styles.list}>
@@ -260,6 +243,114 @@ export function BrokerChat({ startVraag }: { startVraag?: string } = {}) {
   );
 }
 
+/**
+ * Eerst kiezen met wie je praat (wens Jelle 11-08). Zonder deze stap leek het
+ * alsof je één vraag naar alle hulpmakelaars tegelijk stuurde; dat kan nu
+ * niet meer. Je ziet wie er is, waar diegene je mee kan helpen en of hij nu
+ * online is, en pas daarna open je een gesprek met die ene persoon.
+ */
+function MakelaarKiezer({
+  makelaars,
+  onlineIds,
+  onlineText,
+  onKies,
+  onProfiel,
+  profiel,
+  onSluitProfiel,
+}: {
+  makelaars: Makelaar[];
+  onlineIds: string[];
+  onlineText: string;
+  onKies: (makelaar: Makelaar) => void;
+  onProfiel: (makelaar: Makelaar) => void;
+  profiel: Makelaar | null;
+  onSluitProfiel: () => void;
+}) {
+  // Wie nu online is staat bovenaan: daar krijg je het snelst antwoord.
+  const gesorteerd = [...makelaars].sort(
+    (a, b) => Number(onlineIds.includes(b.id)) - Number(onlineIds.includes(a.id)),
+  );
+
+  return (
+    <View style={styles.fill}>
+      <ScrollView contentContainerStyle={styles.kiezerLijst}>
+        <View style={styles.noticeCard}>
+          <TvzText preset="secondary" style={styles.notice}>
+            {t('steun.vertrouwelijk')}
+          </TvzText>
+        </View>
+
+        <View style={styles.kiezerKop}>
+          <TvzText preset="cardTitle">{t('steun.kiesTitel')}</TvzText>
+          <TvzText preset="secondary">{onlineText}</TvzText>
+        </View>
+
+        {gesorteerd.map((makelaar) => {
+          const online = onlineIds.includes(makelaar.id);
+          return (
+            <View key={makelaar.id} style={styles.kiezerKaart}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t('steun.deckLabel', { naam: makelaar.voornaam })}
+                onPress={() => onProfiel(makelaar)}
+                style={styles.kiezerRij}
+              >
+                <ProfileAvatar
+                  name={makelaar.voornaam}
+                  avatarPath={makelaar.avatar_path}
+                  size={52}
+                />
+                <View style={styles.kiezerTekst}>
+                  <View style={styles.kiezerNaamRij}>
+                    <TvzText preset="cardTitle">{makelaar.voornaam}</TvzText>
+                    {online ? <PulseDot size={7} /> : null}
+                  </View>
+                  <TvzText preset="secondary" numberOfLines={2}>
+                    {makelaar.bio ?? t('steun.bioFallback', { naam: makelaar.voornaam })}
+                  </TvzText>
+                </View>
+              </Pressable>
+
+              {makelaar.onderwerpen.length > 0 ? (
+                <View style={styles.kiezerChips}>
+                  {makelaar.onderwerpen.slice(0, 3).map((onderwerp) => (
+                    <Pill key={onderwerp} label={onderwerp} />
+                  ))}
+                </View>
+              ) : null}
+
+              <Button
+                label={t('steun.stelVraagAan', { naam: makelaar.voornaam })}
+                variant="outline"
+                onPress={() => {
+                  void haptics.stevig();
+                  onKies(makelaar);
+                }}
+              />
+            </View>
+          );
+        })}
+
+        {makelaars.length === 0 ? (
+          <TvzText preset="secondary" style={styles.notice}>
+            {t('steun.geenMakelaars')}
+          </TvzText>
+        ) : null}
+      </ScrollView>
+
+      <MakelaarProfiel
+        makelaar={profiel}
+        online={!!profiel && onlineIds.includes(profiel.id)}
+        onClose={onSluitProfiel}
+        onStart={(makelaar) => {
+          onSluitProfiel();
+          onKies(makelaar);
+        }}
+      />
+    </View>
+  );
+}
+
 /** Profiel-sheet van één makelaar: banner, bio, onderwerpen en de vraag-knop. */
 function MakelaarProfiel({
   makelaar,
@@ -334,6 +425,39 @@ function MakelaarProfiel({
 }
 
 const styles = StyleSheet.create({
+  kiezerLijst: {
+    padding: spacing.screen,
+    gap: spacing.cardGap,
+    paddingBottom: spacing.xxl,
+  },
+  kiezerKop: {
+    marginTop: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  kiezerKaart: {
+    backgroundColor: colors.white,
+    borderRadius: radius.card,
+    padding: spacing.cardPadding,
+    gap: spacing.md,
+  },
+  kiezerRij: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  kiezerTekst: {
+    flex: 1,
+  },
+  kiezerNaamRij: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  kiezerChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.chipGap,
+  },
   fill: { flex: 1 },
   statusRow: {
     flexDirection: 'row',

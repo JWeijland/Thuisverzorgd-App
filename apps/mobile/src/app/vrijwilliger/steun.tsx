@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { PadHeader } from '@/features/navigatie/PadHeader';
+import { PadPagina } from '@/features/navigatie/PadPagina';
 import { LerenScherm } from '@/features/steun/LerenScherm';
 import { colors } from '@/theme';
 
@@ -13,7 +14,9 @@ export default function VrijwilligerSteun() {
   return (
     <View style={styles.safe}>
       <PadHeader pad="vrijwilliger" />
-      <LerenScherm />
+      <PadPagina>
+        <LerenScherm />
+      </PadPagina>
     </View>
   );
 }

@@ -1,4 +1,4 @@
-import type { Dagdeel, KringAntwoorden, TaakSoort } from '@/features/circles/kringopbouw';
+import type { KringAntwoorden, TaakSoort } from '@/features/circles/kringopbouw';
 import { toDateString } from '@/lib/dates';
 
 export type VoorstelTaak = {
@@ -7,11 +7,18 @@ export type VoorstelTaak = {
   time: string;
 };
 
-/** Vaste tijden per dagdeel; dezelfde als de snelkeuzes bij taak inplannen. */
-const TIJD_PER_DAGDEEL: Record<Dagdeel, string> = {
-  ochtend: '09:00',
-  middag: '14:00',
-  avond: '19:00',
+/**
+ * Een tijd die bij de taak past, zodat het voorstel meteen logisch aanvoelt:
+ * boodschappen in de ochtend, koken tegen etenstijd, wandelen 's middags.
+ * De kring kan alles nog verzetten; dit is alleen het startpunt.
+ */
+const TIJD_PER_TAAK: Record<TaakSoort, string> = {
+  boodschappen: '10:00',
+  wandelen: '14:00',
+  vervoer: '10:00',
+  koken: '17:30',
+  gezelschap: '14:00',
+  anders: '14:00',
 };
 
 /**
@@ -24,7 +31,6 @@ const TIJD_PER_DAGDEEL: Record<Dagdeel, string> = {
  */
 export function voorstelRooster(antwoorden: KringAntwoorden, start: Date): VoorstelTaak[] {
   const taken = antwoorden.taken ?? [];
-  const dagdelen = antwoorden.dagdelen?.length ? antwoorden.dagdelen : (['ochtend'] as Dagdeel[]);
   if (taken.length === 0) return [];
 
   // De taken verdelen over de zeven dagen, met zoveel mogelijk ruimte ertussen.
@@ -33,7 +39,6 @@ export function voorstelRooster(antwoorden: KringAntwoorden, start: Date): Voors
   return taken.map((taak, i) => {
     const dag = new Date(start);
     dag.setDate(dag.getDate() + Math.min(6, i * stap));
-    const dagdeel = dagdelen[i % dagdelen.length]!;
-    return { type: taak, date: toDateString(dag), time: TIJD_PER_DAGDEEL[dagdeel] };
+    return { type: taak, date: toDateString(dag), time: TIJD_PER_TAAK[taak] };
   });
 }

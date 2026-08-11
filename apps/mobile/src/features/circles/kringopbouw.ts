@@ -8,19 +8,17 @@ export const KRINGOPBOUW_STAPPEN = 6;
 
 export type TaakSoort = 'boodschappen' | 'wandelen' | 'vervoer' | 'koken' | 'gezelschap' | 'anders';
 
-export type Dagdeel = 'ochtend' | 'middag' | 'avond';
-
 export type KringAntwoorden = {
   /** Stap 1: voor wie regel je hulp. */
   naam?: string;
   relatie?: string;
-  /** Stap 2: adres en thuissituatie. */
+  /** Stap 2: waar woont diegene (volledig adres uit de suggesties). */
   adres?: string;
-  thuissituatie?: string;
   /** Stap 3: welke taken zijn nodig. */
   taken?: TaakSoort[];
-  /** Stap 4: voorkeuren. */
-  dagdelen?: Dagdeel[];
+  /** Bij "anders": in eigen woorden wat er verder nodig is. */
+  andereTaken?: string;
+  /** Stap 4: wat de kring verder moet weten. */
   goedOmTeWeten?: string;
 };
 

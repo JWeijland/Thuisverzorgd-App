@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, usePathname } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
@@ -13,6 +13,7 @@ import {
   toontKruimelspoor,
   type PadId,
 } from '@/features/navigatie/paden';
+import { useSchuifRichting } from '@/features/navigatie/PadPagina';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { useWalkthrough } from '@/features/onboarding/walkthrough';
 import { t } from '@/i18n';
@@ -66,10 +67,15 @@ export function PadHeader({
   const actief = actiefSchuifje(padConfig, actiefRoute ?? pathname);
   const meetSchuifje = useWalkthrough((state) => state.meetSchuifje);
   const meetHeader = useWalkthrough((state) => state.meetHeader);
+  const zetRichting = useSchuifRichting((state) => state.zetRichting);
+  const meldActief = useSchuifRichting((state) => state.meldActief);
   useStatusBalk('licht');
 
   const spoor = [actief ? t(actief.labelKey) : t(padConfig.titelKey), ...kruimels];
-  const toonTerug = terug ?? kruimels.length > 0;
+  // Overal een weg terug: als er niets in de stapel zit valt hij terug op
+  // het keuzescherm, zodat je nooit vastzit (wens Jelle 11-08).
+  const kanTerug = router.canGoBack();
+  const toonTerug = terug ?? true;
   const naam = profile.data?.name ?? '';
   const schuifjes = schuifjesVoor(padConfig, profile.data?.role);
   const toonSpoor = toontKruimelspoor(profile.data?.role);
@@ -90,7 +96,8 @@ export function PadHeader({
               accessibilityLabel={t('algemeen.terug')}
               onPress={() => {
                 void haptics.tik();
-                router.back();
+                if (kanTerug) router.back();
+                else router.replace('/pad');
               }}
               style={styles.rond}
             >
@@ -150,21 +157,20 @@ export function PadHeader({
         </View>
 
         {verbergSchuifjes ? null : (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.schuifjes}
-          >
-            {schuifjes.map((schuifje) => {
+          // Eén balk met even brede vakjes in plaats van losse pillen: het
+          // actieve vakje schuift van links naar rechts mee (wens Jelle 11-08).
+          <View style={[styles.schuifbalk, { backgroundColor: padConfig.schuifjeVlak }]}>
+            {schuifjes.map((schuifje, i) => {
               const isActief = schuifje.route === actief?.route;
               return (
                 <Pressable
                   key={schuifje.route}
                   onLayout={(event) => {
-                    // x is relatief aan de rij; de rij zelf begint op de
-                    // schermpadding van de balk.
+                    // x is relatief aan de balk; de balk begint op de
+                    // schermpadding van de header.
                     const { x, width } = event.nativeEvent.layout;
                     meetSchuifje(schuifje.route, spacing.screen + x + width / 2);
+                    if (isActief) meldActief(i);
                   }}
                   accessibilityRole="tab"
                   accessibilityState={{ selected: isActief }}
@@ -172,15 +178,14 @@ export function PadHeader({
                   onPress={() => {
                     if (isActief) return;
                     void haptics.selectie();
+                    zetRichting(i);
                     router.replace(schuifje.route as never);
                   }}
-                  style={[
-                    styles.schuifje,
-                    { backgroundColor: isActief ? colors.white : padConfig.schuifjeVlak },
-                  ]}
+                  style={[styles.schuifje, isActief && styles.schuifjeActief]}
                 >
                   <TvzText
                     preset="meta"
+                    numberOfLines={1}
                     style={[
                       styles.schuifjeTekst,
                       { color: isActief ? padConfig.schuifjeActiefTekst : colors.white },
@@ -191,7 +196,7 @@ export function PadHeader({
                 </Pressable>
               );
             })}
-          </ScrollView>
+          </View>
         )}
 
         {children}
@@ -274,17 +279,23 @@ const styles = StyleSheet.create({
   kruimelActief: {
     color: colors.white,
   },
-  schuifjes: {
-    gap: spacing.chipGap,
-    paddingTop: spacing.md,
-    paddingRight: spacing.screen,
+  schuifbalk: {
+    flexDirection: 'row',
+    gap: 3,
+    marginTop: spacing.md,
+    padding: 3,
+    borderRadius: radius.card,
   },
   schuifje: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    minHeight: 34,
+    flex: 1,
+    minHeight: 38,
+    alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 6,
+    borderRadius: radius.row,
+  },
+  schuifjeActief: {
+    backgroundColor: colors.white,
   },
   schuifjeTekst: {
     fontSize: 13,

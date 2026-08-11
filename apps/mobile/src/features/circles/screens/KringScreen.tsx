@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Search, UserPlus } from 'lucide-react-native';
 
 import {
   useCircleMembers,
@@ -241,20 +242,45 @@ function KringDetail({
 
           {isBeheerder ? (
             <>
-              <Button
-                label={t('kring.uitnodigen')}
-                variant="outline"
-                size="lg"
-                onPress={() => router.push('/uitnodigen')}
-              />
-              {/* Het kleine knopje naar de kaart: sinds de herstructurering is
-                  dit de enige plek waar de volledige buurtkaart nog vandaan
-                  komt voor een beheerder (handoff §3b). */}
-              <Button
-                label={t('kring.boZoektBuddy')}
-                variant="outline"
-                onPress={() => router.push('/buurt')}
-              />
+              {/* Twee gelijkwaardige vierkante knoppen (wens Jelle 11-08):
+                  iemand die je al kent uitnodigen, of Bo laten kijken wie er
+                  in de buurt is. Allebei gaan ze over buddy's, dus heten ze
+                  ook allebei zo. */}
+              <View style={styles.knoppenRij}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('kring.uitnodigen')}
+                  onPress={() => {
+                    void haptics.tik();
+                    router.push('/uitnodigen');
+                  }}
+                  style={styles.vierkanteKnop}
+                >
+                  <View style={styles.knopIcoon}>
+                    <UserPlus color={colors.primary} size={22} strokeWidth={2.2} />
+                  </View>
+                  <TvzText preset="cardTitle" style={styles.knopTekst}>
+                    {t('kring.uitnodigen')}
+                  </TvzText>
+                </Pressable>
+
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('kring.boZoektBuddy')}
+                  onPress={() => {
+                    void haptics.tik();
+                    router.push('/regelen/buddy-zoeken');
+                  }}
+                  style={styles.vierkanteKnop}
+                >
+                  <View style={styles.knopIcoon}>
+                    <Search color={colors.primary} size={22} strokeWidth={2.2} />
+                  </View>
+                  <TvzText preset="cardTitle" style={styles.knopTekst}>
+                    {t('kring.boZoektBuddy')}
+                  </TvzText>
+                </Pressable>
+              </View>
               <Card dashed style={styles.codeCardSmall}>
                 <TvzText preset="meta" style={styles.codeLabel}>
                   {t('kring.koppelTitel')}
@@ -272,6 +298,33 @@ function KringDetail({
 }
 
 const styles = StyleSheet.create({
+  knoppenRij: {
+    flexDirection: 'row',
+    gap: spacing.cardGap,
+  },
+  vierkanteKnop: {
+    flex: 1,
+    aspectRatio: 1.25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    padding: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: radius.card,
+    borderWidth: 1.5,
+    borderColor: colors.line,
+  },
+  knopIcoon: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.tile,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.tintBlue,
+  },
+  knopTekst: {
+    textAlign: 'center',
+  },
   safeBg: {
     flex: 1,
     backgroundColor: colors.bg,

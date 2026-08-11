@@ -1,21 +1,23 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
-import { useBestMatches, useInvite, useMyCircle } from '@/features/circles/api';
+import { useInvite, useMyCircle } from '@/features/circles/api';
 import { t } from '@/i18n';
 import { colors, spacing } from '@/theme';
-import { Button, Card, SectionHeader, TextField, TvzText } from '@/ui';
+import { Button, TextField, TvzText } from '@/ui';
 import { useStatusBalk } from '@/lib/statusbalk';
 
-/** Vrijwilliger uitnodigen: e-mail/TVZ-ID + "Best matches in de buurt". */
+/**
+ * Buddy uitnodigen die je al kent: op e-mailadres of TVZ-ID. Onbekende
+ * buddy's uit de buurt stelt Bo voor op /regelen/buddy-zoeken; die twee
+ * dingen stonden eerst door elkaar op deze pagina (feedback Jelle 11-08).
+ */
 export default function UitnodigenScreen() {
   useStatusBalk('donker');
   const circle = useMyCircle();
   const invite = useInvite(circle.data?.id);
-  const matches = useBestMatches(circle.data?.id);
   const [target, setTarget] = useState('');
   const [message, setMessage] = useState('');
   const [feedback, setFeedback] = useState<{ ok: boolean; text: string } | null>(null);
@@ -36,17 +38,6 @@ export default function UitnodigenScreen() {
           setFeedback({ ok: true, text: t('uitnodigen.verstuurd') });
           setTarget('');
         },
-        onError: (err) => setFeedback({ ok: false, text: errorText(err) }),
-      },
-    );
-  }
-
-  function inviteMatch(matchId: string) {
-    setFeedback(null);
-    invite.mutate(
-      { target: matchId, message: message.trim() || undefined },
-      {
-        onSuccess: () => setFeedback({ ok: true, text: t('uitnodigen.verstuurd') }),
         onError: (err) => setFeedback({ ok: false, text: errorText(err) }),
       },
     );
@@ -93,39 +84,6 @@ export default function UitnodigenScreen() {
           onPress={() => sendInvite(target.trim())}
         />
 
-        {(matches.data ?? []).length > 0 ? (
-          <>
-            <SectionHeader title={t('uitnodigen.bestMatches')} />
-            <View style={styles.matches}>
-              {(matches.data ?? []).map((match) => (
-                <Card key={match.id} style={styles.matchCard}>
-                  <View style={styles.matchRow}>
-                    <ProfileAvatar name={match.voornaam} avatarPath={match.avatar_path} />
-                    <View style={styles.matchInfo}>
-                      <TvzText preset="cardTitle">
-                        {match.voornaam}
-                        {match.city ? ` · ${match.city}` : ''}
-                      </TvzText>
-                      <TvzText preset="secondary">
-                        {t('uitnodigen.matchMeta', {
-                          kringen: match.kringen,
-                          taken: match.helped_count,
-                        })}
-                        {match.waardering ? ` · ★ ${match.waardering}` : ''}
-                      </TvzText>
-                    </View>
-                    <Button
-                      label={t('uitnodigen.nodigUit')}
-                      variant="outline"
-                      style={styles.matchButton}
-                      onPress={() => inviteMatch(match.id)}
-                    />
-                  </View>
-                </Card>
-              ))}
-            </View>
-          </>
-        ) : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -160,22 +118,5 @@ const styles = StyleSheet.create({
   feedbackError: {
     color: colors.error,
     marginBottom: spacing.sm,
-  },
-  matches: {
-    gap: spacing.cardGap,
-  },
-  matchCard: {
-    paddingVertical: spacing.md,
-  },
-  matchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  matchInfo: { flex: 1 },
-  matchButton: {
-    minHeight: 38,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
   },
 });

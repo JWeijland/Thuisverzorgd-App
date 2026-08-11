@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { PadHeader } from '@/features/navigatie/PadHeader';
+import { PadPagina } from '@/features/navigatie/PadPagina';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { RoosterBeheerder } from '@/features/tasks/screens/RoosterBeheerder';
 import { RoosterHulpvrager } from '@/features/tasks/screens/RoosterHulpvrager';
@@ -16,7 +17,9 @@ export default function Planning() {
   return (
     <View style={styles.safe}>
       <PadHeader pad="regelen" />
-      {profile.data?.role === 'hulpvrager' ? <RoosterHulpvrager /> : <RoosterBeheerder />}
+      <PadPagina>
+        {profile.data?.role === 'hulpvrager' ? <RoosterHulpvrager /> : <RoosterBeheerder />}
+      </PadPagina>
     </View>
   );
 }
