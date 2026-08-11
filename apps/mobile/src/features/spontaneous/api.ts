@@ -231,6 +231,16 @@ export function useSpontaneousActions() {
     onError: () => void haptics.fout(),
   });
 
+  /** De vrijwilliger neemt zijn eigen aanbod terug (zolang het nog niet is
+   *  geaccepteerd; daarna annuleer je de afspraak). */
+  const withdrawOffer = useMutation({
+    mutationFn: async (offerId: string) => {
+      const { error } = await supabase.rpc('trek_aanbod_in', { p_offer: offerId });
+      if (error) throw error;
+    },
+    onSuccess: invalidate,
+  });
+
   const rejectOffer = useMutation({
     mutationFn: async (offerId: string) => {
       const { error } = await supabase.rpc('reject_offer', { p_offer: offerId });
@@ -258,7 +268,15 @@ export function useSpontaneousActions() {
     onSuccess: invalidate,
   });
 
-  return { createRequest, offerHelp, acceptOffer, rejectOffer, cancelRequest, completeRequest };
+  return {
+    createRequest,
+    offerHelp,
+    withdrawOffer,
+    acceptOffer,
+    rejectOffer,
+    cancelRequest,
+    completeRequest,
+  };
 }
 
 export function useRequestContact(requestId: string | undefined, enabled: boolean) {

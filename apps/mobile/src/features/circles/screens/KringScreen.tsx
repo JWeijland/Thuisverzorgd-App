@@ -1,10 +1,12 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, UserPlus } from 'lucide-react-native';
 
 import {
+  markCircleChatRead,
   useCircleMembers,
   useMyCircle,
   type Member,
@@ -154,7 +156,23 @@ function KringDetail({ circleId, name }: { circleId: string; name: string }) {
   const profile = useProfile();
   const members = useCircleMembers(circleId);
   const isBeheerder = profile.data?.role === 'beheerder';
-  const [tab, setTab] = useState<'leden' | 'berichten'>('leden');
+  // Kom je van de berichtenknop, dan sta je meteen op Berichten.
+  const { tab: startTab } = useLocalSearchParams<{ tab?: string }>();
+  const queryClient = useQueryClient();
+  const [tab, setTab] = useState<'leden' | 'berichten'>(
+    startTab === 'berichten' ? 'berichten' : 'leden',
+  );
+
+  // Bij het verlaten van de Berichten-tab is alles gelezen; de badge
+  // verdwijnt dan. Stond eerst op de losse kringchat-pagina.
+  useEffect(() => {
+    if (tab !== 'berichten') return;
+    return () => {
+      markCircleChatRead(circleId).then(() =>
+        queryClient.invalidateQueries({ queryKey: ['messages-unread', circleId] }),
+      );
+    };
+  }, [tab, circleId, queryClient]);
 
   const roleSuffix = (senderId: string) => {
     const lid = (members.data ?? []).find((item) => item.profile_id === senderId);

@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { MessagesSquare } from 'lucide-react-native';
 
 import { useUnreadCircleMessages } from '@/features/circles/api';
+import { kringRoute } from '@/features/circles/kringRoute';
+import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { colors, scaleText, useTextScale } from '@/theme';
 import { fonts } from '@/theme/typography';
@@ -11,6 +13,7 @@ import { fonts } from '@/theme/typography';
 export function KringBerichtenKnop({ circleId }: { circleId: string }) {
   const nieuw = useUnreadCircleMessages(circleId);
   const { factor } = useTextScale();
+  const profile = useProfile();
 
   return (
     <Pressable
@@ -18,7 +21,9 @@ export function KringBerichtenKnop({ circleId }: { circleId: string }) {
       accessibilityLabel={
         nieuw > 0 ? t('kring.berichtenNieuw', { aantal: nieuw }) : t('kring.berichtenTitel')
       }
-      onPress={() => router.push('/kringchat')}
+      // Berichten zijn geen aparte pagina meer: ze zitten onder Mijn kring
+      // (handoff scherm 07). De knop opent die tab meteen op Berichten.
+      onPress={() => router.push(kringRoute(profile.data?.role, 'berichten') as never)}
       style={styles.knop}
     >
       <MessagesSquare color={colors.primary} size={20} strokeWidth={2.2} />

@@ -93,8 +93,8 @@
     "vrijwilliger1Tekst": "Alle taken van je kring op een rij, met bovenin de week: het groene stipje op vandaag ben jij. Zie je een open taak? Met 'Aannemen' pak je hem met een tik. Afronden doe je met 'Rond af' en een berichtje voor de kring.",
     "vrijwilliger2Titel": "Help ook spontaan",
     "vrijwilliger2Tekst": "Op de kaart zie je directe hulpvragen uit de buurt als groene druppels. Tik erop, stuur een kort berichtje mee en je bent onderweg. Met de beschikbaarheidsknop bovenin zet je jezelf aan of uit voor spontane hulp.",
-    "vrijwilliger3Titel": "Leren voor buddy’s",
-    "vrijwilliger3Tekst": "Korte opleidingen die je bezoeken makkelijker maken, soms met een toets. Hier vind je ook het forum met tips van andere buddy’s.",
+    "vrijwilliger3Titel": "Leren",
+    "vrijwilliger3Tekst": "Korte opleidingen die je bezoeken makkelijker maken: van een goed gesprek tot tillen zonder je rug te belasten.",
     "vrijwilliger4Titel": "Jouw beschikbaarheid",
     "vrijwilliger4Tekst": "Op je profiel stel je per week in op welke dagen je kunt helpen (standaard staan alle dagen aan). Even weg? Zet de vakantiemodus aan. Tik op je foto om een profielfoto in te stellen.",
     "hulpvrager1Titel": "Hier zie je wie er komt",
@@ -614,7 +614,8 @@
     "ingetrokkenBericht": "Berichtje van {naam}: \"{bericht}\"",
     "terugNaarKaart": "Terug naar de kaart",
     "afgerondTitel": "Afgerond, dankjewel!",
-    "idNodig": "Rond eerst je ID-check af voordat je op aanvragen kunt reageren."
+    "idNodig": "Rond eerst je ID-check af voordat je op aanvragen kunt reageren.",
+    "aanbodIntrekken": "Mijn aanbod intrekken"
   },
   "uitnodigen": {
     "titel": "Buddy uitnodigen",
@@ -758,9 +759,7 @@
   },
   "leren": {
     "titel": "Leren",
-    "uitleg": "Korte opleidingen die je bezoeken makkelijker maken.",
-    "forumTitel": "Forum",
-    "forumTekst": "Tips en ervaringen van andere buddy’s."
+    "uitleg": "Korte opleidingen die je bezoeken makkelijker maken."
   },
   "steunKeuze": {
     "titel": "Steun",
@@ -869,11 +868,11 @@
     },
     "vrijwilliger": {
       "titel": "Helpen in de buurt",
-      "sub": "Je taken, de kaart en steun voor jezelf",
+      "sub": "Je taken, de kaart en wat je kunt leren",
       "uitleg": "Zie wie er hulp zoekt bij jou in de buurt en pak op wat jou past.",
       "buurt": "In de buurt",
       "taken": "Mijn taken",
-      "steun": "Steun"
+      "steun": "Leren"
     }
   },
   "wegwijzerPad": {

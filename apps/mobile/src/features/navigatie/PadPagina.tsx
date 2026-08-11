@@ -21,10 +21,10 @@ type RichtingState = {
 };
 
 /**
- * Onthoudt welke kant je op gaat tussen de schuifjes. De inhoud beweegt mee
- * met de richting van je tik: tik je een schuifje links aan, dan schuift het
- * scherm naar links; tik je rechts, dan schuift het naar rechts. Andersom
- * voelt tegennatuurlijk (feedback Jelle 11-08).
+ * Onthoudt welke kant je op gaat tussen de schuifjes. De pagina beweegt de
+ * kant op waar je heen tikt: naar een schuifje links schuift het scherm naar
+ * links, naar rechts naar rechts. Daarvoor moet de nieuwe pagina aan de
+ * tegenoverliggende kant beginnen en die kant op bewegen.
  */
 export const useSchuifRichting = create<RichtingState>((set, get) => ({
   richting: 1,
@@ -35,7 +35,9 @@ export const useSchuifRichting = create<RichtingState>((set, get) => ({
     set((state) => (state.vorigeIndex === index ? state : { vorigeIndex: index })),
 }));
 
-const DUUR = 220;
+const DUUR = 240;
+/** Hoe ver de pagina begint, als deel van de schermbreedte. */
+const AFSTAND = 0.14;
 
 /**
  * De inhoud van een pagina binnen een pad. Schuift bij binnenkomst de kant op
@@ -49,13 +51,19 @@ const DUUR = 220;
 export function PadPagina({ children }: { children: ReactNode }) {
   const richting = useSchuifRichting((state) => state.richting);
   const { width } = useWindowDimensions();
-  const verschuiving = useSharedValue(richting * width * 0.25);
+  const verschuiving = useSharedValue(richting * width * AFSTAND);
+  // De pagina komt tegelijk in beeld terwijl hij schuift. Zonder die fade
+  // zie je vooral de sprong naar de startpositie en niet de beweging zelf
+  // (feedback Jelle 11-08).
+  const zichtbaar = useSharedValue(0);
 
   useEffect(() => {
     verschuiving.value = withTiming(0, { duration: DUUR, easing: Easing.out(Easing.cubic) });
-  }, [verschuiving]);
+    zichtbaar.value = withTiming(1, { duration: DUUR * 0.8 });
+  }, [verschuiving, zichtbaar]);
 
   const beweging = useAnimatedStyle(() => ({
+    opacity: zichtbaar.value,
     transform: [{ translateX: verschuiving.value }],
   }));
 

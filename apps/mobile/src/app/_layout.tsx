@@ -26,6 +26,19 @@ import { ErrorBoundary } from '@/ui/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync();
 
+/** De pagina's die je met de schuifjes bereikt (zie features/navigatie/paden.ts). */
+const PAD_ROUTES = [
+  'weten/wegwijzer',
+  'weten/forum',
+  'weten/zorgmakelaars',
+  'regelen/voorzieningen',
+  'regelen/planning',
+  'regelen/kring',
+  'vrijwilliger/buurt',
+  'vrijwilliger/taken',
+  'vrijwilliger/steun',
+] as const;
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Baloo2_600SemiBold,
@@ -55,7 +68,14 @@ export default function RootLayout() {
           <TextScaleProvider>
             <StatusBar style="light" />
             <NotificationGateway />
-            <Stack screenOptions={{ headerShown: false }} />
+            <Stack screenOptions={{ headerShown: false }}>
+              {/* De schuifjes van een pad wisselen met `replace`. De eigen
+                  overgang zit in PadPagina; de systeemovergang staat daarom
+                  uit, anders schuift het scherm twee kanten tegelijk op. */}
+              {PAD_ROUTES.map((naam) => (
+                <Stack.Screen key={naam} name={naam} options={{ animation: 'none' }} />
+              ))}
+            </Stack>
             {/* Stonden vroeger in de tabbalk-layout; die bestaat niet meer,
                 dus ze hangen nu boven de hele app. */}
             <TaskBanner />

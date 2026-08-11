@@ -38,7 +38,7 @@ import { PaginaKop } from '@/ui/PaginaKop';
 /**
  * Kring-tab · beheerder (ontwerp 4.0): de week van de kring. Eén functie:
  * zien wie er wanneer komt en open plekken vullen. Plannen, leden en
- * berichten zijn eigen pagina's (/taak-plannen, /kring, /kringchat).
+ * berichten zijn eigen pagina's (/taak-plannen en /regelen/kring).
  */
 export function RoosterBeheerder() {
   const profile = useProfile();

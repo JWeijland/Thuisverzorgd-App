@@ -15,6 +15,7 @@ import {
 import { REQUEST_TYPE_LABEL } from '@/features/spontaneous/RequesterFlow';
 import { formatDistance, haversineKm, type LatLng } from '@/lib/geo';
 import { t } from '@/i18n';
+import { haptics } from '@/lib/haptics';
 import { colors, radius, shadows, spacing } from '@/theme';
 import { Button, EmptyState, PulseDot, TextField, TvzText } from '@/ui';
 
@@ -135,6 +136,18 @@ export function VolunteerFlow({ selected, onCloseSelected, ownLocation }: Props)
         <TvzText preset="secondary" style={styles.uitleg}>
           {t('directeHulp.verstuurdTekst', { naam: 'de aanvrager' })}
         </TvzText>
+        {/* Je moet je woord kunnen terugnemen zolang de aanvrager je nog
+            niet heeft gekozen (feedback Jelle 11-08). */}
+        <Button
+          label={t('directeHulp.aanbodIntrekken')}
+          variant="outline"
+          disabled={actions.withdrawOffer.isPending}
+          onPress={() => {
+            void haptics.waarschuwing();
+            actions.withdrawOffer.mutate(offer.id);
+          }}
+          style={styles.action}
+        />
       </View>
     );
   }

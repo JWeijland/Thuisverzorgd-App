@@ -43,7 +43,7 @@ function Rondje({ circleId, naam }: { circleId: string; naam: string }) {
       accessibilityLabel={naam}
       onPress={() => {
         void haptics.tik();
-        router.push('/regelen/kring');
+        router.push('/vrijwilliger/kring');
       }}
       style={[styles.rondje, shadows.floating]}
     >

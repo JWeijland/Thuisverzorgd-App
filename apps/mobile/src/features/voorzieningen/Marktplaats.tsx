@@ -157,8 +157,11 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     gap: spacing.cardGap,
   },
+  // Buddy is de belangrijkste voorziening van de app, dus de tegel is een
+  // brede banner met een echte foto. De verhouding volgt de foto (1200×560),
+  // zodat er niets wordt uitgerekt of afgesneden.
   buddyTegel: {
-    height: 168,
+    aspectRatio: 1200 / 560,
     borderRadius: radius.tile,
     overflow: 'hidden',
     justifyContent: 'flex-end',
@@ -175,10 +178,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: '72%',
+    height: '78%',
   },
+  // Ruimte rondom de tekst, zodat hij niet tegen de rand van de foto plakt.
   buddyTekst: {
-    flex: 1,
+    padding: spacing.cardPadding,
+    paddingBottom: spacing.lg,
   },
   buddyKop: {
     flexDirection: 'row',
@@ -187,6 +192,7 @@ const styles = StyleSheet.create({
   },
   buddyTitel: {
     color: colors.white,
+    fontSize: 20,
   },
   buddySub: {
     color: 'rgba(255,255,255,0.85)',

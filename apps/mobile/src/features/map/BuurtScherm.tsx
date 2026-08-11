@@ -252,7 +252,7 @@ export function BuurtScherm() {
             style={[styles.teller, shadows.card]}
           >
             <View style={styles.tellerIcon}>
-              <MapPin color={colors.accent} size={17} strokeWidth={2.4} />
+              <MapPin color={colors.accentDark} size={17} strokeWidth={2.4} />
             </View>
             <View style={styles.tellerTextWrap}>
               <TvzText preset="cardTitle" style={styles.tellerTitel}>
@@ -729,13 +729,16 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   // Tellerkaart (ontwerp 1a): navy vlak met groene pin, kringen dik, aanvragen eronder.
+  // Zacht wit vlak dat over de kaart zweeft in plaats van een donkerblauw
+  // blok: de kaart blijft het beeld, de teller is een notitie erover
+  // (feedback Jelle 11-08).
   teller: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     alignSelf: 'flex-start',
     maxWidth: '86%',
-    backgroundColor: colors.primaryDark,
+    backgroundColor: 'rgba(255,255,255,0.94)',
     borderRadius: radius.tile,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -745,7 +748,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: colors.successBg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -753,14 +756,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tellerTitel: {
-    color: colors.white,
+    color: colors.ink,
     fontSize: 16,
   },
   tellerSub: {
-    color: 'rgba(255,255,255,0.75)',
+    color: colors.inkSoft,
   },
   tellerChevron: {
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.inkFaint,
   },
   sheetScroll: {
     maxHeight: 420,

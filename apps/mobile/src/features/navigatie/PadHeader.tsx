@@ -10,6 +10,7 @@ import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import {
   actiefSchuifje,
   PADEN,
+  heeftPadKeuze,
   schuifjesVoor,
   toontKruimelspoor,
   type PadId,
@@ -106,7 +107,7 @@ export function PadHeader({
               onPress={() => {
                 void haptics.tik();
                 if (kanTerug) router.back();
-                else router.replace('/pad');
+                else router.replace(heeftPadKeuze(profile.data?.role) ? '/pad' : '/vrijwilliger/buurt');
               }}
               style={styles.rond}
             >
@@ -114,17 +115,22 @@ export function PadHeader({
             </Pressable>
           ) : null}
 
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('paden.naarKeuze')}
-            onPress={() => {
-              void haptics.selectie();
-              router.replace('/pad');
-            }}
-            style={styles.boKnop}
-          >
-            <BoPeek width={40} />
-          </Pressable>
+          {/* De Bo-knop leidt naar het keuzescherm met de twee paden. De
+              vrijwilliger heeft dat scherm niet: die verleent hulp en hoort
+              daar nooit te komen (feedback Jelle 11-08). */}
+          {heeftPadKeuze(profile.data?.role) ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('paden.naarKeuze')}
+              onPress={() => {
+                void haptics.selectie();
+                router.replace('/pad');
+              }}
+              style={styles.boKnop}
+            >
+              <BoPeek width={40} />
+            </Pressable>
+          ) : null}
 
           <View style={styles.tekst}>
             <TvzText preset="cardTitle" numberOfLines={1} style={styles.titel}>
@@ -188,10 +194,11 @@ export function PadHeader({
                     if (isActief) return;
                     void haptics.selectie();
                     zetRichting(i);
-                    // navigate en niet replace: zo houdt de terugpijl een
-                    // echte geschiedenis, maar stapelt hij niet eindeloos op
-                    // (een schuifje waar je al was wordt hergebruikt).
-                    router.navigate(schuifje.route as never);
+                    // replace en niet navigate: de schuifjes zijn geen
+                    // geschiedenis. Zo blijft de terugpijl kort (hij eindigt
+                    // op het keuzescherm) en is onze eigen overgang de enige
+                    // beweging op het scherm.
+                    router.replace(schuifje.route as never);
                   }}
                   style={[styles.schuifje, isActief && styles.schuifjeActief]}
                 >
