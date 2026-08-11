@@ -1,55 +1,18 @@
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import type { Task } from '@/features/tasks/api';
-import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { t } from '@/i18n';
-import { isoWeekDays, toDateString } from '@/lib/dates';
 import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, radius, spacing } from '@/theme';
-import { Button, Card, TvzText } from '@/ui';
+import { Bo, Button, TvzBounce, TvzText } from '@/ui';
 
 /**
- * Het verhaal van de app in drie stappen (ontwerp 4.0), eenmalig vóór de
- * rolkeuze: weten, regelen, er is iemand. De week is de rode draad en komt
- * hier voor het eerst in beeld.
+ * Het verhaal van de app, eenmalig vóór de rolkeuze. Drie regels, meer niet:
+ * hulp vragen, iemand komt langs, je ziet wie. Alles wat daar niet in past is
+ * eruit gehaald, want dit scherm werd te druk (feedback Jelle 11-08). Geen
+ * uitleg over gratis of betaald: het heet gewoon hulp.
  */
-/**
- * Twee voorbeeldtaken zodat de weekstrip in de onboarding laat zien wat de
- * legenda belooft: een groene dag waar iemand komt en een oranje dag die nog
- * open staat.
- */
-function voorbeeldWeek(anker: Date): Task[] {
-  const dagen = isoWeekDays(anker);
-  const leeg = {
-    circle_id: '',
-    custom_label: null,
-    recurrence: 'eenmalig' as const,
-    claimed_by: null,
-    claimer: null,
-    circle: null,
-  };
-  return [
-    {
-      ...leeg,
-      id: 'voorbeeld-1',
-      type: 'boodschappen' as const,
-      date: toDateString(dagen[1]!),
-      time: '10:00',
-      status: 'ingepland' as const,
-    },
-    {
-      ...leeg,
-      id: 'voorbeeld-2',
-      type: 'wandelen' as const,
-      date: toDateString(dagen[4]!),
-      time: '14:00',
-      status: 'open' as const,
-    },
-  ];
-}
-
 export default function VerhaalScreen() {
   useStatusBalk('donker');
 
@@ -57,19 +20,21 @@ export default function VerhaalScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <TvzText preset="screenTitle" style={styles.titel}>
-          {t('verhaal.titel')}
-        </TvzText>
-        <TvzText preset="secondary" style={styles.uitleg}>
-          {t('verhaal.uitleg')}
-        </TvzText>
+      <View style={styles.container}>
+        <View style={styles.kop}>
+          <TvzBounce>
+            <Bo width={96} />
+          </TvzBounce>
+          <TvzText preset="screenTitle" style={styles.titel}>
+            {t('verhaal.titel')}
+          </TvzText>
+        </View>
 
-        <Card style={styles.stappenKaart}>
+        <View style={styles.stappen}>
           {stappen.map((nummer) => (
             <View key={nummer} style={styles.stap}>
               <View style={styles.stapNr}>
-                <TvzText preset="meta" style={styles.stapNrTekst}>
+                <TvzText preset="cardTitle" style={styles.stapNrTekst}>
                   {nummer}
                 </TvzText>
               </View>
@@ -77,30 +42,22 @@ export default function VerhaalScreen() {
                 <TvzText preset="cardTitle" style={styles.stapTitel}>
                   {t(`verhaal.stap${nummer}Titel`)}
                 </TvzText>
-                <TvzText preset="secondary">{t(`verhaal.stap${nummer}Tekst`)}</TvzText>
+                <TvzText preset="body" style={styles.stapUitleg}>
+                  {t(`verhaal.stap${nummer}Tekst`)}
+                </TvzText>
               </View>
             </View>
           ))}
-        </Card>
-
-        <Card>
-          <TvzText preset="cardTitle" style={styles.weekTitel}>
-            {t('verhaal.weekTitel')}
-          </TvzText>
-          {/* Een voorbeeldweek met echte stipjes: een lege strip met een
-              legenda beloofde bolletjes die je nergens zag. */}
-          <WeekStrip anchor={new Date()} tasks={voorbeeldWeek(new Date())} legenda />
-        </Card>
-
-        <View style={styles.voet}>
-          <Button
-            label={t('algemeen.verder')}
-            variant="cta"
-            size="lg"
-            onPress={() => router.replace('/rolkeuze')}
-          />
         </View>
-      </ScrollView>
+
+        <Button
+          label={t('algemeen.verder')}
+          variant="cta"
+          size="lg"
+          style={styles.knop}
+          onPress={() => router.replace('/rolkeuze')}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -111,29 +68,34 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
   },
   container: {
+    flex: 1,
     padding: spacing.screen,
-    paddingBottom: spacing.xxl,
-    gap: spacing.cardGap,
-    flexGrow: 1,
+    paddingBottom: spacing.xl,
+  },
+  kop: {
+    alignItems: 'center',
+    marginTop: spacing.lg,
   },
   titel: {
     marginTop: spacing.md,
+    fontSize: 30,
+    textAlign: 'center',
   },
-  uitleg: {
-    marginBottom: spacing.md,
-  },
-  stappenKaart: {
-    gap: spacing.lg,
-    paddingVertical: spacing.xl,
+  // De drie stappen vullen het midden van het scherm; ruim uit elkaar, zodat
+  // je ze los van elkaar leest.
+  stappen: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: spacing.xl,
   },
   stap: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.md,
+    alignItems: 'center',
+    gap: spacing.lg,
   },
   stapNr: {
-    width: 26,
-    height: 26,
+    width: 40,
+    height: 40,
     borderRadius: radius.pill,
     backgroundColor: colors.primary,
     alignItems: 'center',
@@ -141,18 +103,20 @@ const styles = StyleSheet.create({
   },
   stapNrTekst: {
     color: colors.white,
+    fontSize: 19,
   },
   stapTekst: {
     flex: 1,
   },
   stapTitel: {
-    marginBottom: 2,
+    fontSize: 21,
   },
-  weekTitel: {
-    marginBottom: spacing.md,
+  stapUitleg: {
+    fontSize: 17,
+    lineHeight: 25,
+    marginTop: 2,
   },
-  voet: {
-    marginTop: 'auto',
-    paddingTop: spacing.lg,
+  knop: {
+    borderRadius: radius.card,
   },
 });

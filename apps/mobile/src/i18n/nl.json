@@ -79,32 +79,32 @@
     "leren": "Leren"
   },
   "rondleiding": {
-    "beheerder1Titel": "De week van je kring",
-    "beheerder1Tekst": "Hier zie je wie er wanneer komt: groen is een buddy, blauw een geboekte dienst, oranje is nog leeg. Met '+ Taak inplannen' zet je een taak klaar en open plekken vul je met 'Vul de week'. Leden en Berichten staan bovenin.",
-    "beheerder2Titel": "De kaart van je buurt",
-    "beheerder2Tekst": "Op de Kaart-tab zie je buddy's bij jou in de buurt: gescreende vrijwilligers (met ID-check) die willen helpen. Nu meteen hulp nodig, buiten het rooster om? Tik onderaan op 'Directe hulp': buddy's dichtbij krijgen direct een melding en jij kiest zelf wie er komt.",
-    "beheerder4Titel": "Alles begint bij Steun",
-    "beheerder4Tekst": "Dit is je startpunt. Bovenaan zie je de week van je kring, daaronder de wegwijzer, de stappenplannen, de hulpmakelaar en het forum. Elk antwoord eindigt in een volgende stap.",
+    "beheerderVoorzienTitel": "Hier vraag je hulp",
+    "beheerderVoorzienTekst": "Kies wat je nodig hebt. Iemand uit de buurt komt langs.",
+    "beheerder1Titel": "Je week",
+    "beheerder1Tekst": "Hier zie je wie er komt en wanneer.",
+    "beheerder2Titel": "Je kring",
+    "beheerder2Tekst": "De mensen die helpen. Hier nodig je iemand uit.",
+    "beheerder4Titel": "Vragen?",
+    "beheerder4Tekst": "Typ je vraag. Je krijgt meteen antwoord.",
     "beheerder5Titel": "Jouw profiel",
-    "beheerder5Tekst": "Tik op je foto om een profielfoto in te stellen. Hier zet je ook grotere letters aan en beheer je je meldingen.",
-    "beheerderVoorzienTitel": "Hulp aan huis regelen",
-    "beheerderVoorzienTekst": "Op de Voorzien-tab boek je hulp aan huis: van kapper tot warme maaltijd, vaste gezichten uit de buurt. Buddy’s blijven gratis, die regel je via je kring. Je betaalt pas na het bezoek en annuleren is gratis tot 24 uur vooraf.",
-    "vrijwilliger1Titel": "Hier staan de taken",
-    "vrijwilliger1Tekst": "Alle taken van je kring op een rij, met bovenin de week: het groene stipje op vandaag ben jij. Zie je een open taak? Met 'Aannemen' pak je hem met een tik. Afronden doe je met 'Rond af' en een berichtje voor de kring.",
-    "vrijwilliger2Titel": "Help ook spontaan",
-    "vrijwilliger2Tekst": "Op de kaart zie je directe hulpvragen uit de buurt als groene druppels. Tik erop, stuur een kort berichtje mee en je bent onderweg. Met de beschikbaarheidsknop bovenin zet je jezelf aan of uit voor spontane hulp.",
+    "beheerder5Tekst": "Tik op je foto voor je instellingen.",
+    "vrijwilliger2Titel": "De kaart",
+    "vrijwilliger2Tekst": "Hier zie je wie hulp zoekt bij jou in de buurt.",
+    "vrijwilliger1Titel": "Je taken",
+    "vrijwilliger1Tekst": "Tik op een taak om hem aan te nemen.",
     "vrijwilliger3Titel": "Leren",
-    "vrijwilliger3Tekst": "Korte opleidingen die je bezoeken makkelijker maken: van een goed gesprek tot tillen zonder je rug te belasten.",
-    "vrijwilliger4Titel": "Jouw beschikbaarheid",
-    "vrijwilliger4Tekst": "Op je profiel stel je per week in op welke dagen je kunt helpen (standaard staan alle dagen aan). Even weg? Zet de vakantiemodus aan. Tik op je foto om een profielfoto in te stellen.",
-    "hulpvrager1Titel": "Hier zie je wie er komt",
-    "hulpvrager1Tekst": "Hier staat wie er vandaag langskomt en hoe laat, met een grote belknop. In de week eronder zie je de rest: een groen stipje betekent dat er iemand komt, oranje dat de plek nog open staat.",
-    "hulpvragerVoorzienTitel": "Zelf hulp vragen",
-    "hulpvragerVoorzienTekst": "Kies wat je nodig hebt: gratis een buddy voor gezelschap of een klusje, of hulp aan huis zoals de kapper of een warme maaltijd. Degene die het voor je regelt kijkt mee.",
-    "hulpvrager2Titel": "Dit is je kring",
-    "hulpvrager2Tekst": "Alle mensen om je heen, met wat ze voor je doen. Hier vind je ook je eigen code en je instellingen, zoals grotere letters.",
-    "hulpvragerSteunTitel": "Iemand die meedenkt",
-    "hulpvragerSteunTekst": "Kom je ergens niet uit? Lees het na in de wegwijzer, of praat gratis met een zorgmakelaar die met je meedenkt."
+    "vrijwilliger3Tekst": "Korte lessen die je bezoeken makkelijker maken.",
+    "vrijwilliger4Titel": "Jouw dagen",
+    "vrijwilliger4Tekst": "Op je profiel zet je aan wanneer je kunt.",
+    "hulpvragerVoorzienTitel": "Hier vraag je hulp",
+    "hulpvragerVoorzienTekst": "Kies wat je nodig hebt. Iemand komt langs.",
+    "hulpvrager1Titel": "Wie er komt",
+    "hulpvrager1Tekst": "Hier zie je wie er langskomt en hoe laat.",
+    "hulpvrager2Titel": "Je kring",
+    "hulpvrager2Tekst": "De mensen om je heen.",
+    "hulpvragerSteunTitel": "Vragen?",
+    "hulpvragerSteunTekst": "Stel je vraag. Iemand denkt met je mee."
   },
   "placeholder": {
     "titel": "Dit scherm komt eraan",
@@ -833,15 +833,13 @@
     "slotzin": "Samen sta je er nooit alleen voor."
   },
   "verhaal": {
-    "titel": "Eén doel: langer thuis wonen",
-    "uitleg": "Thuisverzorgd heeft één opdracht: je naaste kan thuis blijven wonen, met de buurt om zich heen. Dat gaat in drie stappen.",
-    "stap1Titel": "Weten wat kan",
-    "stap1Tekst": "In Steun vind je de wegwijzer en een hulpmakelaar die meedenkt. Elk antwoord eindigt in een volgende stap.",
-    "stap2Titel": "Hulp regelen",
-    "stap2Tekst": "Zelfde vraag, twee smaken: gratis via je kring en de buurt, of een vaste hulp aan huis. Wat je ook kiest, het wordt een afspraak.",
-    "stap3Titel": "Er is iemand",
-    "stap3Tekst": "Alles landt in dezelfde week. Groen is geregeld, oranje staat nog open. Iedereen ziet wie er komt, niemand hoeft te raden.",
-    "weekTitel": "Zo ziet zo’n week eruit"
+    "titel": "Zo werkt het",
+    "stap1Titel": "Vraag hulp",
+    "stap1Tekst": "Boodschappen, een klusje of gezelschap.",
+    "stap2Titel": "Iemand komt langs",
+    "stap2Tekst": "Iemand uit de buurt pakt het op.",
+    "stap3Titel": "Je ziet wie er komt",
+    "stap3Tekst": "Wie er komt en wanneer staat in je week."
   },
   "kringuitleg": {
     "beheerderTitel": "Jij regelt, de kring draait",
@@ -866,7 +864,7 @@
     "weten": {
       "titel": "Ik wil het weten",
       "sub": "Wegwijzer, forum en zorgmakelaars",
-      "uitleg": "De wegwijzer met alles over zorgen voor een naaste, het forum met lotgenoten, en zorgmakelaars die met je meedenken.",
+      "uitleg": "Antwoord op je vragen over zorgen voor iemand.",
       "wegwijzer": "Wegwijzer",
       "forum": "Forum",
       "zorgmakelaars": "Zorgmakelaars"
@@ -874,7 +872,7 @@
     "regelen": {
       "titel": "Ik wil hulp regelen",
       "sub": "Buddy’s, voorzieningen en je kring",
-      "uitleg": "Buddy’s uit de buurt in je hulpkring, en voorzieningen als kapper of tuinman direct in de planning.",
+      "uitleg": "Hulp thuis regelen en zien wie er komt.",
       "voorzieningen": "Voorzieningen",
       "planning": "Mijn planning",
       "kring": "Mijn kring"
@@ -882,7 +880,7 @@
     "vrijwilliger": {
       "titel": "Helpen in de buurt",
       "sub": "Je taken, de kaart en wat je kunt leren",
-      "uitleg": "Zie wie er hulp zoekt bij jou in de buurt en pak op wat jou past.",
+      "uitleg": "Zie wie hulp zoekt bij jou in de buurt.",
       "buurt": "In de buurt",
       "taken": "Mijn taken",
       "steun": "Leren"

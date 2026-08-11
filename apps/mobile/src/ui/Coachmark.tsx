@@ -53,8 +53,12 @@ export function Coachmark({
         <View style={[styles.arrow, styles.arrowUp, { marginLeft: arrowOffset }]} />
       ) : null}
       <View style={[styles.card, shadows.floating]}>
-        <TvzText preset="hand">{title}</TvzText>
-        <TvzText preset="secondary" style={styles.body}>
+        {/* Groter en rustiger dan eerst: een rondleiding lees je in één
+            oogopslag, niet in een alinea (feedback Jelle 11-08). */}
+        <TvzText preset="hand" style={styles.titel}>
+          {title}
+        </TvzText>
+        <TvzText preset="body" style={styles.body}>
           {body}
         </TvzText>
         <View style={styles.footer}>
@@ -96,9 +100,14 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
     borderRadius: radius.card,
-    padding: spacing.lg,
+    padding: spacing.cardPadding,
+  },
+  titel: {
+    fontSize: 26,
   },
   body: {
+    fontSize: 17,
+    lineHeight: 25,
     marginTop: spacing.xs,
   },
   footer: {
