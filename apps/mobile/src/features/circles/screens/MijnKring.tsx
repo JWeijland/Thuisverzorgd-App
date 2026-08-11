@@ -5,10 +5,11 @@ import { ChevronRight, Settings } from 'lucide-react-native';
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useCircleMembers, useMyCircle } from '@/features/circles/api';
 import { KringMotief } from '@/features/circles/KringMotief';
+import { MijnCode } from '@/features/circles/MijnCode';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
-import { Button, Card, EmptyState, RolChip, TvzText } from '@/ui';
+import { Card, EmptyState, RolChip, TvzText } from '@/ui';
 import { PaginaKop } from '@/ui/PaginaKop';
 
 /**
@@ -31,15 +32,14 @@ export function MijnKring() {
       <PaginaKop titel={t('mijnKring.titel')} sub={t('mijnKring.uitleg')} />
       <ScrollView contentContainerStyle={styles.lijst}>
         {!circle.isLoading && !circle.data ? (
-          <Card>
-            <EmptyState title={t('koppelcode.nodigTitel')} body={t('koppelcode.nodigTekst')} />
-            <Button
-              label={t('koppelcode.invullen')}
-              variant="cta"
-              size="lg"
-              onPress={() => router.push('/koppelcode')}
-            />
-          </Card>
+          // Nog geen kring: dan is het enige wat deze rol hoeft te doen zijn
+          // code doorgeven aan degene die de hulp regelt (feedback 11-08).
+          <>
+            <Card>
+              <EmptyState title={t('mijnCode.nodigTitel')} body={t('mijnCode.nodigTekst')} bo />
+            </Card>
+            <MijnCode />
+          </>
         ) : (
           <>
             <View style={styles.motief}>

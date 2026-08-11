@@ -18,6 +18,8 @@ export type KringAntwoorden = {
   taken?: TaakSoort[];
   /** Bij "anders": in eigen woorden wat er verder nodig is. */
   andereTaken?: string;
+  /** De persoonlijke code van de naaste, als die de app al heeft. */
+  code?: string;
   /** Stap 4: wat de kring verder moet weten. */
   goedOmTeWeten?: string;
 };
@@ -124,6 +126,37 @@ export function useStartProefweek() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
+}
+
+/**
+ * Koppelt de persoon voor wie je zorgt aan je kring met zijn eigen code
+ * (feedback Jelle 11-08). De oudere leest die code voor; jij vult hem in.
+ */
+export function useKoppelNaaste() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ circleId, code }: { circleId: string; code: string }) => {
+      const { error } = await supabase.rpc('koppel_naaste', {
+        p_circle: circleId,
+        p_code: code.trim().toUpperCase(),
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['circle-members'] });
+      queryClient.invalidateQueries({ queryKey: ['my-circle'] });
+    },
+  });
+}
+
+/** Vertaalt de foutcodes van `koppel_naaste` naar begrijpelijke tekst. */
+export function koppelFoutTekst(fout: unknown): string {
+  const bericht = fout instanceof Error ? fout.message : '';
+  if (bericht.includes('code_onbekend')) return 'mijnCode.foutOnbekend';
+  if (bericht.includes('geen_hulpvrager')) return 'mijnCode.foutGeenHulpvrager';
+  if (bericht.includes('al_in_kring')) return 'mijnCode.foutAlInKring';
+  if (bericht.includes('eigen_code')) return 'mijnCode.foutEigenCode';
+  return 'mijnCode.foutOnbekend';
 }
 
 /** Bevestigt na de proefweek dat het rooster werkte. */

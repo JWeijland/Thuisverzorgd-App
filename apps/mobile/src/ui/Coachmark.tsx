@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { colors, radius, shadows, spacing } from '@/theme';
-import { Bo } from '@/ui/Bo';
+import { Bo, type BoRol } from '@/ui/Bo';
 import { Button } from '@/ui/Button';
 import { TvzText } from '@/ui/TvzText';
 
@@ -19,6 +19,8 @@ type Props = {
   arrowOffset?: number;
   /** Mascotte Bo zit bovenop het wolkje (rondleiding, handoff). */
   bo?: boolean;
+  /** Rolkleur van Bo, zodat hij dezelfde kleur heeft als elders in die rol. */
+  boRol?: BoRol;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -36,6 +38,7 @@ export function Coachmark({
   arrow,
   arrowOffset = 32,
   bo,
+  boRol,
   style,
 }: Props) {
   const isLast = step >= totalSteps;
@@ -43,7 +46,7 @@ export function Coachmark({
     <View style={style}>
       {bo ? (
         <View pointerEvents="none" style={styles.bo}>
-          <Bo width={92} />
+          <Bo width={92} rol={boRol} />
         </View>
       ) : null}
       {arrow === 'up' ? (

@@ -2,8 +2,10 @@ import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import type { Task } from '@/features/tasks/api';
 import { WeekStrip } from '@/features/tasks/WeekStrip';
 import { t } from '@/i18n';
+import { isoWeekDays, toDateString } from '@/lib/dates';
 import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, radius, spacing } from '@/theme';
 import { Button, Card, TvzText } from '@/ui';
@@ -13,6 +15,41 @@ import { Button, Card, TvzText } from '@/ui';
  * rolkeuze: weten, regelen, er is iemand. De week is de rode draad en komt
  * hier voor het eerst in beeld.
  */
+/**
+ * Twee voorbeeldtaken zodat de weekstrip in de onboarding laat zien wat de
+ * legenda belooft: een groene dag waar iemand komt en een oranje dag die nog
+ * open staat.
+ */
+function voorbeeldWeek(anker: Date): Task[] {
+  const dagen = isoWeekDays(anker);
+  const leeg = {
+    circle_id: '',
+    custom_label: null,
+    recurrence: 'eenmalig' as const,
+    claimed_by: null,
+    claimer: null,
+    circle: null,
+  };
+  return [
+    {
+      ...leeg,
+      id: 'voorbeeld-1',
+      type: 'boodschappen' as const,
+      date: toDateString(dagen[1]!),
+      time: '10:00',
+      status: 'ingepland' as const,
+    },
+    {
+      ...leeg,
+      id: 'voorbeeld-2',
+      type: 'wandelen' as const,
+      date: toDateString(dagen[4]!),
+      time: '14:00',
+      status: 'open' as const,
+    },
+  ];
+}
+
 export default function VerhaalScreen() {
   useStatusBalk('donker');
 
@@ -50,7 +87,9 @@ export default function VerhaalScreen() {
           <TvzText preset="cardTitle" style={styles.weekTitel}>
             {t('verhaal.weekTitel')}
           </TvzText>
-          <WeekStrip anchor={new Date()} tasks={[]} legenda />
+          {/* Een voorbeeldweek met echte stipjes: een lege strip met een
+              legenda beloofde bolletjes die je nergens zag. */}
+          <WeekStrip anchor={new Date()} tasks={voorbeeldWeek(new Date())} legenda />
         </Card>
 
         <View style={styles.voet}>

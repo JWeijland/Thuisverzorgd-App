@@ -22,10 +22,15 @@ import {
   EmptyState,
   RolChip,
   StatusPill,
+  TextField,
   TvzText,
 } from '@/ui';
 import { ChatView } from '@/features/circles/ChatView';
-import { useKringConcept } from '@/features/circles/kringopbouw';
+import {
+  koppelFoutTekst,
+  useKoppelNaaste,
+  useKringConcept,
+} from '@/features/circles/kringopbouw';
 import { KringMotief } from '@/features/circles/KringMotief';
 import { haptics } from '@/lib/haptics';
 import { useStatusBalk } from '@/lib/statusbalk';
@@ -53,7 +58,6 @@ export function KringScreen() {
     <KringDetail
       circleId={circle.data.id}
       name={circle.data.name}
-      linkCode={circle.data.link_code}
     />
   );
 }
@@ -81,6 +85,55 @@ function KringStart() {
   );
 }
 
+/**
+ * De naaste koppelen met zijn eigen code (feedback Jelle 11-08). Zolang er
+ * nog geen hulpvrager in de kring zit, staat dit blok op de kringpagina, want
+ * zonder die persoon mist de kring haar middelpunt.
+ */
+function KoppelNaasteKaart({ circleId }: { circleId: string }) {
+  const koppel = useKoppelNaaste();
+  const [code, setCode] = useState('');
+  const [fout, setFout] = useState<string | null>(null);
+
+  return (
+    <Card style={styles.koppelKaart}>
+      <TvzText preset="cardTitle">{t('mijnCode.koppelKort')}</TvzText>
+      <TvzText preset="secondary">{t('mijnCode.koppelUitleg')}</TvzText>
+      <TextField
+        label={t('mijnCode.koppelLabel')}
+        value={code}
+        onChangeText={(waarde) => {
+          setFout(null);
+          setCode(waarde.toUpperCase());
+        }}
+        placeholder="TVZ-XXXX"
+        autoCapitalize="characters"
+        autoCorrect={false}
+      />
+      {fout ? (
+        <TvzText preset="secondary" style={styles.koppelFout}>
+          {t(fout)}
+        </TvzText>
+      ) : null}
+      <Button
+        label={t('mijnCode.koppelKnop')}
+        variant="cta"
+        disabled={koppel.isPending || code.trim().length < 6}
+        onPress={() => {
+          void haptics.stevig();
+          koppel.mutate(
+            { circleId, code },
+            {
+              onSuccess: () => setCode(''),
+              onError: (error) => setFout(koppelFoutTekst(error)),
+            },
+          );
+        }}
+      />
+    </Card>
+  );
+}
+
 function KringLeeg() {
   return (
     <SafeAreaView style={styles.safeBg} edges={['top']}>
@@ -98,15 +151,7 @@ function KringLeeg() {
   );
 }
 
-function KringDetail({
-  circleId,
-  name,
-  linkCode,
-}: {
-  circleId: string;
-  name: string;
-  linkCode: string;
-}) {
+function KringDetail({ circleId, name }: { circleId: string; name: string }) {
   const profile = useProfile();
   const members = useCircleMembers(circleId);
   const isBeheerder = profile.data?.role === 'beheerder';
@@ -281,14 +326,12 @@ function KringDetail({
                   </TvzText>
                 </Pressable>
               </View>
-              <Card dashed style={styles.codeCardSmall}>
-                <TvzText preset="meta" style={styles.codeLabel}>
-                  {t('kring.koppelTitel')}
-                </TvzText>
-                <TvzText preset="cardTitle" style={styles.code}>
-                  {linkCode}
-                </TvzText>
-              </Card>
+              {/* De hulpvrager koppel je met zíjn code, niet met die van de
+                  kring (feedback Jelle 11-08). Staat hij er al in, dan is dit
+                  blok klaar en verdwijnt het. */}
+              {members.data && !members.data.some((lid) => lid.member_role === 'hulpvrager') ? (
+                <KoppelNaasteKaart circleId={circleId} />
+              ) : null}
             </>
           ) : null}
         </ScrollView>
@@ -298,6 +341,12 @@ function KringDetail({
 }
 
 const styles = StyleSheet.create({
+  koppelKaart: {
+    gap: spacing.md,
+  },
+  koppelFout: {
+    color: colors.error,
+  },
   knoppenRij: {
     flexDirection: 'row',
     gap: spacing.cardGap,

@@ -98,13 +98,13 @@
     "vrijwilliger4Titel": "Jouw beschikbaarheid",
     "vrijwilliger4Tekst": "Op je profiel stel je per week in op welke dagen je kunt helpen (standaard staan alle dagen aan). Even weg? Zet de vakantiemodus aan. Tik op je foto om een profielfoto in te stellen.",
     "hulpvrager1Titel": "Hier zie je wie er komt",
-    "hulpvrager1Tekst": "Op deze pagina staat wie er vandaag langskomt en hoe laat, met een grote belknop. In de week eronder zie je de rest: groen is een buddy, blauw is hulp aan huis.",
+    "hulpvrager1Tekst": "Hier staat wie er vandaag langskomt en hoe laat, met een grote belknop. In de week eronder zie je de rest: een groen stipje betekent dat er iemand komt, oranje dat de plek nog open staat.",
     "hulpvragerVoorzienTitel": "Zelf hulp vragen",
-    "hulpvragerVoorzienTekst": "Kies wat je nodig hebt: gratis een buddy voor gezelschap of een klusje, of hulp aan huis zoals de kapper of een warme maaltijd. Je beheerder kijkt altijd mee.",
+    "hulpvragerVoorzienTekst": "Kies wat je nodig hebt: gratis een buddy voor gezelschap of een klusje, of hulp aan huis zoals de kapper of een warme maaltijd. Degene die het voor je regelt kijkt mee.",
     "hulpvrager2Titel": "Dit is je kring",
-    "hulpvrager2Tekst": "Alle mensen om je heen, met wat ze voor je doen: wie alles regelt, wie er langskomt en wie meedenkt. Hier staan ook je instellingen, zoals grotere letters.",
+    "hulpvrager2Tekst": "Alle mensen om je heen, met wat ze voor je doen. Hier vind je ook je eigen code en je instellingen, zoals grotere letters.",
     "hulpvragerSteunTitel": "Iemand die meedenkt",
-    "hulpvragerSteunTekst": "Kom je ergens niet uit? Praat gratis met de hulpmakelaar. Of lees in gewone taal over vergeten, geld en prettig thuis wonen."
+    "hulpvragerSteunTekst": "Kom je ergens niet uit? Lees het na in de wegwijzer, of praat gratis met een zorgmakelaar die met je meedenkt."
   },
   "placeholder": {
     "titel": "Dit scherm komt eraan",
@@ -729,9 +729,8 @@
     "makelaarMeervoud": "hulpmakelaars"
   },
   "week": {
-    "legendaBuddy": "een buddy komt",
-    "legendaDienst": "hulp aan huis",
-    "legendaOpen": "nog leeg"
+    "legendaBuddy": "er komt iemand",
+    "legendaOpen": "nog open"
   },
   "steunHub": {
     "subtitel": "Samen houden jullie {naam} thuis.",
@@ -821,9 +820,9 @@
     "stap1Titel": "Weten wat kan",
     "stap1Tekst": "In Steun vind je de wegwijzer en een hulpmakelaar die meedenkt. Elk antwoord eindigt in een volgende stap.",
     "stap2Titel": "Hulp regelen",
-    "stap2Tekst": "Zelfde vraag, twee smaken: gratis via je kring en de buurt, of betaald via de diensten. Wat je ook kiest, het wordt een afspraak.",
+    "stap2Tekst": "Zelfde vraag, twee smaken: gratis via je kring en de buurt, of een vaste hulp aan huis. Wat je ook kiest, het wordt een afspraak.",
     "stap3Titel": "Er is iemand",
-    "stap3Tekst": "Alles landt in dezelfde week. Iedereen ziet wie er komt, niemand hoeft te raden.",
+    "stap3Tekst": "Alles landt in dezelfde week. Groen is geregeld, oranje staat nog open. Iedereen ziet wie er komt, niemand hoeft te raden.",
     "weekTitel": "Zo ziet zo’n week eruit"
   },
   "kringuitleg": {
@@ -837,7 +836,7 @@
     "rolVrijwilligerTekst": "Komen langs voor gezelschap en een handje hulp. Gratis en vrijwillig.",
     "rolHulpvragerTitel": "De hulpvrager",
     "rolHulpvragerTekst": "Hier draait de kring om: ziet wie er komt en kan zelf om hulp vragen.",
-    "rodeDraad": "Alles wat jullie regelen, gratis of betaald, komt samen in één week.",
+    "rodeDraad": "Alles wat jullie regelen komt samen in één week.",
     "deAppIn": "De app in"
   },
   "paden": {
@@ -943,5 +942,25 @@
     "leegTitel": "Nog niemand gevonden",
     "leegTekst": "Er is nu geen buddy in je buurt die past bij deze kring. Bo blijft kijken; probeer het over een paar dagen nog eens.",
     "opDeKaart": "Bekijk de buurt op de kaart"
+  },
+  "mijnCode": {
+    "label": "Jouw code",
+    "uitleg": "Geef deze code aan degene die de hulp voor je regelt. Die vult hem in en dan horen jullie bij elkaar.",
+    "deel": "Code doorsturen",
+    "deelTekst": "Mijn code voor Thuisverzorgd is {code}. Daarmee kun je mij aan je hulpkring koppelen.",
+    "onboardingTitel": "Dit is jouw code",
+    "onboardingUitleg": "Je hoeft zelf niets in te vullen. Lees deze code voor aan degene die de hulp voor je regelt, of stuur hem door.",
+    "nodigTitel": "Nog geen kring",
+    "nodigTekst": "Zodra iemand jouw code invult, zie je hier wie er langskomt en wanneer.",
+    "koppelTitel": "Heeft {naam} de app al?",
+    "koppelKort": "Koppel de persoon voor wie je zorgt",
+    "koppelUitleg": "Vraag om de code die in zijn of haar app staat, bijvoorbeeld TVZ-4Q7B. Daarmee ziet diegene het rooster en wie er komt.",
+    "koppelLabel": "Code",
+    "koppelKnop": "Koppelen",
+    "koppelLater": "Nog geen code? Dat kan later ook, vanaf de kringpagina.",
+    "foutOnbekend": "Deze code kennen we niet. Kijk of hij goed is overgetikt.",
+    "foutGeenHulpvrager": "Deze code hoort bij iemand die zelf hulp geeft. Nodig die persoon uit als buddy.",
+    "foutAlInKring": "Deze persoon hoort al bij een andere hulpkring.",
+    "foutEigenCode": "Dit is je eigen code. Vraag de code van de persoon voor wie je zorgt."
   }
 }

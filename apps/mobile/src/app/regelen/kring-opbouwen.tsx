@@ -14,6 +14,7 @@ import { useCreateCircle } from '@/features/circles/api';
 import {
   KRINGOPBOUW_STAPPEN,
   useBewaarKringConcept,
+  useKoppelNaaste,
   useKringConcept,
   useStartProefweek,
   useWisKringConcept,
@@ -71,6 +72,7 @@ function Wizard({
   const wis = useWisKringConcept();
   const maakKring = useCreateCircle();
   const startProefweek = useStartProefweek();
+  const koppelNaaste = useKoppelNaaste();
   const [stap, setStap] = useState(beginStap);
   const [antwoorden, setAntwoorden] = useState<KringAntwoorden>(beginAntwoorden);
 
@@ -220,7 +222,27 @@ function Wizard({
           ) : null}
 
           {stap === 5 ? (
-            <Card style={styles.kaart}>
+            <>
+              <Card style={styles.kaart}>
+                <TvzText preset="cardTitle">
+                  {t('mijnCode.koppelTitel', {
+                    naam: antwoorden.naam?.split(' ')[0] ?? t('kringopbouw.diegene'),
+                  })}
+                </TvzText>
+                <TvzText preset="secondary">{t('mijnCode.koppelUitleg')}</TvzText>
+                <TextField
+                  label={t('mijnCode.koppelLabel')}
+                  value={antwoorden.code ?? ''}
+                  onChangeText={(code) => zet({ code: code.toUpperCase() })}
+                  placeholder="TVZ-XXXX"
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                />
+                <TvzText preset="meta" style={styles.codeTip}>
+                  {t('mijnCode.koppelLater')}
+                </TvzText>
+              </Card>
+              <Card style={styles.kaart}>
               <TvzText preset="body">{t('kringopbouw.uitnodigenUitleg')}</TvzText>
               <Button
                 label={t('kring.uitnodigen')}
@@ -232,7 +254,8 @@ function Wizard({
                 variant="outline"
                 onPress={() => router.push('/regelen/buddy-zoeken')}
               />
-            </Card>
+              </Card>
+            </>
           ) : null}
 
           {stap === 6 ? (
@@ -247,6 +270,12 @@ function Wizard({
                   t('kringopbouw.kringnaam', { naam: naam.split(' ')[0]! }),
                 );
                 await startProefweek.mutateAsync({ circleId: kring.id, taken: rooster });
+              // De code is optioneel: heeft de naaste de app nog niet, dan
+              // koppelt de beheerder hem later vanaf de kringpagina.
+              const code = antwoorden.code?.trim();
+              if (code) {
+                await koppelNaaste.mutateAsync({ circleId: kring.id, code }).catch(() => {});
+              }
                 wis.mutate();
                 router.replace('/regelen/planning');
               }}
@@ -322,6 +351,9 @@ function Proefweek({
 }
 
 const styles = StyleSheet.create({
+  codeTip: {
+    color: colors.inkFaint,
+  },
   fill: {
     flex: 1,
   },

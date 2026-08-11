@@ -22,12 +22,6 @@ export type WalkthroughStep = {
 export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
   beheerder: [
     {
-      titleKey: 'rondleiding.beheerder4Titel',
-      textKey: 'rondleiding.beheerder4Tekst',
-      pad: 'weten',
-      route: '/weten/wegwijzer',
-    },
-    {
       titleKey: 'rondleiding.beheerderVoorzienTitel',
       textKey: 'rondleiding.beheerderVoorzienTekst',
       pad: 'regelen',
@@ -44,6 +38,12 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       textKey: 'rondleiding.beheerder2Tekst',
       pad: 'regelen',
       route: '/regelen/kring',
+    },
+    {
+      titleKey: 'rondleiding.beheerder4Titel',
+      textKey: 'rondleiding.beheerder4Tekst',
+      pad: 'weten',
+      route: '/weten/wegwijzer',
     },
   ],
   vrijwilliger: [
@@ -66,13 +66,10 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       route: '/vrijwilliger/steun',
     },
   ],
+  // De hulpvrager loopt eerst het hele groene pad af en stapt pas daarna naar
+  // het blauwe: zo springt de kleur van de kop niet heen en weer, en volgt de
+  // rondleiding de volgorde van de schuifjes (feedback Jelle 11-08).
   hulpvrager: [
-    {
-      titleKey: 'rondleiding.hulpvrager1Titel',
-      textKey: 'rondleiding.hulpvrager1Tekst',
-      pad: 'regelen',
-      route: '/regelen/planning',
-    },
     {
       titleKey: 'rondleiding.hulpvragerVoorzienTitel',
       textKey: 'rondleiding.hulpvragerVoorzienTekst',
@@ -80,16 +77,22 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       route: '/regelen/voorzieningen',
     },
     {
-      titleKey: 'rondleiding.hulpvragerSteunTitel',
-      textKey: 'rondleiding.hulpvragerSteunTekst',
-      pad: 'weten',
-      route: '/weten/wegwijzer',
+      titleKey: 'rondleiding.hulpvrager1Titel',
+      textKey: 'rondleiding.hulpvrager1Tekst',
+      pad: 'regelen',
+      route: '/regelen/planning',
     },
     {
       titleKey: 'rondleiding.hulpvrager2Titel',
       textKey: 'rondleiding.hulpvrager2Tekst',
       pad: 'regelen',
       route: '/regelen/kring',
+    },
+    {
+      titleKey: 'rondleiding.hulpvragerSteunTitel',
+      textKey: 'rondleiding.hulpvragerSteunTekst',
+      pad: 'weten',
+      route: '/weten/wegwijzer',
     },
   ],
 };

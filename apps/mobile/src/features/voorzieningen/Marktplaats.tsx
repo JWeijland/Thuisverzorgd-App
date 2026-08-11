@@ -1,7 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   Car,
   ChevronRight,
@@ -11,7 +10,6 @@ import {
   HeartHandshake,
   HeartPulse,
   Scissors,
-  Search,
   ShoppingBasket,
   Soup,
   Sparkles,
@@ -22,7 +20,7 @@ import { useDiensten, type Dienst } from '@/features/voorzieningen/api';
 import { euro } from '@/features/voorzieningen/slots';
 import { t } from '@/i18n';
 import { colors, gradient, radius, spacing } from '@/theme';
-import { EmptyState, TvzText, tvzIn } from '@/ui';
+import { TvzText, tvzIn } from '@/ui';
 import Animated from 'react-native-reanimated';
 
 /** Warme foto per dienst (Pexels, zie assets/images/diensten/BRONNEN.md). */
@@ -58,41 +56,15 @@ const DIENST_ICONS: Record<string, LucideIcon> = {
  */
 export function Marktplaats() {
   const diensten = useDiensten();
-  const [zoek, setZoek] = useState('');
-
-  const term = zoek.trim().toLowerCase();
-  const lijst = (diensten.data ?? []).filter(
-    (dienst) =>
-      !term ||
-      dienst.name.toLowerCase().includes(term) ||
-      dienst.provider.business.toLowerCase().includes(term) ||
-      dienst.provider.name.toLowerCase().includes(term),
-  );
-  // Buddy hoort ook bij de zoekresultaten: gratis hulp is het eerste antwoord.
-  const buddyZichtbaar = !term || t('voorzien.buddyTegelTitel').toLowerCase().includes(term);
-
-  const zoekVeld = (
-    <View style={[styles.zoekVeld, styles.zoekVeldLicht]}>
-      <Search color={colors.inkFaint} size={18} strokeWidth={2.2} />
-      <TextInput
-        value={zoek}
-        onChangeText={setZoek}
-        placeholder={t('voorzien.zoeken')}
-        placeholderTextColor={colors.inkFaint}
-        style={styles.zoekInput}
-        autoCorrect={false}
-        accessibilityLabel={t('voorzien.zoeken')}
-      />
-    </View>
-  );
+  // Geen zoekbalk meer (feedback Jelle 11-08): met tien tegels zoek je met je
+  // ogen, niet met een toetsenbord.
+  const lijst = diensten.data ?? [];
 
   return (
     <View style={styles.safe}>
-      <View style={styles.zoekLos}>{zoekVeld}</View>
 
       <ScrollView contentContainerStyle={styles.lijst}>
-        {buddyZichtbaar ? (
-          <Animated.View entering={tvzIn}>
+        <Animated.View entering={tvzIn}>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={t('voorzien.buddyTegelTitel')}
@@ -120,8 +92,7 @@ export function Marktplaats() {
                 <ChevronRight color={colors.white} size={22} strokeWidth={2.2} />
               </LinearGradient>
             </Pressable>
-          </Animated.View>
-        ) : null}
+        </Animated.View>
 
         <View style={styles.grid}>
           {lijst.map((dienst) => (
@@ -129,9 +100,6 @@ export function Marktplaats() {
           ))}
         </View>
 
-        {!diensten.isLoading && lijst.length === 0 && !buddyZichtbaar ? (
-          <EmptyState title={t('voorzien.geenResultaat')} />
-        ) : null}
       </ScrollView>
     </View>
   );
@@ -179,35 +147,6 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.bg,
-  },
-  zoekVeld: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.white,
-    borderRadius: radius.pill,
-    paddingHorizontal: 14,
-    marginTop: spacing.md,
-    minHeight: 46,
-    // Ruimte laten voor Bo, die rechts over de rand piept.
-    marginRight: 96,
-  },
-  zoekVeldLicht: {
-    marginTop: 0,
-    marginRight: 0,
-    borderWidth: 1.5,
-    borderColor: colors.line,
-  },
-  zoekLos: {
-    paddingHorizontal: spacing.screen,
-    paddingBottom: spacing.xs,
-  },
-  zoekInput: {
-    flex: 1,
-    fontFamily: 'ComicNeue_400Regular',
-    fontSize: 15,
-    color: colors.ink,
-    paddingVertical: 10,
   },
   lijst: {
     padding: spacing.screen,

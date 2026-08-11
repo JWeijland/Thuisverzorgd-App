@@ -25,16 +25,20 @@ const DOT_KLEUR: Record<DayDot, string> = {
   dienst: colors.primaryMid,
 };
 
+/**
+ * De legenda noemt alleen wat je in de planning ook echt ziet: groen als er
+ * iemand komt, oranje als de plek nog open staat. Geboekte diensten hebben
+ * geen eigen stipje meer (feedback Jelle 11-08).
+ */
 const LEGENDA: { dot: DayDot; labelKey: string }[] = [
   { dot: 'ingepland', labelKey: 'week.legendaBuddy' },
-  { dot: 'dienst', labelKey: 'week.legendaDienst' },
   { dot: 'open', labelKey: 'week.legendaOpen' },
 ];
 
 /**
- * Weekstrip Ma–Zo met stipjes per dag: groen = een buddy gaat, blauw =
- * geboekte dienst, oranje = nog open. Dezelfde week keert terug bij
- * beheerder, buddy en hulpvrager (rode draad van ontwerp 4.0).
+ * Weekstrip Ma–Zo met stipjes per dag: groen = er komt iemand, oranje = de
+ * plek staat nog open. Dezelfde strip staat bij beheerder, buddy en
+ * hulpvrager, zodat iedereen naar dezelfde week kijkt.
  */
 export function WeekStrip({ anchor, tasks, boekingDagen, legenda, selected, onSelectDay }: Props) {
   const days = isoWeekDays(anchor);

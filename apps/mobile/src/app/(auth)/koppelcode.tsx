@@ -1,93 +1,51 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useSession } from '@/features/onboarding/useAuth';
+import { MijnCode } from '@/features/circles/MijnCode';
 import { t } from '@/i18n';
-import { supabase } from '@/lib/supabase';
-import { colors, spacing } from '@/theme';
-import { Button, Card, TextField, TvzText } from '@/ui';
 import { useStatusBalk } from '@/lib/statusbalk';
+import { colors, spacing } from '@/theme';
+import { Bo, Button, TvzBounce, TvzText } from '@/ui';
 
-/** Koppelcode: de hulpvrager koppelt zich aan een bestaande kring ("kijkt mee"). */
+/**
+ * De code van de oudere, direct na de rolkeuze (feedback Jelle 11-08).
+ *
+ * Hiervoor moest de oudere zelf een code van de beheerder overtikken. Dat is
+ * omgedraaid: hij ziet nu zijn eigen code en geeft die door. Overtikken doet
+ * degene die de hulp regelt, want die zit toch al in de app te regelen.
+ */
 export default function KoppelcodeScreen() {
   useStatusBalk('donker');
-  const { session } = useSession();
-  const queryClient = useQueryClient();
-  const [code, setCode] = useState('');
-  const [error, setError] = useState<string | undefined>();
-  const [busy, setBusy] = useState(false);
-
-  async function redeem() {
-    if (!session || busy) return;
-    setBusy(true);
-    setError(undefined);
-    // De RPC koppelt aan de kring én zet de rol op hulpvrager.
-    const { error: rpcError } = await supabase.rpc('redeem_circle_code', {
-      p_code: code.trim().toUpperCase(),
-    });
-    setBusy(false);
-    if (rpcError) {
-      setError(t('koppelcode.onbekend'));
-      return;
-    }
-    await queryClient.invalidateQueries();
-    router.replace({ pathname: '/kringuitleg', params: { rol: 'hulpvrager' } });
-  }
-
-  /** Nog geen code? Dan alvast naar de app; de code kan later alsnog. */
-  async function later() {
-    if (!session || busy) return;
-    setBusy(true);
-    await supabase.rpc('change_role', { p_role: 'hulpvrager' });
-    await queryClient.invalidateQueries({ queryKey: ['profile'] });
-    setBusy(false);
-    router.replace({ pathname: '/kringuitleg', params: { rol: 'hulpvrager' } });
-  }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back}>
-          <TvzText preset="cardTitle">←</TvzText>
-        </Pressable>
-        <TvzText preset="screenTitle">{t('koppelcode.titel')}</TvzText>
-        <TvzText preset="secondary" style={styles.uitleg}>
-          {t('koppelcode.uitleg')}
-        </TvzText>
-        <Card dashed style={styles.codeCard}>
-          <TextField
-            label={t('koppelcode.titel')}
-            placeholder={t('koppelcode.placeholder')}
-            value={code}
-            onChangeText={(v) => setCode(v.toUpperCase())}
-            autoCapitalize="characters"
-            autoCorrect={false}
-            error={error}
-            style={styles.codeInput}
-          />
-        </Card>
-        <Button
-          label={busy ? t('algemeen.laden') : t('koppelcode.verstuur')}
-          variant="cta"
-          size="lg"
-          disabled={busy || code.trim().length < 4}
-          onPress={redeem}
-        />
-        <Pressable
-          accessibilityRole="button"
-          onPress={later}
-          disabled={busy}
-          hitSlop={8}
-          style={styles.laterLink}
-        >
-          <TvzText preset="secondary" style={styles.laterText}>
-            {t('koppelcode.later')}
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.kop}>
+          <TvzBounce>
+            <Bo width={92} rol="hulpvrager" />
+          </TvzBounce>
+          <TvzText preset="screenTitle" style={styles.titel}>
+            {t('mijnCode.onboardingTitel')}
           </TvzText>
-        </Pressable>
-      </View>
+          <TvzText preset="body" style={styles.uitleg}>
+            {t('mijnCode.onboardingUitleg')}
+          </TvzText>
+        </View>
+
+        <MijnCode />
+
+        <View style={styles.voet}>
+          <Button
+            label={t('algemeen.verder')}
+            variant="cta"
+            size="lg"
+            onPress={() =>
+              router.replace({ pathname: '/kringuitleg', params: { rol: 'hulpvrager' } })
+            }
+          />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -98,37 +56,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
   },
   container: {
-    flex: 1,
     padding: spacing.screen,
+    paddingBottom: spacing.xxl,
+    gap: spacing.lg,
+    flexGrow: 1,
   },
-  back: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.surfaceAlt,
+  kop: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.lg,
+    gap: spacing.sm,
+    marginTop: spacing.lg,
+  },
+  titel: {
+    textAlign: 'center',
   },
   uitleg: {
-    marginTop: spacing.xs,
-    marginBottom: spacing.xl,
-  },
-  codeCard: {
-    marginBottom: spacing.xl,
-  },
-  codeInput: {
     textAlign: 'center',
-    fontSize: 22,
-    letterSpacing: 2,
   },
-  laterLink: {
-    alignSelf: 'center',
-    marginTop: spacing.lg,
-    padding: spacing.sm,
-  },
-  laterText: {
-    color: colors.primaryMid,
-    textDecorationLine: 'underline',
+  voet: {
+    marginTop: 'auto',
   },
 });
