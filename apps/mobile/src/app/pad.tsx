@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { BookOpen, HeartHandshake, Settings } from 'lucide-react-native';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PADEN, schuifjesVoor, type Pad } from '@/features/navigatie/paden';
@@ -64,6 +64,13 @@ export default function PadKeuze() {
   );
 }
 
+/** Foto per pad: iemand die iets opzoekt, en iemand die iemand helpt. */
+const FOTOS = {
+  weten: require('../../assets/images/paden/weten.jpg'),
+  regelen: require('../../assets/images/paden/regelen.jpg'),
+  vrijwilliger: require('../../assets/images/paden/regelen.jpg'),
+} as const;
+
 function PadKaart({ pad, icoon }: { pad: Pad; icoon: React.ReactNode }) {
   const profile = useProfile();
   const schuifjes = schuifjesVoor(pad, profile.data?.role);
@@ -77,31 +84,28 @@ function PadKaart({ pad, icoon }: { pad: Pad; icoon: React.ReactNode }) {
         if (eerste) router.replace(eerste.route as never);
       }}
     >
-      <LinearGradient
-        colors={pad.gradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.kaart, shadows.floating]}
-      >
-        <View style={styles.kaartKop}>
-          <View style={styles.kaartIcoon}>{icoon}</View>
-          <TvzText preset="cardTitle" style={styles.kaartTitel}>
-            {t(pad.titelKey)}
+      {/* Tekst links op de padkleur, foto rechts. De foto bedekt bewust maar
+          een deel van de kaart: hij vertelt waar het pad over gaat zonder de
+          tekst in de weg te zitten (wens Jelle 11-08). */}
+      <View style={[styles.kaart, shadows.floating]}>
+        <LinearGradient
+          colors={pad.gradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.kaartTekstVlak}
+        >
+          <View style={styles.kaartKop}>
+            <View style={styles.kaartIcoon}>{icoon}</View>
+            <TvzText preset="cardTitle" style={styles.kaartTitel}>
+              {t(pad.titelKey)}
+            </TvzText>
+          </View>
+          <TvzText preset="secondary" style={styles.kaartUitleg}>
+            {t(pad.uitlegKey)}
           </TvzText>
-        </View>
-        <TvzText preset="body" style={styles.kaartUitleg}>
-          {t(pad.uitlegKey)}
-        </TvzText>
-        <View style={styles.kaartChips}>
-          {schuifjes.map((schuifje) => (
-            <View key={schuifje.route} style={[styles.chip, { backgroundColor: pad.schuifjeVlak }]}>
-              <TvzText preset="meta" style={styles.chipTekst}>
-                {t(schuifje.labelKey)}
-              </TvzText>
-            </View>
-          ))}
-        </View>
-      </LinearGradient>
+        </LinearGradient>
+        <Image source={FOTOS[pad.id]} style={styles.kaartFoto} resizeMode="cover" />
+      </View>
     </Pressable>
   );
 }
@@ -128,9 +132,20 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   kaart: {
+    flexDirection: 'row',
     borderRadius: radius.card,
+    overflow: 'hidden',
+    minHeight: 150,
+  },
+  kaartTekstVlak: {
+    flex: 1.45,
     padding: spacing.cardPadding,
     gap: spacing.sm,
+    justifyContent: 'center',
+  },
+  kaartFoto: {
+    flex: 1,
+    height: '100%',
   },
   kaartKop: {
     flexDirection: 'row',
@@ -151,21 +166,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   kaartUitleg: {
-    color: 'rgba(255,255,255,0.9)',
-  },
-  kaartChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.chipGap,
-    marginTop: spacing.xs,
-  },
-  chip: {
-    borderRadius: radius.pill,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
-  chipTekst: {
-    color: colors.white,
+    color: 'rgba(255,255,255,0.92)',
   },
   gegevens: {
     flexDirection: 'row',

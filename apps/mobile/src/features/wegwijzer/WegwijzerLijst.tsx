@@ -1,11 +1,9 @@
 import { router } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import {
   Bookmark,
   ChevronRight,
-  ExternalLink,
   MessagesSquare,
   Search,
   Sparkles,
@@ -20,13 +18,13 @@ import {
   useGuideSuggesties,
   useGuideThemes,
   useLogZoekopdracht,
-  type Antwoord,
+  type AiAntwoord,
   type GuideModule,
   type ThemaKleur,
   type Zoektreffer,
 } from '@/features/wegwijzer/api';
 import { ThemaIcoon } from '@/features/wegwijzer/ThemaIcoon';
-import { filterLokaal, knipAntwoord, magZoeken, splitsTreffer } from '@/features/wegwijzer/zoekterm';
+import { filterLokaal, magZoeken, splitsTreffer } from '@/features/wegwijzer/zoekterm';
 import { t } from '@/i18n';
 import { colors, radius, spacing, themaTints } from '@/theme';
 import { Card, Chip, EmptyState, Pill, SectionHeader, TvzText } from '@/ui';
@@ -144,8 +142,8 @@ export function WegwijzerLijst({ kop }: { kop?: ReactNode }) {
               </ScrollView>
             ) : null}
 
-            {(antwoorden.data ?? []).length > 0 ? (
-              <AntwoordKaart antwoorden={antwoorden.data!} />
+            {antwoorden.data?.gevonden ? (
+              <AntwoordKaart antwoord={antwoorden.data} />
             ) : null}
 
             <TvzText preset="meta" style={styles.telling}>
@@ -278,13 +276,14 @@ export function WegwijzerLijst({ kop }: { kop?: ReactNode }) {
  * uit komt en de bronnen die het onderbouwen. Vinden we niets met voldoende
  * zekerheid, dan verschijnt deze kaart niet en blijft de gewone lijst over.
  */
-function AntwoordKaart({ antwoorden }: { antwoorden: Antwoord[] }) {
-  const beste = antwoorden[0];
-  if (!beste) return null;
-  const tint = themaTint(beste.thema_kleur);
-  const { tekst, geknipt } = knipAntwoord(beste.antwoord);
-  const stappen = beste.soort === 'stappen' ? tekst.split('\n').filter(Boolean) : [];
-  const overige = antwoorden.slice(1).filter((rij) => rij.module_id !== beste.module_id);
+/**
+ * Het AI-antwoord op een getypte vraag, met de onderwerpen eronder waarop het
+ * berust. Bewust altijd mét bronnen: je moet kunnen nalezen waar het vandaan
+ * komt, zeker bij vragen over regelingen en geld.
+ */
+function AntwoordKaart({ antwoord }: { antwoord: AiAntwoord }) {
+  if (!antwoord.gevonden || !antwoord.antwoord) return null;
+  const tint = themaTint('blauw');
 
   return (
     <Card style={[styles.antwoord, { borderColor: tint.vlak }]}>
@@ -293,80 +292,38 @@ function AntwoordKaart({ antwoorden }: { antwoorden: Antwoord[] }) {
         <TvzText preset="meta" style={[styles.antwoordLabel, { color: tint.icoon }]}>
           {t('wegwijzer.antwoordKop')}
         </TvzText>
-        <Pill label={beste.thema} color={tint.icoon} backgroundColor={tint.vlak} />
       </View>
-      <TvzText preset="cardTitle" style={styles.kaartTitel}>
-        {beste.titel}
+
+      <TvzText preset="body" style={styles.antwoordTekst}>
+        {antwoord.antwoord}
       </TvzText>
-      {stappen.length > 0 ? (
-        <View style={styles.antwoordStappen}>
-          {stappen.map((stap, index) => (
-            <TvzText key={stap} preset="body" style={styles.antwoordTekst}>
-              {index + 1}. {stap.trim()}
-            </TvzText>
-          ))}
-        </View>
-      ) : (
-        <TvzText preset="body" style={styles.antwoordTekst}>
-          {tekst}
-        </TvzText>
-      )}
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => openModule(beste.module_id)}
-        style={styles.antwoordUit}
-        hitSlop={6}
-      >
-        <TvzText preset="meta" style={styles.antwoordUitTekst}>
-          {t('wegwijzer.antwoordUit', { onderwerp: beste.module_titel })}
-          {geknipt ? ` · ${t('wegwijzer.antwoordLees')}` : ''}
-        </TvzText>
-        <ChevronRight color={colors.primaryMid} size={16} strokeWidth={2.4} />
-      </Pressable>
 
-      {beste.bronnen.length > 0 ? (
-        <>
-          <TvzText preset="meta" style={styles.antwoordBronKop}>
-            {t('wegwijzer.antwoordBronnen')}
+      <TvzText preset="meta" style={styles.antwoordBronKop}>
+        {t('wegwijzer.antwoordBronnen')}
+      </TvzText>
+      {antwoord.bronnen.map((bron) => (
+        <Pressable
+          key={bron.module_id}
+          accessibilityRole="button"
+          accessibilityLabel={bron.titel}
+          onPress={() => openModule(bron.module_id)}
+          style={styles.antwoordBron}
+          hitSlop={4}
+        >
+          <TvzText preset="meta" style={styles.antwoordBronTekst}>
+            {bron.titel}
           </TvzText>
-          {beste.bronnen.map((bron) => (
-            <Pressable
-              key={bron.url}
-              accessibilityRole="link"
-              onPress={() => WebBrowser.openBrowserAsync(bron.url)}
-              style={styles.antwoordBron}
-              hitSlop={4}
-            >
-              <ExternalLink color={colors.primaryMid} size={15} strokeWidth={2.2} />
-              <TvzText preset="meta" style={styles.antwoordBronTekst}>
-                {bron.titel}
-              </TvzText>
-            </Pressable>
-          ))}
-        </>
-      ) : null}
+          <ChevronRight color={colors.primaryMid} size={15} strokeWidth={2.2} />
+        </Pressable>
+      ))}
 
-      {overige.length > 0 ? (
-        <View style={styles.antwoordOverige}>
-          <TvzText preset="meta" style={styles.antwoordBronKop}>
-            {t('wegwijzer.antwoordMeer')}
-          </TvzText>
-          <View style={styles.chips}>
-            {overige.map((rij) => (
-              <Chip
-                key={rij.sectie_id}
-                label={rij.module_titel}
-                onPress={() => openModule(rij.module_id)}
-              />
-            ))}
-          </View>
-        </View>
-      ) : null}
+      <TvzText preset="meta" style={styles.antwoordVoet}>
+        {t('wegwijzer.antwoordVoet')}
+      </TvzText>
     </Card>
   );
 }
 
-/** Een module als zoektreffer tonen zolang het serverantwoord onderweg is. */
 function alsTreffer(module: GuideModule): Zoektreffer {
   return {
     id: module.id,
@@ -567,6 +524,10 @@ const styles = StyleSheet.create({
   antwoordUitTekst: {
     color: colors.primaryMid,
     flexShrink: 1,
+  },
+  antwoordVoet: {
+    marginTop: spacing.md,
+    color: colors.inkFaint,
   },
   antwoordBronKop: {
     color: colors.inkFaint,

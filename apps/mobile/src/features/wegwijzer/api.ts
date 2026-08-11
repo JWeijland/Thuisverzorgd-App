@@ -197,17 +197,38 @@ export function useGuideSearch(term: string) {
  * álle inhoudswoorden van de vraag in één onderdeel voorkomen; daardoor is
  * een gevonden antwoord betrouwbaar en zwijgt de kaart bij twijfel.
  */
+/** Wat de edge function `wegwijzer-ai` terugstuurt. */
+export type AiAntwoord = {
+  gevonden: boolean;
+  antwoord: string | null;
+  bronnen: { module_id: string; slug: string; titel: string }[];
+};
+
+/**
+ * Het antwoord op een getypte vraag. Sinds 11-08 schrijft Claude dit antwoord,
+ * maar uitsluitend op onze eigen kennisbank: de edge function stuurt de
+ * gevonden stukken mee en verbiedt het model er iets buiten te gebruiken. Zo
+ * staat er nooit iets in de app dat niet in onze bronnen staat.
+ *
+ * Het oude, extractieve antwoord (`wegwijzer_antwoord`) knipte letterlijk een
+ * alinea uit de kennisbank en sloeg de vraag daarmee vaak nét mis.
+ */
 export function useGuideAntwoord(term: string) {
   const { session } = useSession();
   const schoon = normaliseer(term);
   return useQuery({
     queryKey: ['wegwijzer-antwoord', schoon],
     enabled: !!session && magZoeken(schoon),
-    staleTime: 60 * 1000,
-    queryFn: async (): Promise<Antwoord[]> => {
-      const { data, error } = await supabase.rpc('wegwijzer_antwoord', { p_vraag: schoon });
+    // Een AI-antwoord kost geld; binnen het uur dezelfde vraag hergebruikt
+    // gewoon het vorige antwoord.
+    staleTime: 60 * 60 * 1000,
+    retry: false,
+    queryFn: async (): Promise<AiAntwoord> => {
+      const { data, error } = await supabase.functions.invoke('wegwijzer-ai', {
+        body: { vraag: schoon },
+      });
       if (error) throw error;
-      return (data ?? []) as Antwoord[];
+      return data as AiAntwoord;
     },
   });
 }

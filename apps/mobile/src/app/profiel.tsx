@@ -11,19 +11,17 @@ import { NotificationSettings } from '@/features/notifications/NotificationSetti
 import { useProfile } from '@/features/onboarding/useAuth';
 import { logUit } from '@/features/onboarding/uitloggen';
 import { STRAAL_OPTIES, dichtstbijzijndeStraal, straalLabel } from '@/features/onboarding/straal';
+import { KeuzeRij } from '@/ui/KeuzeRij';
 import { useUpdateProfile } from '@/features/profile/api';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { WEEKDAY_SHORT, isoWeekKey, isoWeekNumber } from '@/lib/dates';
-import { colors, gradient, radius, spacing, useTextScale } from '@/theme';
-import { LinearGradient } from 'expo-linear-gradient';
+import { colors, radius, spacing, useTextScale } from '@/theme';
 import {
   BottomSheet,
   Button,
   Card,
-  Chip,
   GradientHeader,
-  Pill,
   TextField,
   Toggle,
   TvzText,
@@ -214,6 +212,9 @@ export default function ProfielScreen() {
     <View style={styles.safe}>
       <GradientHeader title={t('profiel.titel')} subtitle={t('profiel.subtitel')} wobbel terug />
       <ScrollView contentContainerStyle={styles.container}>
+        {/* Foto links, naam en rol ernaast als gewone tekst. De pil om de rol
+            is weg; de instellingen staan er rustig onder in plaats van in een
+            groot gekleurd blok (feedback Jelle 11-08). */}
         <View style={styles.header}>
           <Pressable
             accessibilityRole="button"
@@ -221,41 +222,40 @@ export default function ProfielScreen() {
             onPress={() => setPhotoOpen(true)}
             style={styles.avatarWrap}
           >
-            <ProfileAvatar name={p?.name ?? '?'} avatarPath={p?.avatar_path} size={72} />
+            <ProfileAvatar name={p?.name ?? '?'} avatarPath={p?.avatar_path} size={68} />
             <View style={styles.avatarBadge}>
               <Camera color={colors.white} size={13} strokeWidth={2.2} />
             </View>
           </Pressable>
-          <TvzText preset="screenTitle" style={styles.name}>
-            {p?.name ?? ''}
-          </TvzText>
-          {p?.role ? <Pill label={ROLE_LABELS[p.role] ?? p.role} /> : null}
+          <View style={styles.headerTekst}>
+            <TvzText preset="screenTitle" style={styles.name} numberOfLines={1}>
+              {p?.name ?? ''}
+            </TvzText>
+            {p?.role ? (
+              <TvzText preset="secondary">{ROLE_LABELS[p.role] ?? p.role}</TvzText>
+            ) : null}
+          </View>
         </View>
 
         {isVolunteer ? (
           <>
-            <LinearGradient {...gradient} style={styles.poolCard}>
+            <Card style={styles.card}>
               <View style={styles.row}>
-                <TvzText preset="cardTitle" style={styles.poolTitle}>
-                  {t('profiel.poolTitel')}
-                </TvzText>
+                <View style={styles.rowText}>
+                  <TvzText preset="cardTitle">{t('profiel.poolTitel')}</TvzText>
+                  <TvzText preset="secondary">{t('profiel.poolUitleg')}</TvzText>
+                </View>
                 <Toggle
                   value={p?.pool_opt_in ?? false}
                   onValueChange={(value) => update.mutate({ pool_opt_in: value })}
                   accessibilityLabel={t('profiel.poolTitel')}
                 />
               </View>
-              <TvzText preset="secondary" style={styles.poolText}>
-                {t('profiel.poolUitleg')}
-              </TvzText>
-              <View style={styles.poolRij}>
+
+              <View style={[styles.row, styles.rowBorder]}>
                 <View style={styles.rowText}>
-                  <TvzText preset="cardTitle" style={styles.poolTitle}>
-                    {t('profiel.spontaanTitel')}
-                  </TvzText>
-                  <TvzText preset="secondary" style={styles.poolText}>
-                    {t('profiel.spontaanUitleg')}
-                  </TvzText>
+                  <TvzText preset="cardTitle">{t('profiel.spontaanTitel')}</TvzText>
+                  <TvzText preset="secondary">{t('profiel.spontaanUitleg')}</TvzText>
                 </View>
                 <Toggle
                   value={p?.spontaneous_available ?? true}
@@ -264,68 +264,63 @@ export default function ProfielScreen() {
                 />
               </View>
 
-              {/* Hoe ver wil je gaan? Bepaalt welke hulpvragen en kringen je
-                  ziet, en voor welke kringen jij als buddy in beeld komt. */}
-              <View style={styles.straalBlok}>
-                <TvzText preset="cardTitle" style={styles.poolTitle}>
-                  {t('profiel.straalTitel')}
-                </TvzText>
-                <TvzText preset="secondary" style={styles.poolText}>
-                  {t('profiel.straalUitleg')}
-                </TvzText>
-                <View style={styles.straalChips}>
-                  {STRAAL_OPTIES.map((meters) => {
-                    const gekozen = dichtstbijzijndeStraal(p?.help_radius_m) === meters;
-                    return (
-                      <Pressable
-                        key={meters}
-                        accessibilityRole="radio"
-                        accessibilityState={{ checked: gekozen }}
-                        accessibilityLabel={t('profiel.straalKeuze', {
-                          afstand: straalLabel(meters),
-                        })}
-                        onPress={() => update.mutate({ help_radius_m: meters })}
-                        style={[styles.straalChip, gekozen && styles.straalChipActief]}
-                      >
-                        <TvzText
-                          preset="meta"
-                          style={gekozen ? styles.straalChipTekstActief : styles.straalChipTekst}
-                        >
-                          {straalLabel(meters)}
-                        </TvzText>
-                      </Pressable>
-                    );
-                  })}
-                </View>
+              {/* De afstand bepaalt welke hulpvragen en kringen je ziet, en
+                  voor welke kringen jij als buddy in beeld komt. */}
+              <View style={[styles.straalBlok, styles.rowBorder]}>
+                <TvzText preset="cardTitle">{t('profiel.straalTitel')}</TvzText>
+                <TvzText preset="secondary">{t('profiel.straalUitleg')}</TvzText>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.straalRij}
+                >
+                  <KeuzeRij
+                    opties={STRAAL_OPTIES.map((meters) => ({
+                      waarde: String(meters),
+                      label: straalLabel(meters),
+                    }))}
+                    gekozen={String(dichtstbijzijndeStraal(p?.help_radius_m))}
+                    onKies={(waarde) => update.mutate({ help_radius_m: Number(waarde) })}
+                  />
+                </ScrollView>
               </View>
-            </LinearGradient>
+            </Card>
 
             <Card style={styles.card}>
               <TvzText preset="cardTitle">{t('profiel.beschikbaarheid')}</TvzText>
               <TvzText preset="secondary">{t('profiel.beschikbaarheidUitleg')}</TvzText>
-              <View style={styles.days}>
-                {weekDates.map((date, offset) => (
-                  <Chip
-                    key={offset}
-                    label={
+              <View style={styles.weken}>
+                <KeuzeRij
+                  opties={weekDates.map((date, offset) => ({
+                    waarde: String(offset),
+                    label:
                       offset === 0
                         ? t('profiel.dezeWeek', { week: isoWeekNumber(date) })
-                        : t('profiel.weekLabel', { week: isoWeekNumber(date) })
-                    }
-                    selected={weekOffset === offset}
-                    onPress={() => setWeekOffset(offset)}
-                  />
-                ))}
+                        : t('profiel.weekLabel', { week: isoWeekNumber(date) }),
+                  }))}
+                  gekozen={String(weekOffset)}
+                  onKies={(waarde) => setWeekOffset(Number(waarde))}
+                />
               </View>
-              <View style={styles.days}>
-                {DAY_CODES.map((day, i) => (
-                  <Chip
-                    key={day}
-                    label={WEEKDAY_SHORT[i]!}
-                    selected={weekDays.includes(day)}
-                    onPress={() => toggleDay(day)}
-                  />
-                ))}
+              {/* Dagen als vierkante vakjes, zoals de dagbalk bij inplannen. */}
+              <View style={styles.dagBalk}>
+                {DAY_CODES.map((day, i) => {
+                  const aan = weekDays.includes(day);
+                  return (
+                    <Pressable
+                      key={day}
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: aan }}
+                      accessibilityLabel={WEEKDAY_SHORT[i]!}
+                      onPress={() => toggleDay(day)}
+                      style={[styles.dag, aan && styles.dagAan]}
+                    >
+                      <TvzText preset="meta" style={aan ? styles.dagTekstAan : undefined}>
+                        {WEEKDAY_SHORT[i]}
+                      </TvzText>
+                    </Pressable>
+                  );
+                })}
               </View>
               <View style={[styles.row, styles.rowBorder]}>
                 <View style={styles.rowText}>
@@ -710,9 +705,41 @@ const styles = StyleSheet.create({
     paddingBottom: 110,
   },
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.lg,
     marginBottom: spacing.xl,
+  },
+  headerTekst: {
+    flex: 1,
+  },
+  straalRij: {
+    paddingRight: spacing.screen,
+  },
+  weken: {
+    marginTop: spacing.sm,
+  },
+  dagBalk: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: spacing.md,
+  },
+  dag: {
+    flex: 1,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.row,
+    backgroundColor: colors.white,
+    borderWidth: 1.5,
+    borderColor: colors.line,
+  },
+  dagAan: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  dagTekstAan: {
+    color: colors.white,
   },
   avatarWrap: {
     position: 'relative',
@@ -792,54 +819,7 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: spacing.md,
   },
-  poolCard: {
-    borderRadius: radius.card,
-    padding: spacing.cardPadding,
-    marginBottom: spacing.md,
-  },
-  poolTitle: {
-    color: colors.white,
-    flex: 1,
-  },
-  poolText: {
-    color: 'rgba(255,255,255,0.85)',
-    marginTop: spacing.sm,
-  },
   straalBlok: {
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.25)',
-  },
-  straalChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.chipGap,
-    marginTop: spacing.md,
-  },
-  straalChip: {
-    minHeight: 34,
-    borderRadius: radius.pill,
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.45)',
-  },
-  straalChipActief: {
-    backgroundColor: colors.white,
-    borderColor: colors.white,
-  },
-  straalChipTekst: {
-    color: colors.white,
-  },
-  straalChipTekstActief: {
-    color: colors.primary,
-  },
-  poolRij: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginTop: spacing.md,
     paddingTop: spacing.md,
     borderTopWidth: 1,
@@ -865,12 +845,6 @@ const styles = StyleSheet.create({
     minHeight: 38,
     paddingVertical: 6,
     paddingHorizontal: 16,
-  },
-  days: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.chipGap,
-    marginTop: spacing.md,
   },
   vacationNote: {
     backgroundColor: colors.warnBg,

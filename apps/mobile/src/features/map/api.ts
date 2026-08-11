@@ -46,6 +46,21 @@ export function useMyCircleStatus(circleId: string | undefined) {
   });
 }
 
+/** Aanmelding bij een kring terugnemen zolang de beheerder nog niets deed. */
+export function useWithdrawJoin() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (circleId: string) => {
+      const { error } = await supabase.rpc('trek_aanmelding_in', { p_circle: circleId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['circle-status'] });
+      queryClient.invalidateQueries({ queryKey: ['map-circles'] });
+    },
+  });
+}
+
 /** Aanmelden bij een kring vanaf de kaart; de beheerder beslist. */
 export function useRequestToJoin() {
   const queryClient = useQueryClient();

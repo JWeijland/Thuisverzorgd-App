@@ -12,6 +12,7 @@ import {
   useMapCircles,
   useMyCircleStatus,
   useRequestToJoin,
+  useWithdrawJoin,
   type MapBuddy,
   type MapCircle,
 } from '@/features/map/api';
@@ -32,6 +33,7 @@ import { KringRondjes } from '@/features/circles/KringRondjes';
 import { ZwevendeSchuifjes } from '@/features/navigatie/ZwevendeSchuifjes';
 import { VolunteerFlow } from '@/features/spontaneous/VolunteerFlow';
 import { countInRegion, DEFAULT_REGION, formatDistance, haversineKm, type LatLng } from '@/lib/geo';
+import { haptics } from '@/lib/haptics';
 import { useKeyboard } from '@/lib/keyboard';
 import { t } from '@/i18n';
 import { colors, radius, shadows, spacing } from '@/theme';
@@ -463,6 +465,7 @@ function KringKaart({
   onClose: () => void;
 }) {
   const status = useMyCircleStatus(circle.id);
+  const withdrawJoin = useWithdrawJoin();
   const join = useRequestToJoin();
   const aangevraagd = status.data === 'aangevraagd' || join.isSuccess;
   const lid = status.data === 'lid';
@@ -507,11 +510,25 @@ function KringKaart({
           {t('buurt.alLid')}
         </TvzText>
       ) : aangevraagd ? (
-        <View style={styles.kringGoed}>
-          <TvzText preset="secondary" style={styles.kringGoedText}>
-            {t('buurt.aanmeldingVerstuurd')}
-          </TvzText>
-        </View>
+        <>
+          <View style={styles.kringGoed}>
+            <TvzText preset="secondary" style={styles.kringGoedText}>
+              {t('buurt.aanmeldingVerstuurd')}
+            </TvzText>
+          </View>
+          {/* Terugnemen kan zolang de beheerder nog niets besloten heeft
+              (feedback Jelle 11-08). */}
+          <Button
+            label={t('buurt.aanmeldingIntrekken')}
+            variant="outline"
+            style={styles.kringKnop}
+            disabled={withdrawJoin.isPending}
+            onPress={() => {
+              void haptics.waarschuwing();
+              withdrawJoin.mutate(circle.id);
+            }}
+          />
+        </>
       ) : idVerified ? (
         <>
           <Button

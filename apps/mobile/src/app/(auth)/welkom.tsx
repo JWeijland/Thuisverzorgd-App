@@ -36,15 +36,21 @@ export default function WelkomScreen() {
           </TvzBounce>
         </View>
         <View style={styles.buttons}>
+          {/* Op de toegangspagina staan de knoppen vierkanter dan elders: ze
+              zijn hier het hele scherm en geen actie in een rij (wens Jelle
+              11-08). */}
           <Button
             label={t('welkom.accountAanmaken')}
             variant="cta"
             size="lg"
+            style={styles.knop}
             onPress={() => router.push({ pathname: '/account', params: { modus: 'nieuw' } })}
           />
           <Button
             label={t('welkom.inloggen')}
             variant="outlineOnDark"
+            size="lg"
+            style={styles.knop}
             onPress={() => router.push({ pathname: '/account', params: { modus: 'inloggen' } })}
           />
         </View>
@@ -54,6 +60,9 @@ export default function WelkomScreen() {
 }
 
 const styles = StyleSheet.create({
+  knop: {
+    borderRadius: radius.card,
+  },
   fill: { flex: 1 },
   safe: {
     flex: 1,

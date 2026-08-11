@@ -347,8 +347,8 @@
     "poolUitleg": "Zet jezelf aan voor de buddy-pool: kringen in de buurt kunnen je vragen voor één losse taak, of je sluit je juist ergens aan als vast gezicht. Jij kiest per kring.",
     "spontaanTitel": "Beschikbaar voor directe hulp",
     "spontaanUitleg": "Staat dit uit? Dan zie je geen spontane hulpvragen op de kaart en krijg je er geen melding van.",
-    "straalTitel": "Hoe ver wil je gaan?",
-    "straalUitleg": "Je krijgt alleen hulpvragen en kringen te zien binnen deze afstand, en kringen verderop zien jou niet staan.",
+    "straalTitel": "Afstand tot je huis",
+    "straalUitleg": "Je ziet alleen hulpvragen en kringen binnen deze afstand, en kringen verderop zien jou niet staan.",
     "straalKeuze": "Binnen {afstand}",
     "beschikbaarheid": "Mijn beschikbaarheid",
     "beschikbaarheidUitleg": "Kies een week en vink aan op welke dagen je kunt. Het rooster stelt je alleen taken voor op die dagen.",
@@ -569,7 +569,8 @@
     "afstandVanJou": "{afstand} van jou",
     "plekkenVrij": "{aantal} plekken vrij",
     "mijnKringen": "mijn kringen",
-    "kruimel": "Op de kaart"
+    "kruimel": "Op de kaart",
+    "aanmeldingIntrekken": "Aanmelding intrekken"
   },
   "directeHulp": {
     "titel": "Directe hulp",
@@ -637,10 +638,10 @@
     "titel": "Wegwijzer",
     "intro": "Alles over de wetten en regelingen rond mantelzorg. Typ een vraag of zoekwoord; je krijgt direct het antwoord uit de kennisbank, met de bronnen die het onderbouwen.",
     "zoekPlaceholder": "Typ een vraag, bijv. hoe vraag ik zorgverlof aan",
-    "antwoordKop": "Direct antwoord",
+    "antwoordKop": "Antwoord uit de wegwijzer",
     "antwoordUit": "Uit: {onderwerp}",
     "antwoordLees": "Lees het hele onderwerp",
-    "antwoordBronnen": "Bronnen bij dit antwoord",
+    "antwoordBronnen": "Gebaseerd op",
     "antwoordMeer": "Hier staat ook iets over",
     "wissen": "Zoekterm wissen",
     "veelGezocht": "Waar anderen naar zoeken",
@@ -668,7 +669,8 @@
     "vraagVoorbeeld": "Ik heb een vraag over: {onderwerp}. ",
     "makelaarTitel": "Kom je er niet uit?",
     "makelaarTekst": "Chat 1-op-1 met een hulpmakelaar. Gratis en vertrouwelijk.",
-    "makelaarKnop": "Chat met een hulpmakelaar"
+    "makelaarKnop": "Chat met een hulpmakelaar",
+    "antwoordVoet": "Dit antwoord is samengevat uit de onderwerpen hierboven. Klopt het niet met jouw situatie? Vraag het aan een zorgmakelaar."
   },
   "voorzien": {
     "titel": "Voorzieningen",

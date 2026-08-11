@@ -2,6 +2,8 @@ import { router, usePathname } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { actiefSchuifje, PADEN, type PadId } from '@/features/navigatie/paden';
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
+import { useProfile } from '@/features/onboarding/useAuth';
 import { useWalkthrough } from '@/features/onboarding/walkthrough';
 import { t } from '@/i18n';
 import { haptics } from '@/lib/haptics';
@@ -26,6 +28,7 @@ export function ZwevendeSchuifjes({ pad, actiefRoute }: Props) {
   const actief = actiefSchuifje(padConfig, actiefRoute ?? pathname);
   const meetSchuifje = useWalkthrough((state) => state.meetSchuifje);
   const meetHeader = useWalkthrough((state) => state.meetHeader);
+  const profile = useProfile();
 
   return (
     // De rondleiding wijst ook hier naar het juiste vakje: dit scherm heeft
@@ -65,15 +68,39 @@ export function ZwevendeSchuifjes({ pad, actiefRoute }: Props) {
           );
         })}
       </View>
+
+      {/* Je eigen profiel staat op elke pagina rechtsboven; op de kaart
+          hoort hij daar dus ook (feedback Jelle 11-08). */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t('paden.naarProfiel')}
+        onPress={() => router.push('/profiel')}
+        style={[styles.profiel, shadows.floating]}
+      >
+        <ProfileAvatar
+          name={profile.data?.name ?? ''}
+          avatarPath={profile.data?.avatar_path}
+          size={38}
+        />
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
     paddingHorizontal: spacing.screen,
   },
+  profiel: {
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: colors.white,
+  },
   balk: {
+    flex: 1,
     flexDirection: 'row',
     gap: 3,
     padding: 3,
