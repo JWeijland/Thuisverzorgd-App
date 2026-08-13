@@ -1,9 +1,9 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
-import { useBrokerPresenceIds, useMakelaars } from '@/features/forum/api';
+import { useBrokerPresenceIds, useMakelaars, type Makelaar } from '@/features/forum/api';
 import { t } from '@/i18n';
 import { colors, gradient, radius, spacing } from '@/theme';
 import { Button, TvzText } from '@/ui';
@@ -12,6 +12,10 @@ import { Button, TvzText } from '@/ui';
  * Hulpmakelaar-blok bovenaan de wegwijzer (handoff, scherm 02): "Kom je er
  * even niet uit?", de gezichten van de makelaars die nu online zijn, en twee
  * knoppen: chatten of videobellen.
+ *
+ * De drie gezichten staan groot naast elkaar met hun naam eronder, in plaats
+ * van klein en over elkaar heen (wens Jelle 13-08): je praat straks met een
+ * mens, dus die mag je eerst zien.
  */
 export function MakelaarHero() {
   const makelaars = useMakelaars();
@@ -19,34 +23,37 @@ export function MakelaarHero() {
 
   const lijst = makelaars.data ?? [];
   const online = lijst.filter((makelaar) => onlineIds.includes(makelaar.id));
-  const gezichten = (online.length > 0 ? online : lijst).slice(0, 3);
+  // Wie online is staat vooraan; daarna vullen we aan tot drie gezichten.
+  const gezichten = [...online, ...lijst.filter((makelaar) => !online.includes(makelaar))].slice(
+    0,
+    3,
+  );
 
   return (
     <LinearGradient {...gradient} style={styles.kaart}>
-      <View style={styles.rij}>
+      <TvzText preset="cardTitle" style={styles.titel}>
+        {t('wegwijzerPad.heroTitel')}
+      </TvzText>
+
+      {gezichten.length > 0 ? (
         <View style={styles.gezichten}>
-          {gezichten.map((makelaar, i) => (
-            <View key={makelaar.id} style={[styles.gezicht, i > 0 && styles.gezichtOverlap]}>
-              <ProfileAvatar
-                name={makelaar.voornaam}
-                avatarPath={makelaar.avatar_path}
-                size={30}
-                backgroundColor={colors.primaryMid}
-              />
-            </View>
+          {gezichten.map((makelaar) => (
+            <Gezicht
+              key={makelaar.id}
+              makelaar={makelaar}
+              online={onlineIds.includes(makelaar.id)}
+            />
           ))}
         </View>
-        <View style={styles.tekst}>
-          <TvzText preset="cardTitle" style={styles.titel}>
-            {t('wegwijzerPad.heroTitel')}
-          </TvzText>
-          <TvzText preset="meta" style={styles.sub}>
-            {online.length === 1
-              ? t('wegwijzerPad.heroOnline1')
-              : t('wegwijzerPad.heroOnline', { aantal: online.length })}
-          </TvzText>
-        </View>
-      </View>
+      ) : null}
+
+      <TvzText preset="meta" style={styles.sub}>
+        {online.length === 0
+          ? t('wegwijzerPad.heroNiemandOnline')
+          : online.length === 1
+            ? t('wegwijzerPad.heroOnline1')
+            : t('wegwijzerPad.heroOnline', { aantal: online.length })}
+      </TvzText>
 
       <View style={styles.knoppen}>
         <Button
@@ -74,36 +81,79 @@ export function MakelaarHero() {
   );
 }
 
+/** Eén makelaar: grote foto, naam eronder, groen stipje als hij nu online is. */
+function Gezicht({ makelaar, online }: { makelaar: Makelaar; online: boolean }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={makelaar.voornaam}
+      onPress={() =>
+        router.push({ pathname: '/weten/zorgmakelaars', params: { makelaar: makelaar.id } })
+      }
+      style={styles.gezicht}
+    >
+      <View style={styles.fotoRing}>
+        <ProfileAvatar
+          name={makelaar.voornaam}
+          avatarPath={makelaar.avatar_path}
+          size={64}
+          backgroundColor={colors.primaryMid}
+        />
+        {online ? <View style={styles.stip} /> : null}
+      </View>
+      <TvzText preset="meta" numberOfLines={1} style={styles.naam}>
+        {makelaar.voornaam}
+      </TvzText>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   kaart: {
     borderRadius: radius.card,
     padding: spacing.cardPadding,
-    gap: spacing.lg,
-  },
-  rij: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: spacing.md,
-  },
-  gezichten: {
-    flexDirection: 'row',
-  },
-  gezicht: {
-    borderRadius: 17,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.55)',
-  },
-  gezichtOverlap: {
-    marginLeft: -12,
-  },
-  tekst: {
-    flex: 1,
   },
   titel: {
     color: colors.white,
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  gezichten: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.xl,
+    marginTop: spacing.xs,
+  },
+  gezicht: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  fotoRing: {
+    borderRadius: 36,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.55)',
+    padding: 2,
+  },
+  stip: {
+    position: 'absolute',
+    right: 2,
+    bottom: 2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: colors.accent,
+    borderWidth: 2,
+    borderColor: colors.primaryDark,
+  },
+  naam: {
+    color: colors.white,
+    maxWidth: 84,
+    textAlign: 'center',
   },
   sub: {
     color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
   },
   knoppen: {
     flexDirection: 'row',

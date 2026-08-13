@@ -11,11 +11,11 @@ import { PadHeader } from '@/features/navigatie/PadHeader';
  * Vanuit de wegwijzer kun je hier binnenkomen met ?vraag=... voorgevuld.
  */
 export default function Zorgmakelaars() {
-  const params = useLocalSearchParams<{ vraag?: string }>();
+  const params = useLocalSearchParams<{ vraag?: string; makelaar?: string }>();
   return (
     <View style={styles.safe}>
       <PadHeader pad="weten" />
-      <BrokerChat startVraag={params.vraag} />
+      <BrokerChat startVraag={params.vraag} startMakelaar={params.makelaar} />
     </View>
   );
 }

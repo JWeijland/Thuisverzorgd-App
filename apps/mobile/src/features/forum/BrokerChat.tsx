@@ -37,7 +37,10 @@ const DECK_TILT = ['-5deg', '4deg', '-3deg', '5deg', '-4deg', '3deg'];
  * Rechts hangt een kaartendeck met de makelaars; tik = profiel bekijken en
  * van daaruit een gesprek met die ene makelaar starten.
  */
-export function BrokerChat({ startVraag }: { startVraag?: string } = {}) {
+export function BrokerChat({
+  startVraag,
+  startMakelaar,
+}: { startVraag?: string; startMakelaar?: string } = {}) {
   const { session } = useSession();
   const makelaars = useMakelaars();
   const onlineIds = useBrokerPresenceIds();
@@ -46,6 +49,15 @@ export function BrokerChat({ startVraag }: { startVraag?: string } = {}) {
   // Gekozen makelaar = eigen gesprek met die persoon; zonder keuze de wachtrij.
   const [gekozen, setGekozen] = useState<Makelaar | null>(null);
   const [profiel, setProfiel] = useState<Makelaar | null>(null);
+
+  // Tik je op de wegwijzer op een gezicht, dan opent zijn kaartje meteen
+  // (wens Jelle 13-08). Alleen de eerste keer dat die makelaar binnenkomt.
+  const [vorigeStartMakelaar, setVorigeStartMakelaar] = useState<string | undefined>(undefined);
+  if (startMakelaar !== vorigeStartMakelaar && (makelaars.data ?? []).length > 0) {
+    setVorigeStartMakelaar(startMakelaar);
+    const gevonden = (makelaars.data ?? []).find((makelaar) => makelaar.id === startMakelaar);
+    if (gevonden) setProfiel(gevonden);
+  }
   const chat = useMyBrokerChat(gekozen?.id ?? null);
   const messages = useBrokerMessages(chat.data);
   const send = useSendBrokerMessage(chat.data);

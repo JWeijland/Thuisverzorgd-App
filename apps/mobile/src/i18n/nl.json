@@ -893,6 +893,8 @@
     "heroTitel": "Kom je er even niet uit?",
     "heroOnline1": "1 hulpmakelaar uit je buurt is online",
     "heroOnline": "{aantal} hulpmakelaars uit je buurt zijn online",
+    "heroNiemandOnline": "Nu even niemand online. Je bericht komt aan.",
+    "heroOnlineNu": "online",
     "chatNu": "Chat nu",
     "videobel": "Videobel",
     "videobelVraag": "Ik zou graag videobellen. Wanneer schikt het?"
