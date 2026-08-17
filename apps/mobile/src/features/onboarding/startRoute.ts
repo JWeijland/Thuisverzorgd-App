@@ -21,5 +21,11 @@ export function getStartRoute(hasSession: boolean, profile: ProfileGate): string
   // De aanbieder (account door Thuisverzorgd aangemaakt) heeft geen
   // keuzescherm: die landt direct in Mijn agenda.
   if (profile.role === 'aanbieder') return '/aanbieder/beschikbaarheid';
+  // Sinds 17-08 land je standaard op de hulp-pagina; het info-gedeelte zit
+  // achter het vergrootglas (zoek-popup). Het keuzescherm blijft bereikbaar
+  // via de Bo-knop.
+  if (profile.role === 'beheerder' || profile.role === 'hulpvrager') {
+    return '/regelen/voorzieningen';
+  }
   return '/pad';
 }

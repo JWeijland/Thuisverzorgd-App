@@ -754,7 +754,11 @@
     "buddyEenmaligUitleg": "Eenmalig, nu of binnenkort. De buurt reageert op je vraag.",
     "geenSlots": "Er zijn de komende twee weken geen vrije momenten. Kijk later nog eens.",
     "geenSlotsKnop": "Geen vrije momenten",
-    "boekBezet": "Dit moment is net geboekt of niet meer beschikbaar. Ga terug en kies een ander moment."
+    "boekBezet": "Dit moment is net geboekt of niet meer beschikbaar. Ga terug en kies een ander moment.",
+    "makelaarTegelTitel": "De mantelzorgmakelaar",
+    "makelaarTegelTekst": "Stel je vragen aan een echte kenner. Gratis, via chat of videobellen.",
+    "makelaarTegelOnline1": "Eén makelaar is nu online. Gratis, via chat of videobellen.",
+    "makelaarTegelOnline": "{aantal} makelaars zijn nu online. Gratis, via chat of videobellen."
   },
   "rolchip": {
     "beheerder": "beheerder",
@@ -1040,5 +1044,13 @@
     "afsprakenLeeg": "Nog geen afspraken",
     "afsprakenLeegUitleg": "Zodra iemand je boekt, verschijnt de afspraak hier.",
     "bij": "Bij {naam}"
+  },
+  "zoekPopup": {
+    "titel": "Zoek het op",
+    "sub": "Stel je vraag, wij zoeken het uit.",
+    "uitleg": "Dit is een zoekfunctie op basis van officiële documenten en regelingen. Je krijgt een duidelijk antwoord mét verwijzingen naar de bron, zodat je snel en betrouwbaar weet waar je aan toe bent.",
+    "makelaarKnop": "Naar de mantelzorgmakelaar",
+    "makelaarTitel": "Liever een mens?",
+    "makelaarSub": "Chat gratis met de mantelzorgmakelaar."
   }
 }

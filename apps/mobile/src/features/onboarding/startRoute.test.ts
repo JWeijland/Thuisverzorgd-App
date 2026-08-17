@@ -19,9 +19,13 @@ describe('getStartRoute', () => {
     expect(getStartRoute(true, { role: 'vrijwilliger', id_verified: true })).toBe('/vrijwilliger/buurt');
   });
 
-  it('beheerder en hulpvrager starten op het keuzescherm met de twee paden', () => {
-    expect(getStartRoute(true, { role: 'beheerder', id_verified: false })).toBe('/pad');
-    expect(getStartRoute(true, { role: 'hulpvrager', id_verified: false })).toBe('/pad');
+  it('beheerder en hulpvrager landen standaard op de hulp-pagina', () => {
+    expect(getStartRoute(true, { role: 'beheerder', id_verified: false })).toBe(
+      '/regelen/voorzieningen',
+    );
+    expect(getStartRoute(true, { role: 'hulpvrager', id_verified: false })).toBe(
+      '/regelen/voorzieningen',
+    );
   });
 
   it('aanbieder slaat het keuzescherm over en landt in Mijn agenda', () => {
