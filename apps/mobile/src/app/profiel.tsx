@@ -31,6 +31,7 @@ const ROLE_LABELS: Record<string, string> = {
   beheerder: 'Beheerder van de kring',
   vrijwilliger: 'Buddy',
   hulpvrager: 'Hulpvrager',
+  aanbieder: 'Aanbieder',
   admin: 'Admin',
   makelaar: 'Hulpmakelaar',
 };

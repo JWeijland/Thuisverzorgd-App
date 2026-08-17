@@ -23,6 +23,12 @@ describe('getStartRoute', () => {
     expect(getStartRoute(true, { role: 'beheerder', id_verified: false })).toBe('/pad');
     expect(getStartRoute(true, { role: 'hulpvrager', id_verified: false })).toBe('/pad');
   });
+
+  it('aanbieder slaat het keuzescherm over en landt in Mijn agenda', () => {
+    expect(getStartRoute(true, { role: 'aanbieder', id_verified: false })).toBe(
+      '/aanbieder/beschikbaarheid',
+    );
+  });
 });
 
 describe('i18n t()', () => {

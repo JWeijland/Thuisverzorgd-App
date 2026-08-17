@@ -4,7 +4,7 @@
  */
 
 export type ProfileGate = {
-  role: 'beheerder' | 'vrijwilliger' | 'hulpvrager' | 'admin' | 'makelaar' | null;
+  role: 'beheerder' | 'vrijwilliger' | 'hulpvrager' | 'aanbieder' | 'admin' | 'makelaar' | null;
   id_verified: boolean;
 } | null;
 
@@ -18,5 +18,8 @@ export function getStartRoute(hasSession: boolean, profile: ProfileGate): string
   // eerst een pad, de vrijwilliger slaat dat keuzescherm over en landt direct
   // op de kaart met hulpvragen.
   if (profile.role === 'vrijwilliger') return '/vrijwilliger/buurt';
+  // De aanbieder (account door Thuisverzorgd aangemaakt) heeft geen
+  // keuzescherm: die landt direct in Mijn agenda.
+  if (profile.role === 'aanbieder') return '/aanbieder/beschikbaarheid';
   return '/pad';
 }

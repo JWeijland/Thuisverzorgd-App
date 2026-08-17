@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 
 export type Profile = {
   id: string;
-  role: 'beheerder' | 'vrijwilliger' | 'hulpvrager' | 'admin' | 'makelaar' | null;
+  role: 'beheerder' | 'vrijwilliger' | 'hulpvrager' | 'aanbieder' | 'admin' | 'makelaar' | null;
   name: string;
   email: string | null;
   username: string | null;

@@ -69,6 +69,9 @@ const FOTOS = {
   weten: require('../../assets/images/paden/weten.jpg'),
   regelen: require('../../assets/images/paden/regelen.jpg'),
   vrijwilliger: require('../../assets/images/paden/regelen.jpg'),
+  // De aanbieder komt nooit op het keuzescherm (die landt in Mijn agenda),
+  // maar het type dekt alle paden.
+  aanbieder: require('../../assets/images/paden/regelen.jpg'),
 } as const;
 
 function PadKaart({ pad, icoon }: { pad: Pad; icoon: React.ReactNode }) {

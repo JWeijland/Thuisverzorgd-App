@@ -9,11 +9,16 @@
  *
  * De vrijwilliger slaat het keuzescherm over: die landt direct op de kaart
  * en heeft zijn eigen drie schuifjes.
+ *
+ * De aanbieder (kapper, tuinman, ...) slaat het keuzescherm ook over: die
+ * landt in Mijn agenda met twee schuifjes (Beschikbaarheid en Mijn
+ * afspraken). Zo'n account maakt Thuisverzorgd zelf aan; er is nergens in de
+ * app een knop om aanbieder te worden.
  */
 
 import { colors } from '@/theme';
 
-export type PadId = 'weten' | 'regelen' | 'vrijwilliger';
+export type PadId = 'weten' | 'regelen' | 'vrijwilliger' | 'aanbieder';
 
 export type Schuifje = {
   /** Route waar dit schuifje heen gaat (absoluut pad). */
@@ -46,6 +51,8 @@ export type Pad = {
 const HULP_GROEN: [string, string] = ['#5FA22A', '#8DC93F'];
 const INFO_BLAUW: [string, string] = [colors.primary, colors.primaryMid];
 const VRIJWILLIGER_NAVY: [string, string] = [colors.primaryDark, colors.primaryMid];
+/** Warm amber voor de werkkant van de app: dit is niemands zorgscherm. */
+const AANBIEDER_AMBER: [string, string] = ['#8A6009', '#C08F1F'];
 
 export const PADEN: Record<PadId, Pad> = {
   weten: {
@@ -93,6 +100,20 @@ export const PADEN: Record<PadId, Pad> = {
       { route: '/vrijwilliger/steun', labelKey: 'paden.vrijwilliger.steun' },
     ],
   },
+  aanbieder: {
+    id: 'aanbieder',
+    titelKey: 'paden.aanbieder.titel',
+    subtitelKey: 'paden.aanbieder.sub',
+    uitlegKey: 'paden.aanbieder.uitleg',
+    gradient: AANBIEDER_AMBER,
+    achtergrond: colors.bg,
+    schuifjeVlak: 'rgba(255,255,255,0.20)',
+    schuifjeActiefTekst: colors.warnText,
+    schuifjes: [
+      { route: '/aanbieder/beschikbaarheid', labelKey: 'paden.aanbieder.beschikbaarheid' },
+      { route: '/aanbieder/afspraken', labelKey: 'paden.aanbieder.afspraken' },
+    ],
+  },
 };
 
 /** Het pad waar een route bij hoort, afgeleid uit het eerste segment. */
@@ -101,6 +122,7 @@ export function padVanRoute(pathname: string): PadId | null {
   if (segment === 'weten') return 'weten';
   if (segment === 'regelen') return 'regelen';
   if (segment === 'vrijwilliger') return 'vrijwilliger';
+  if (segment === 'aanbieder') return 'aanbieder';
   return null;
 }
 
@@ -140,8 +162,16 @@ export function toontKruimelspoor(role: string | null | undefined): boolean {
 
 /**
  * Rollen die het keuzescherm met de twee paden zien. De vrijwilliger niet:
- * die verleent hulp en landt direct op de kaart.
+ * die verleent hulp en landt direct op de kaart. De aanbieder ook niet: die
+ * heeft alleen zijn agenda.
  */
 export function heeftPadKeuze(role: string | null | undefined): boolean {
   return role === 'beheerder' || role === 'hulpvrager';
+}
+
+/** Waar "naar huis" heen gaat als er niets meer op de terugstapel staat. */
+export function thuisRoute(role: string | null | undefined): string {
+  if (heeftPadKeuze(role)) return '/pad';
+  if (role === 'aanbieder') return '/aanbieder/beschikbaarheid';
+  return '/vrijwilliger/buurt';
 }

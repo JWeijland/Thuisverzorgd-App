@@ -12,6 +12,7 @@ import {
   PADEN,
   heeftPadKeuze,
   schuifjesVoor,
+  thuisRoute,
   toontKruimelspoor,
   type PadId,
 } from '@/features/navigatie/paden';
@@ -107,7 +108,7 @@ export function PadHeader({
               onPress={() => {
                 void haptics.tik();
                 if (kanTerug) router.back();
-                else router.replace(heeftPadKeuze(profile.data?.role) ? '/pad' : '/vrijwilliger/buurt');
+                else router.replace(thuisRoute(profile.data?.role) as never);
               }}
               style={styles.rond}
             >
@@ -245,7 +246,7 @@ const GOLF = 16;
 /** Bo kleurt mee met het pad, zoals overal in de app. */
 function boRolVoor(pad: PadId): BoRol {
   if (pad === 'vrijwilliger') return 'vrijwilliger';
-  if (pad === 'weten') return 'beheerder';
+  if (pad === 'weten' || pad === 'aanbieder') return 'beheerder';
   return 'vrijwilliger';
 }
 
