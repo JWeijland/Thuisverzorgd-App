@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AdminAanbieders } from '@/features/aanbieder/AdminAanbieders';
 import { useProfile } from '@/features/onboarding/useAuth';
 import { t } from '@/i18n';
 import { supabase } from '@/lib/supabase';
@@ -167,6 +168,9 @@ export default function AdminScreen() {
           </TvzText>
           <TvzText preset="secondary">{t('admin.matchtijdUitleg')}</TvzText>
         </Card>
+
+        {/* Accounts voor de voorzieningen-aanbieders (alleen hier aan te maken). */}
+        <AdminAanbieders />
       </ScrollView>
     </View>
   );
