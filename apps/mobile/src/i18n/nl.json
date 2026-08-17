@@ -423,7 +423,22 @@
     "perTypeUitleg": "Afgeronde taken, afgelopen 30 dagen",
     "matchtijd": "{uren} uur",
     "matchtijdUitleg": "gemiddelde tijd tot match",
-    "geenToegang": "Dit dashboard is alleen voor beheerders van Thuisverzorgd."
+    "geenToegang": "Dit dashboard is alleen voor beheerders van Thuisverzorgd.",
+    "aanbiedersTitel": "Aanbieders",
+    "aanbiedersUitleg": "Maak hier accounts voor aanbieders. Zij loggen in met de gebruikersnaam en het wachtwoord die jij doorgeeft; zelf aanmelden kan niet.",
+    "aanbiederActief": "account actief",
+    "aanbiederGeen": "geen account",
+    "aanbiederNieuwUitleg": "Kies een gebruikersnaam en wachtwoord en geef die aan de aanbieder.",
+    "aanbiederResetUitleg": "Dit account bestaat al. Je kunt hier alleen een nieuw wachtwoord instellen.",
+    "aanbiederGebruikersnaam": "Gebruikersnaam",
+    "aanbiederWachtwoord": "Wachtwoord",
+    "aanbiederMaakKnop": "Account aanmaken",
+    "aanbiederResetKnop": "Nieuw wachtwoord instellen",
+    "aanbiederAangemaakt": "Account aangemaakt. Inloggen kan met gebruikersnaam {naam}.",
+    "aanbiederGereset": "Nieuw wachtwoord ingesteld voor {naam}.",
+    "aanbiederNaamBezet": "Deze gebruikersnaam is al in gebruik.",
+    "aanbiederNaamOngeldig": "Gebruikersnaam: 3 tot 24 tekens, alleen letters, cijfers, punt, streepje.",
+    "aanbiederWachtwoordKort": "Het wachtwoord moet minimaal 8 tekens zijn."
   },
   "steun": {
     "titel": "Steun & advies",
@@ -736,7 +751,10 @@
     "buddyWekelijks": "Vaste hulp via je hulpkring",
     "buddyWekelijksUitleg": "Elke week een vast moment, gedragen door je eigen kring.",
     "buddyEenmalig": "Spontane hulp",
-    "buddyEenmaligUitleg": "Eenmalig, nu of binnenkort. De buurt reageert op je vraag."
+    "buddyEenmaligUitleg": "Eenmalig, nu of binnenkort. De buurt reageert op je vraag.",
+    "geenSlots": "Er zijn de komende twee weken geen vrije momenten. Kijk later nog eens.",
+    "geenSlotsKnop": "Geen vrije momenten",
+    "boekBezet": "Dit moment is net geboekt of niet meer beschikbaar. Ga terug en kies een ander moment."
   },
   "rolchip": {
     "beheerder": "beheerder",
@@ -884,6 +902,13 @@
       "buurt": "In de buurt",
       "taken": "Mijn taken",
       "steun": "Leren"
+    },
+    "aanbieder": {
+      "titel": "Mijn agenda",
+      "sub": "Je beschikbaarheid en afspraken",
+      "uitleg": "Beheer wanneer je geboekt kunt worden.",
+      "beschikbaarheid": "Beschikbaarheid",
+      "afspraken": "Mijn afspraken"
     }
   },
   "wegwijzerPad": {
@@ -995,5 +1020,25 @@
     "gecontroleerd": "Identiteit gecontroleerd",
     "beschikbaar": "Meestal beschikbaar",
     "nietGevonden": "Deze buddy is niet meer zichtbaar."
+  },
+  "aanbieder": {
+    "geenKoppeling": "Geen aanbiedersprofiel",
+    "geenKoppelingUitleg": "Dit account is nog niet aan een aanbieder gekoppeld. Neem contact op met Thuisverzorgd.",
+    "ritmeTitel": "Werkritme",
+    "ritmeUitleg": "Op deze tijden kun je geboekt worden. Afspraken en je afwezigheid gaan er automatisch vanaf.",
+    "gesloten": "Gesloten",
+    "van": "Van",
+    "tot": "Tot",
+    "totEnMet": "Tot en met",
+    "opslaan": "Opslaan",
+    "tijdFout": "De eindtijd moet na de begintijd liggen.",
+    "afwezigTitel": "Even niet beschikbaar",
+    "afwezigUitleg": "Bijvoorbeeld vakantie of een vrije dag. In deze periode kun je niet geboekt worden.",
+    "afwezigKnop": "Ik ben er even niet",
+    "afwezigLeeg": "Geen periodes gepland.",
+    "afwezigVerwijder": "Periode verwijderen",
+    "afsprakenLeeg": "Nog geen afspraken",
+    "afsprakenLeegUitleg": "Zodra iemand je boekt, verschijnt de afspraak hier.",
+    "bij": "Bij {naam}"
   }
 }
