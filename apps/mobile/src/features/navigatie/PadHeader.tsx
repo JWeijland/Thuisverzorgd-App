@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, usePathname } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, Search } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
@@ -141,6 +141,23 @@ export function PadHeader({
               {t(padConfig.subtitelKey)}
             </TvzText>
           </View>
+
+          {/* Het vergrootglas: heel het info-gedeelte als popup van de
+              hulp-pagina (wens Jelle 17-08). Je stelt je vraag en krijgt een
+              AI-antwoord uit de kennisbank, met bronnen en doorleeslinks. */}
+          {pad === 'regelen' ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('zoekPopup.titel')}
+              onPress={() => {
+                void haptics.tik();
+                router.push('/regelen/zoek');
+              }}
+              style={styles.rond}
+            >
+              <Search color={colors.white} size={19} strokeWidth={2.4} />
+            </Pressable>
+          ) : null}
 
           <Pressable
             accessibilityRole="button"

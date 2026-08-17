@@ -75,6 +75,9 @@ export default function RootLayout() {
               {PAD_ROUTES.map((naam) => (
                 <Stack.Screen key={naam} name={naam} options={{ animation: 'none' }} />
               ))}
+              {/* De zoek-popup (vergrootglas op de hulp-pagina) schuift als
+                  kaart over het scherm; artikelen openen er gewoon bovenop. */}
+              <Stack.Screen name="regelen/zoek" options={{ presentation: 'modal' }} />
             </Stack>
             {/* Stonden vroeger in de tabbalk-layout; die bestaat niet meer,
                 dus ze hangen nu boven de hele app. */}
