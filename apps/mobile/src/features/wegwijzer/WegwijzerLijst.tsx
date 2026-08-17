@@ -38,12 +38,12 @@ function openModule(id: string) {
 }
 
 /**
- * Naar de hulpmakelaar-chat (eigen pagina sinds ontwerp 4.0), met de vraag
- * alvast in het tekstvak.
+ * Naar de mantelzorgmakelaar-chat, met de vraag alvast in het tekstvak. De
+ * makelaar is sinds 17-08 een voorziening in het hulp-pad.
  */
 export function vraagAanMakelaar(vraag?: string) {
   router.push({
-    pathname: '/weten/zorgmakelaars',
+    pathname: '/regelen/makelaar',
     params: vraag ? { vraag } : {},
   });
 }

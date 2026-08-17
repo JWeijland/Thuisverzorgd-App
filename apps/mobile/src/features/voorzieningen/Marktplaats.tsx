@@ -1,8 +1,10 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { Star } from 'lucide-react-native';
+import { ChevronRight, MessagesSquare, Star } from 'lucide-react-native';
 
+import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
+import { useBrokerPresenceIds, useMakelaars } from '@/features/forum/api';
 import { AanbiederAvatar } from '@/features/voorzieningen/AanbiederAvatar';
 import { useDiensten, type Dienst } from '@/features/voorzieningen/api';
 import { euro } from '@/features/voorzieningen/slots';
@@ -75,6 +77,13 @@ export function Marktplaats() {
             </Pressable>
         </Animated.View>
 
+        {/* De mantelzorgmakelaar hoort bij de voorzieningen (wens Jelle
+            17-08): een mens die met je meedenkt, gratis via chat of
+            videobellen. */}
+        <Animated.View entering={tvzIn}>
+          <MakelaarTegel />
+        </Animated.View>
+
         <View style={styles.sectieKop}>
           <TvzText preset="sectionTitle">{t('voorzien.dienstenTitel')}</TvzText>
           <TvzText preset="secondary" style={styles.sectieSub}>
@@ -90,6 +99,72 @@ export function Marktplaats() {
 
       </ScrollView>
     </View>
+  );
+}
+
+/**
+ * De mantelzorgmakelaar-tegel: gezichten van de makelaars (wie online is
+ * eerst), gratis-pil en door naar de chatpagina met profielen en onderwerpen.
+ */
+function MakelaarTegel() {
+  const makelaars = useMakelaars();
+  const onlineIds = useBrokerPresenceIds();
+  const lijst = makelaars.data ?? [];
+  const online = lijst.filter((makelaar) => onlineIds.includes(makelaar.id));
+  const gezichten = [...online, ...lijst.filter((makelaar) => !online.includes(makelaar))].slice(
+    0,
+    3,
+  );
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t('voorzien.makelaarTegelTitel')}
+      onPress={() => router.push('/regelen/makelaar')}
+      style={styles.makelaarTegel}
+    >
+      <View style={styles.makelaarIcoon}>
+        {gezichten.length > 0 ? (
+          <View style={styles.makelaarGezichten}>
+            {gezichten.map((makelaar, index) => (
+              <View
+                key={makelaar.id}
+                style={[styles.makelaarGezicht, index > 0 && styles.makelaarGezichtOverlap]}
+              >
+                <ProfileAvatar
+                  name={makelaar.voornaam}
+                  avatarPath={makelaar.avatar_path}
+                  size={30}
+                  backgroundColor={colors.tintBlue}
+                />
+              </View>
+            ))}
+          </View>
+        ) : (
+          <MessagesSquare color={colors.primary} size={20} strokeWidth={2.2} />
+        )}
+      </View>
+      <View style={styles.makelaarTekst}>
+        <View style={styles.makelaarKop}>
+          <TvzText preset="cardTitle" numberOfLines={1} style={styles.makelaarTitel}>
+            {t('voorzien.makelaarTegelTitel')}
+          </TvzText>
+          <View style={styles.gratisPillLicht}>
+            <TvzText preset="meta" style={styles.gratisTekst}>
+              {t('voorzien.gratisPill')}
+            </TvzText>
+          </View>
+        </View>
+        <TvzText preset="secondary" numberOfLines={2} style={styles.makelaarSub}>
+          {online.length > 0
+            ? online.length === 1
+              ? t('voorzien.makelaarTegelOnline1')
+              : t('voorzien.makelaarTegelOnline', { aantal: online.length })
+            : t('voorzien.makelaarTegelTekst')}
+        </TvzText>
+      </View>
+      <ChevronRight color={colors.inkFaint} size={18} strokeWidth={2.2} />
+    </Pressable>
   );
 }
 
@@ -204,6 +279,55 @@ const styles = StyleSheet.create({
   },
   gratisTekst: {
     color: colors.successText,
+  },
+  makelaarTegel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: radius.tile,
+    borderWidth: 1.5,
+    borderColor: colors.tintBlue,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  makelaarIcoon: {
+    minWidth: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  makelaarGezichten: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  makelaarGezicht: {
+    borderRadius: 17,
+    borderWidth: 2,
+    borderColor: colors.white,
+    backgroundColor: colors.white,
+  },
+  makelaarGezichtOverlap: {
+    marginLeft: -10,
+  },
+  makelaarTekst: {
+    flex: 1,
+  },
+  makelaarKop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  makelaarTitel: {
+    flexShrink: 1,
+  },
+  gratisPillLicht: {
+    backgroundColor: colors.successBg,
+    borderRadius: radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  makelaarSub: {
+    marginTop: 1,
   },
   sectieKop: {
     marginTop: spacing.md,

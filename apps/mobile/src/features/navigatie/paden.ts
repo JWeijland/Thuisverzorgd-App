@@ -64,10 +64,11 @@ export const PADEN: Record<PadId, Pad> = {
     achtergrond: colors.bg,
     schuifjeVlak: 'rgba(255,255,255,0.18)',
     schuifjeActiefTekst: colors.primary,
+    // Zorgmakelaars is hier weg (17-08): de mantelzorgmakelaar is een
+    // voorziening in het hulp-pad geworden (/regelen/makelaar).
     schuifjes: [
       { route: '/weten/wegwijzer', labelKey: 'paden.weten.wegwijzer' },
       { route: '/weten/forum', labelKey: 'paden.weten.forum' },
-      { route: '/weten/zorgmakelaars', labelKey: 'paden.weten.zorgmakelaars' },
     ],
   },
   regelen: {

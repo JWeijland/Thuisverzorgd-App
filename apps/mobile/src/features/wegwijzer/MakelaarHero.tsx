@@ -60,7 +60,7 @@ export function MakelaarHero() {
           label={t('wegwijzerPad.chatNu')}
           variant="cta"
           style={styles.knop}
-          onPress={() => router.push('/weten/zorgmakelaars')}
+          onPress={() => router.push('/regelen/makelaar')}
         />
         {/* Videobellen zelf (Daily.co) staat nog open, zie docs/PLAN.md. Tot
             die tijd zet deze knop de vraag om terug te bellen in de chat, in
@@ -71,7 +71,7 @@ export function MakelaarHero() {
           style={[styles.knop, styles.knopLicht]}
           onPress={() =>
             router.push({
-              pathname: '/weten/zorgmakelaars',
+              pathname: '/regelen/makelaar',
               params: { vraag: t('wegwijzerPad.videobelVraag') },
             })
           }
@@ -88,7 +88,7 @@ function Gezicht({ makelaar, online }: { makelaar: Makelaar; online: boolean }) 
       accessibilityRole="button"
       accessibilityLabel={makelaar.voornaam}
       onPress={() =>
-        router.push({ pathname: '/weten/zorgmakelaars', params: { makelaar: makelaar.id } })
+        router.push({ pathname: '/regelen/makelaar', params: { makelaar: makelaar.id } })
       }
       style={styles.gezicht}
     >

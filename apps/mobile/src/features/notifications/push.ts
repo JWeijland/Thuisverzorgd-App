@@ -20,7 +20,7 @@ const OUDE_ROUTES: Record<string, string> = {
   kring: '/regelen/kring',
   voorzien: '/regelen/voorzieningen',
   forum: '/weten/forum',
-  hulpmakelaar: '/weten/zorgmakelaars',
+  hulpmakelaar: '/regelen/makelaar',
   'wegwijzer-lijst': '/weten/wegwijzer',
 };
 
