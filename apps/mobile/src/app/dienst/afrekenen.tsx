@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -24,7 +25,8 @@ export default function AfrekenenScreen() {
   const dienst = (diensten.data ?? []).find((item) => item.slug === slug);
   const [methode, setMethode] = useState<Betaalwijze>('apple_pay');
   const boek = useCreateBoeking();
-  const [fout, setFout] = useState(false);
+  const queryClient = useQueryClient();
+  const [fout, setFout] = useState<string | null>(null);
   useStatusBalk('donker');
 
   if (!dienst || !slot) {
@@ -35,7 +37,7 @@ export default function AfrekenenScreen() {
 
   function bevestig() {
     if (boek.isPending || !dienst || !slot) return;
-    setFout(false);
+    setFout(null);
     boek.mutate(
       { serviceId: dienst.id, slotIso: slot, method: methode },
       {
@@ -44,7 +46,16 @@ export default function AfrekenenScreen() {
             pathname: '/dienst/bevestigd',
             params: { naam: dienst.provider.name, moment },
           }),
-        onError: () => setFout(true),
+        onError: (err) => {
+          // Iemand anders was net eerder: het moment is bezet (of de
+          // aanbieder heeft zijn beschikbaarheid net aangepast).
+          if (err instanceof Error && err.message.includes('moment_niet_beschikbaar')) {
+            setFout(t('voorzien.boekBezet'));
+            queryClient.invalidateQueries({ queryKey: ['slots'] });
+          } else {
+            setFout(t('voorzien.boekFout'));
+          }
+        },
       },
     );
   }
@@ -120,7 +131,7 @@ export default function AfrekenenScreen() {
         </TvzText>
         {fout ? (
           <TvzText preset="secondary" style={styles.fout}>
-            {t('voorzien.boekFout')}
+            {fout}
           </TvzText>
         ) : null}
       </ScrollView>

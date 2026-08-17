@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, Star } from 'lucide-react-native';
 
 import { AanbiederAvatar } from '@/features/voorzieningen/AanbiederAvatar';
-import { useDiensten } from '@/features/voorzieningen/api';
-import { euro, maakSlots } from '@/features/voorzieningen/slots';
+import { useDiensten, useSlots } from '@/features/voorzieningen/api';
+import { euro, groepeerSlots } from '@/features/voorzieningen/slots';
 import { t } from '@/i18n';
 import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, radius, shadows, spacing } from '@/theme';
@@ -16,20 +16,28 @@ import { Button, TvzText } from '@/ui';
 /**
  * Dienst-detail (handoff voorzieningen): geen blokjes of pillen maar een
  * zachte, persoonlijke pagina rond de aanbieder.
+ *
+ * De tijdsloten komen uit de database (werkritme van de aanbieder min
+ * afwezigheid en bestaande boekingen): dagschuifjes met daaronder de vrije
+ * tijden van die dag als radio-lijst.
  */
 export default function DienstDetail() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const diensten = useDiensten();
   const dienst = (diensten.data ?? []).find((item) => item.slug === slug);
-  const [slots] = useState(() => maakSlots(new Date()));
-  const [gekozen, setGekozen] = useState(0);
+  const momenten = useSlots(dienst?.id);
+  const dagen = groepeerSlots(momenten.data ?? []);
+  const [gekozenDag, setGekozenDag] = useState(0);
+  const [gekozenIso, setGekozenIso] = useState<string | null>(null);
   useStatusBalk('donker');
 
   if (!dienst) {
     return <View style={styles.safe} />;
   }
 
-  const slot = slots[gekozen]!;
+  const dag = dagen[Math.min(gekozenDag, Math.max(dagen.length - 1, 0))];
+  // Standaard het eerste vrije moment van de gekozen dag.
+  const slot = dag?.tijden.find((optie) => optie.iso === gekozenIso) ?? dag?.tijden[0] ?? null;
   const komma = (waarde: number) => String(waarde).replace('.', ',');
   const sterren = Math.round(Number(dienst.rating));
 
@@ -105,32 +113,78 @@ export default function DienstDetail() {
           <TvzText preset="sectionTitle" style={styles.wanneerTitel}>
             {t('voorzien.wanneerTitel', { naam: dienst.provider.name })}
           </TvzText>
-          <View style={styles.slotLijst}>
-            {slots.map((optie, index) => (
-              <Pressable
-                key={optie.iso}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: gekozen === index }}
-                accessibilityLabel={optie.label}
-                onPress={() => setGekozen(index)}
-                style={[styles.slotRij, index > 0 && styles.slotRijLijn]}
+
+          {dagen.length === 0 ? (
+            <TvzText preset="secondary" style={styles.geenSlots}>
+              {momenten.isLoading ? t('algemeen.laden') : t('voorzien.geenSlots')}
+            </TvzText>
+          ) : (
+            <>
+              {/* Dagschuifjes: alleen dagen waarop echt iets vrij is. */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.dagBalk}
+                style={styles.dagScroll}
               >
-                <View style={[styles.radio, gekozen === index && styles.radioActief]}>
-                  {gekozen === index ? <View style={styles.radioStip} /> : null}
-                </View>
-                <TvzText preset="body" style={styles.slotLabel}>
-                  {optie.label}
-                </TvzText>
-                {optie.snelst ? (
-                  <View style={styles.snelstPill}>
-                    <TvzText preset="meta" style={styles.snelstTekst}>
-                      {t('voorzien.snelst')}
-                    </TvzText>
-                  </View>
-                ) : null}
-              </Pressable>
-            ))}
-          </View>
+                {dagen.map((optie, index) => {
+                  const actief = optie.datum === dag?.datum;
+                  return (
+                    <Pressable
+                      key={optie.datum}
+                      accessibilityRole="tab"
+                      accessibilityState={{ selected: actief }}
+                      accessibilityLabel={optie.label}
+                      onPress={() => {
+                        setGekozenDag(index);
+                        setGekozenIso(null);
+                      }}
+                      style={[styles.dagPill, actief && styles.dagPillActief]}
+                    >
+                      <TvzText
+                        preset="meta"
+                        style={[styles.dagPillTekst, actief && styles.dagPillTekstActief]}
+                      >
+                        {optie.label}
+                      </TvzText>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+
+              <View style={styles.slotLijst}>
+                {(dag?.tijden ?? []).map((optie, index) => {
+                  const actief = optie.iso === slot?.iso;
+                  // Het allereerste vrije moment van de hele lijst heet "snelst".
+                  const snelst = gekozenDag === 0 && index === 0;
+                  return (
+                    <Pressable
+                      key={optie.iso}
+                      accessibilityRole="radio"
+                      accessibilityState={{ checked: actief }}
+                      accessibilityLabel={optie.label}
+                      onPress={() => setGekozenIso(optie.iso)}
+                      style={[styles.slotRij, index > 0 && styles.slotRijLijn]}
+                    >
+                      <View style={[styles.radio, actief && styles.radioActief]}>
+                        {actief ? <View style={styles.radioStip} /> : null}
+                      </View>
+                      <TvzText preset="body" style={styles.slotLabel}>
+                        {optie.tijd}
+                      </TvzText>
+                      {snelst ? (
+                        <View style={styles.snelstPill}>
+                          <TvzText preset="meta" style={styles.snelstTekst}>
+                            {t('voorzien.snelst')}
+                          </TvzText>
+                        </View>
+                      ) : null}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </>
+          )}
         </View>
       </ScrollView>
 
@@ -149,16 +203,18 @@ export default function DienstDetail() {
           {/* Vierkanter dan een gewone pill: dit is de handeling waar de hele
               pagina om draait (wens Jelle 11-08). */}
           <Button
-            label={t('voorzien.boekSlot', { moment: slot.label })}
+            label={slot ? t('voorzien.boekSlot', { moment: slot.label }) : t('voorzien.geenSlotsKnop')}
             variant="cta"
             size="lg"
+            disabled={!slot}
             style={styles.boekKnop}
-            onPress={() =>
+            onPress={() => {
+              if (!slot) return;
               router.push({
                 pathname: '/dienst/afrekenen',
                 params: { slug: dienst.slug, slot: slot.iso },
-              })
-            }
+              });
+            }}
           />
         </View>
       </SafeAreaView>
@@ -237,6 +293,38 @@ const styles = StyleSheet.create({
   },
   wanneerTitel: {
     marginTop: spacing.xl,
+  },
+  geenSlots: {
+    marginTop: spacing.md,
+  },
+  dagScroll: {
+    marginTop: spacing.md,
+    // De pillen mogen tot de schermrand doorlopen.
+    marginHorizontal: -spacing.screen,
+  },
+  dagBalk: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.screen,
+  },
+  dagPill: {
+    borderRadius: radius.pill,
+    paddingHorizontal: 14,
+    minHeight: 36,
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  dagPillActief: {
+    backgroundColor: colors.primaryMid,
+    borderColor: colors.primaryMid,
+  },
+  dagPillTekst: {
+    color: colors.inkSoft,
+  },
+  dagPillTekstActief: {
+    color: colors.white,
   },
   slotLijst: {
     backgroundColor: colors.white,

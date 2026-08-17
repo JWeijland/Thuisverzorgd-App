@@ -1,29 +1,30 @@
-import { euro, maakSlots, slotLabel } from '@/features/voorzieningen/slots';
+import { euro, groepeerSlots, slotLabel } from '@/features/voorzieningen/slots';
 
-describe('maakSlots', () => {
-  // Woensdag 5 augustus 2026, halverwege de ochtend.
-  const nu = new Date(2026, 7, 5, 9, 30);
+describe('groepeerSlots', () => {
+  const iso = (dag: number, uur: number, minuut = 0) =>
+    new Date(2026, 7, dag, uur, minuut).toISOString();
 
-  test('vier vaste momenten: morgen 10:00 en 14:00, overmorgen 10:00 en 16:00', () => {
-    const slots = maakSlots(nu);
-    expect(slots.map((slot) => slot.label)).toEqual([
-      'do 10:00',
-      'do 14:00',
-      'vr 10:00',
-      'vr 16:00',
+  test('groepeert momenten per dag, op volgorde', () => {
+    const dagen = groepeerSlots([
+      iso(18, 10),
+      iso(18, 10, 30),
+      iso(18, 14),
+      iso(19, 9),
+      iso(21, 16),
     ]);
+    expect(dagen.map((dag) => dag.label)).toEqual(['di 18 aug', 'wo 19 aug', 'vr 21 aug']);
+    expect(dagen[0]!.tijden.map((slot) => slot.tijd)).toEqual(['10:00', '10:30', '14:00']);
+    expect(dagen[1]!.tijden).toHaveLength(1);
   });
 
-  test('alleen het eerste slot heet "snelst"', () => {
-    const slots = maakSlots(nu);
-    expect(slots[0]!.snelst).toBe(true);
-    expect(slots.filter((slot) => slot.snelst)).toHaveLength(1);
+  test('slots dragen de volledige boeklabel mee', () => {
+    const dagen = groepeerSlots([iso(18, 10)]);
+    expect(dagen[0]!.tijden[0]!.label).toBe('di 10:00');
+    expect(dagen[0]!.tijden[0]!.iso).toBe(iso(18, 10));
   });
 
-  test('alle slots liggen in de toekomst', () => {
-    for (const slot of maakSlots(nu)) {
-      expect(new Date(slot.iso).getTime()).toBeGreaterThan(nu.getTime());
-    }
+  test('leeg blijft leeg', () => {
+    expect(groepeerSlots([])).toEqual([]);
   });
 });
 

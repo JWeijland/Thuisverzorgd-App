@@ -48,6 +48,25 @@ export function useDiensten() {
   });
 }
 
+/**
+ * De boekbare momenten van een dienst: berekend in de database uit het
+ * werkritme van de aanbieder min zijn afwezigheid en bestaande boekingen.
+ */
+export function useSlots(serviceId: string | undefined) {
+  const { session } = useSession();
+  return useQuery({
+    queryKey: ['slots', serviceId],
+    enabled: !!session && !!serviceId,
+    queryFn: async (): Promise<string[]> => {
+      const { data, error } = await supabase.rpc('beschikbare_slots', {
+        p_service: serviceId!,
+      });
+      if (error) throw error;
+      return ((data ?? []) as { slot_at: string }[]).map((rij) => rij.slot_at);
+    },
+  });
+}
+
 export type Boeking = {
   id: string;
   slot_at: string;
@@ -105,6 +124,8 @@ export function useCreateBoeking() {
       // Het "aankoop rond"-moment: lang en bevredigend.
       void haptics.voltooid();
       queryClient.invalidateQueries({ queryKey: ['boekingen'] });
+      // Het geboekte moment is nu bezet voor iedereen.
+      queryClient.invalidateQueries({ queryKey: ['slots'] });
     },
     onError: () => void haptics.fout(),
   });
@@ -118,6 +139,10 @@ export function useCancelBoeking() {
       const { error } = await supabase.rpc('cancel_booking', { p_booking: boekingId });
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['boekingen'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['boekingen'] });
+      // Het moment komt weer vrij voor anderen.
+      queryClient.invalidateQueries({ queryKey: ['slots'] });
+    },
   });
 }
