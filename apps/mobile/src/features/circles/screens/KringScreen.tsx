@@ -9,6 +9,7 @@ import {
   markCircleChatRead,
   useCircleMembers,
   useMyCircle,
+  type Circle,
   type Member,
 } from '@/features/circles/api';
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
@@ -56,12 +57,7 @@ export function KringScreen() {
   if (!circle.data) {
     return isBeheerder ? <KringStart /> : <KringLeeg />;
   }
-  return (
-    <KringDetail
-      circleId={circle.data.id}
-      name={circle.data.name}
-    />
-  );
+  return <KringDetail circle={circle.data} />;
 }
 
 /**
@@ -92,14 +88,18 @@ function KringStart() {
  * nog geen hulpvrager in de kring zit, staat dit blok op de kringpagina, want
  * zonder die persoon mist de kring haar middelpunt.
  */
-function KoppelNaasteKaart({ circleId }: { circleId: string }) {
+function KoppelNaasteKaart({ circleId, naam }: { circleId: string; naam?: string | null }) {
   const koppel = useKoppelNaaste();
   const [code, setCode] = useState('');
   const [fout, setFout] = useState<string | null>(null);
 
   return (
     <Card style={styles.koppelKaart}>
-      <TvzText preset="cardTitle">{t('mijnCode.koppelKort')}</TvzText>
+      <TvzText preset="cardTitle">
+        {naam
+          ? t('mijnCode.koppelTitel', { naam: naam.split(' ')[0]! })
+          : t('mijnCode.koppelKort')}
+      </TvzText>
       <TvzText preset="secondary">{t('mijnCode.koppelUitleg')}</TvzText>
       <TextField
         label={t('mijnCode.koppelLabel')}
@@ -153,7 +153,9 @@ function KringLeeg() {
   );
 }
 
-function KringDetail({ circleId, name }: { circleId: string; name: string }) {
+function KringDetail({ circle }: { circle: Circle }) {
+  const circleId = circle.id;
+  const name = circle.name;
   const profile = useProfile();
   const members = useCircleMembers(circleId);
   const isBeheerder = profile.data?.role === 'beheerder';
@@ -232,6 +234,30 @@ function KringDetail({ circleId, name }: { circleId: string; name: string }) {
           <View style={styles.motiefKlein}>
             <KringMotief />
           </View>
+          {/* De naaste is het middelpunt van de kring, ook zonder eigen
+              account of koppelcode (wens Jelle 18-08): naam en relatie komen
+              uit de kringopbouw. Koppelt hij later alsnog met zijn code, dan
+              staat hij hieronder als gewoon lid en verdwijnt dit kaartje. */}
+          {circle.naaste_naam &&
+          members.data &&
+          !members.data.some((lid) => lid.member_role === 'hulpvrager') ? (
+            <Card style={[styles.memberCard, styles.hulpvragerCard]}>
+              <View style={styles.memberRow}>
+                <ProfileAvatar name={circle.naaste_naam} backgroundColor={colors.primaryDark} />
+                <View style={styles.memberInfo}>
+                  <TvzText preset="cardTitle">{circle.naaste_naam}</TvzText>
+                  <TvzText preset="secondary" style={styles.rolUitleg}>
+                    {circle.naaste_relatie
+                      ? `${t('kring.middelpunt')} · ${circle.naaste_relatie}`
+                      : t('kring.middelpunt')}
+                  </TvzText>
+                </View>
+                <View style={styles.memberRechts}>
+                  <RolChip rol="hulpvrager" />
+                </View>
+              </View>
+            </Card>
+          ) : null}
           {(members.data ?? []).map((member) => {
             const status = STATUS_MAP[member.status];
             const isHulpvrager = member.member_role === 'hulpvrager';
@@ -344,10 +370,11 @@ function KringDetail({ circleId, name }: { circleId: string; name: string }) {
                 </Pressable>
               </View>
               {/* De hulpvrager koppel je met zíjn code, niet met die van de
-                  kring (feedback Jelle 11-08). Staat hij er al in, dan is dit
-                  blok klaar en verdwijnt het. */}
+                  kring (feedback Jelle 11-08). Sinds 18-08 is dit optioneel:
+                  de naaste staat hierboven al als middelpunt, dit blok is er
+                  alleen voor als hij de app zelf ook gebruikt. */}
               {members.data && !members.data.some((lid) => lid.member_role === 'hulpvrager') ? (
-                <KoppelNaasteKaart circleId={circleId} />
+                <KoppelNaasteKaart circleId={circleId} naam={circle.naaste_naam} />
               ) : null}
             </>
           ) : null}

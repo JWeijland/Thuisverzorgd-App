@@ -26,6 +26,7 @@ import { useCreateTask } from '@/features/tasks/api';
 import { taakSoortLabel } from '@/features/tasks/logic';
 import { t } from '@/i18n';
 import { toDateString } from '@/lib/dates';
+import { adresNaarCoordinaten } from '@/lib/geo';
 import { haptics } from '@/lib/haptics';
 import { colors, radius, spacing } from '@/theme';
 import { AdresVeld, Bo, Button, Card, TextField, TvzText } from '@/ui';
@@ -100,14 +101,26 @@ function Wizard({
    * De kring aanmaken. Eén eerste taak is optioneel: soms weet je al wat er
    * moet gebeuren, vaak nog niet. Zonder taak is de kring net zo goed af
    * (wens Jelle 11-08).
+   *
+   * Naam en adres uit de eerste stappen gaan mee de kring in: zo bestaat de
+   * kring om de naaste heen zonder dat die de app of een koppelcode nodig
+   * heeft (wens Jelle 18-08). Het adres wordt via PDOK omgezet naar een plek
+   * op de kaart, zodat buddy's in de buurt gevonden kunnen worden.
    */
   async function afronden(metTaak: boolean) {
     const naam = antwoorden.naam?.trim();
     if (!naam || maakKring.isPending) return;
     void haptics.voltooid();
-    const kring = await maakKring.mutateAsync(
-      t('kringopbouw.kringnaam', { naam: naam.split(' ')[0]! }),
-    );
+    const adres = antwoorden.adres?.trim();
+    const locatie = adres ? await adresNaarCoordinaten(adres) : null;
+    const kring = await maakKring.mutateAsync({
+      name: t('kringopbouw.kringnaam', { naam: naam.split(' ')[0]! }),
+      naasteNaam: naam,
+      naasteRelatie: antwoorden.relatie,
+      naasteInfo: antwoorden.goedOmTeWeten,
+      adres,
+      locatie,
+    });
 
     if (metTaak && antwoorden.eersteTaak) {
       const morgen = new Date();
@@ -261,6 +274,22 @@ function Wizard({
           {stap === 5 ? (
             <>
               <Card style={styles.kaart}>
+              <TvzText preset="body">{t('kringopbouw.uitnodigenUitleg')}</TvzText>
+              <Button
+                label={t('kring.uitnodigen')}
+                variant="outline"
+                onPress={() => router.push('/uitnodigen')}
+              />
+              <Button
+                label={t('kring.boZoektBuddy')}
+                variant="outline"
+                onPress={() => router.push('/regelen/buddy-zoeken')}
+              />
+              </Card>
+              {/* De koppelcode is een extraatje voor als de naaste de app
+                  zelf gebruikt; de kring werkt ook zonder (wens Jelle
+                  18-08). Daarom staat dit blok onder het uitnodigen. */}
+              <Card style={styles.kaart}>
                 <TvzText preset="cardTitle">
                   {t('mijnCode.koppelTitel', {
                     naam: antwoorden.naam?.split(' ')[0] ?? t('kringopbouw.diegene'),
@@ -278,19 +307,6 @@ function Wizard({
                 <TvzText preset="meta" style={styles.codeTip}>
                   {t('mijnCode.koppelLater')}
                 </TvzText>
-              </Card>
-              <Card style={styles.kaart}>
-              <TvzText preset="body">{t('kringopbouw.uitnodigenUitleg')}</TvzText>
-              <Button
-                label={t('kring.uitnodigen')}
-                variant="outline"
-                onPress={() => router.push('/uitnodigen')}
-              />
-              <Button
-                label={t('kring.boZoektBuddy')}
-                variant="outline"
-                onPress={() => router.push('/regelen/buddy-zoeken')}
-              />
               </Card>
             </>
           ) : null}

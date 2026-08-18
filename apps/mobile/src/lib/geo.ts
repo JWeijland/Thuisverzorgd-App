@@ -38,6 +38,30 @@ export function countInRegion(points: LatLng[], region: Region): number {
   return points.filter((point) => isInRegion(point, region)).length;
 }
 
+/**
+ * Coördinaten bij een gekozen adres, via de PDOK Locatieserver (dezelfde
+ * bron als de suggesties in AdresVeld; gratis, geen sleutel). Geeft null als
+ * er niets gevonden wordt; de kring werkt dan gewoon zonder kaartpositie.
+ */
+export async function adresNaarCoordinaten(adres: string): Promise<LatLng | null> {
+  try {
+    const url = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(
+      adres,
+    )}&fq=type:adres&rows=1&fl=centroide_ll`;
+    const antwoord = await fetch(url);
+    if (!antwoord.ok) return null;
+    const json = (await antwoord.json()) as {
+      response?: { docs?: { centroide_ll?: string }[] };
+    };
+    const punt = json.response?.docs?.[0]?.centroide_ll;
+    const match = punt?.match(/POINT\(([\d.-]+) ([\d.-]+)\)/);
+    if (!match) return null;
+    return { lon: Number(match[1]), lat: Number(match[2]) };
+  } catch {
+    return null;
+  }
+}
+
 /** Startpositie: Amsterdam-centrum, tot de eigen locatie bekend is. */
 export const DEFAULT_REGION: Region = {
   latitude: 52.3676,

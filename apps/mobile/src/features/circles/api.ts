@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { useSession } from '@/features/onboarding/useAuth';
+import type { LatLng } from '@/lib/geo';
 import { supabase } from '@/lib/supabase';
 
 export type Circle = {
@@ -10,6 +11,12 @@ export type Circle = {
   owner_id: string;
   name: string;
   link_code: string;
+  /** Naam van de naaste uit de kringopbouw; ook zonder eigen account. */
+  naaste_naam?: string | null;
+  /** Relatie van de beheerder tot de naaste (moeder, buurman, ...). */
+  naaste_relatie?: string | null;
+  /** Adres van de naaste; bepaalt waar de kring op de kaart staat. */
+  address?: string | null;
   /** Start van de proefweek; na 7 dagen vraagt Bo of het rooster werkte. */
   trial_started_at?: string | null;
   /** Moment waarop de kring bevestigde dat het proefrooster klopt. */
@@ -43,7 +50,9 @@ export function useMyCircle() {
     queryFn: async (): Promise<Circle | null> => {
       const { data, error } = await supabase
         .from('circles')
-        .select('id, owner_id, name, link_code, trial_started_at, trial_confirmed_at')
+        .select(
+          'id, owner_id, name, link_code, naaste_naam, naaste_relatie, address, trial_started_at, trial_confirmed_at',
+        )
         .order('created_at', { ascending: true })
         .limit(1);
       if (error) throw error;
@@ -73,14 +82,34 @@ export function useMyCircles() {
   });
 }
 
+export type NieuweKring = {
+  name: string;
+  /** Wie de kring omringt: naam en adres volstaan, een koppelcode hoeft niet. */
+  naasteNaam?: string;
+  naasteRelatie?: string;
+  naasteInfo?: string;
+  adres?: string;
+  /** Coördinaten bij het adres (PDOK); zet de kring op de kaart. */
+  locatie?: LatLng | null;
+};
+
 export function useCreateCircle() {
   const { session } = useSession();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (name: string): Promise<Circle> => {
+    mutationFn: async (kring: NieuweKring): Promise<Circle> => {
       const { data, error } = await supabase
         .from('circles')
-        .insert({ owner_id: session!.user.id, name })
+        .insert({
+          owner_id: session!.user.id,
+          name: kring.name,
+          naaste_naam: kring.naasteNaam?.trim() || null,
+          naaste_relatie: kring.naasteRelatie?.trim() || null,
+          naaste_info: kring.naasteInfo?.trim() || null,
+          address: kring.adres?.trim() || null,
+          // WKT voor de geography-kolom; de trigger rondt location_rounded af.
+          location: kring.locatie ? `POINT(${kring.locatie.lon} ${kring.locatie.lat})` : null,
+        })
         .select('id, owner_id, name, link_code')
         .single();
       if (error) throw error;
