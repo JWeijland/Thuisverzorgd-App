@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { ChevronRight, MessagesSquare, Star } from 'lucide-react-native';
+import { ChevronRight, HeartHandshake, MessagesSquare, Star } from 'lucide-react-native';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
 import { useBrokerPresenceIds, useMakelaars } from '@/features/forum/api';
@@ -12,9 +12,6 @@ import { t } from '@/i18n';
 import { colors, radius, spacing } from '@/theme';
 import { TvzText, tvzIn } from '@/ui';
 import Animated from 'react-native-reanimated';
-
-/** Foto van de buddy-tegel: een buddy op bezoek, samen op de bank. */
-const BUDDY_FOTO = require('../../../assets/images/diensten/buddy.jpg');
 
 /** Foto per dienst (Pexels, zie assets/images/diensten/BRONNEN.md). */
 const DIENST_FOTOS: Record<string, number> = {
@@ -50,14 +47,19 @@ export function Marktplaats() {
               accessibilityLabel={t('voorzien.buddyTegelTitel')}
               onPress={() => router.push('/dienst/buddy')}
             >
-              {/* Een echte foto in plaats van een blauw vlak: je ziet meteen
-                  waar een buddy voor is (feedback Jelle 11-08). */}
-              <View style={styles.buddyTegel}>
-                <Image source={BUDDY_FOTO} style={styles.buddyFoto} resizeMode="cover" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(17,38,64,0.15)', 'rgba(17,38,64,0.82)']}
-                  style={styles.buddySluier}
-                />
+              {/* De vage stockfoto is weg (wens Jelle 18-08): een rustige
+                  navy banner in de merkstijl, met een duidelijk icoon en de
+                  gratis-pil. Zo springt de belangrijkste voorziening eruit
+                  zonder dat je iets hoeft te ontcijferen. */}
+              <LinearGradient
+                colors={[colors.primaryDark, colors.primaryMid]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.buddyTegel}
+              >
+                <View style={styles.buddyIcoon}>
+                  <HeartHandshake color={colors.white} size={26} strokeWidth={2.2} />
+                </View>
                 <View style={styles.buddyTekst}>
                   <View style={styles.buddyKop}>
                     <TvzText preset="cardTitle" style={styles.buddyTitel}>
@@ -73,7 +75,8 @@ export function Marktplaats() {
                     {t('voorzien.buddyTegelTekst')}
                   </TvzText>
                 </View>
-              </View>
+                <ChevronRight color="rgba(255,255,255,0.8)" size={20} strokeWidth={2.4} />
+              </LinearGradient>
             </Pressable>
         </Animated.View>
 
@@ -230,33 +233,26 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     gap: spacing.cardGap,
   },
-  // Buddy is de belangrijkste voorziening van de app, dus de tegel is een
-  // brede banner met een echte foto. De verhouding volgt de foto (1200×620),
-  // zodat er niets wordt uitgerekt of afgesneden.
+  // Buddy is de belangrijkste voorziening van de app: een brede navy banner
+  // die duidelijk boven het raster van betaalde diensten staat.
   buddyTegel: {
-    aspectRatio: 1200 / 620,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
     borderRadius: radius.tile,
-    overflow: 'hidden',
-    justifyContent: 'flex-end',
-  },
-  buddyFoto: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  buddySluier: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '78%',
-  },
-  // Ruimte rondom de tekst, zodat hij niet tegen de rand van de foto plakt.
-  buddyTekst: {
     padding: spacing.cardPadding,
-    paddingBottom: spacing.lg,
+    minHeight: 96,
+  },
+  buddyIcoon: {
+    width: 52,
+    height: 52,
+    borderRadius: radius.tile,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.18)',
+  },
+  buddyTekst: {
+    flex: 1,
   },
   buddyKop: {
     flexDirection: 'row',
