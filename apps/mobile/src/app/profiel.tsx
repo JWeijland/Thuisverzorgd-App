@@ -216,7 +216,9 @@ export default function ProfielScreen() {
 
   return (
     <View style={styles.safe}>
-      <GradientHeader title={t('profiel.titel')} subtitle={t('profiel.subtitel')} wobbel terug />
+      {/* Groene kop: je komt hier vanuit het groene hulp-pad, dus de pagina
+          springt niet meer ineens naar blauw (wens Jelle 18-08). */}
+      <GradientHeader title={t('profiel.titel')} subtitle={t('profiel.subtitel')} wobbel terug groen />
       <ScrollView contentContainerStyle={styles.container}>
         {/* Foto links, naam en rol ernaast als gewone tekst. De pil om de rol
             is weg; de instellingen staan er rustig onder in plaats van in een

@@ -1,6 +1,7 @@
 export {
   colors,
   gradient,
+  gradientGroen,
   radius,
   spacing,
   dashedBorder,

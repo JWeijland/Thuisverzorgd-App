@@ -98,6 +98,13 @@ export const gradient = {
   end: { x: 1, y: 1 },
 } as const;
 
+/** Hulpgroene gradient van het regel-pad; ook voor de profielkop. */
+export const gradientGroen = {
+  colors: ['#5FA22A', colors.accent] as [string, string],
+  start: { x: 0, y: 0 },
+  end: { x: 1, y: 1 },
+} as const;
+
 /** Vlakken bijna vierkant; alles wat een actie of status is, is een pill. */
 export const radius = {
   /** invoervelden */

@@ -8,7 +8,7 @@ import Svg, { Path } from 'react-native-svg';
 
 import { t } from '@/i18n';
 import { useStatusBalk } from '@/lib/statusbalk';
-import { colors, gradient, spacing } from '@/theme';
+import { colors, gradient, gradientGroen, spacing } from '@/theme';
 import { BoPeek, type BoRol } from '@/ui/Bo';
 import { TvzText } from '@/ui/TvzText';
 
@@ -27,6 +27,8 @@ type Props = {
   boRol?: BoRol;
   /** Terugpijl linksboven; elke pagina hoort een weg terug te hebben. */
   terug?: boolean;
+  /** Hulpgroene kop in plaats van de blauwe, zoals op het profiel. */
+  groen?: boolean;
 };
 
 const WAVE_HEIGHT = 18;
@@ -45,6 +47,7 @@ export function GradientHeader({
   bo,
   boRol,
   terug = false,
+  groen = false,
 }: Props) {
   const { width } = useWindowDimensions();
   // Op de blauwe kop moeten klok, wifi en batterij wit zijn. Elk scherm met
@@ -52,7 +55,10 @@ export function GradientHeader({
   useStatusBalk('licht');
 
   return (
-    <LinearGradient {...gradient} style={[styles.header, wobbel && styles.headerWobbel]}>
+    <LinearGradient
+      {...(groen ? gradientGroen : gradient)}
+      style={[styles.header, wobbel && styles.headerWobbel]}
+    >
       <SafeAreaView edges={['top']}>
         <View style={styles.titleRow}>
           {terug ? (
@@ -73,7 +79,7 @@ export function GradientHeader({
               <Svg width={92} height={9} viewBox="0 0 92 9" style={styles.streep}>
                 <Path
                   d="M2 6.2C16 2.4 30 2 44 4.6c14 2.6 28 2.2 46-2.2"
-                  stroke={colors.accent}
+                  stroke={groen ? colors.white : colors.accent}
                   strokeWidth={3.4}
                   strokeLinecap="round"
                   fill="none"
