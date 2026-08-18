@@ -1,5 +1,7 @@
 # Handoff: Thuisverzorgd — hulpkringen-app (pilot)
 
+> **Let op (18-08-2026):** de kleuren in deze handoff en screenshots zijn huisstijl **v3 (navy)** en daarmee verouderd. Sinds huisstijl **v4** is Thuisrood `#E55A40` de merkkleur; zie `apps/mobile/src/theme/HUISSTIJL.md` en het Brand Guidelines v4-pdf. Flows, copy en lay-out hieronder blijven gelden.
+
 ## Overview
 Thuisverzorgd is een Nederlandse app die mantelzorgers ontlast door hulp uit de buurt te organiseren.
 Vier gebruikersrollen:
