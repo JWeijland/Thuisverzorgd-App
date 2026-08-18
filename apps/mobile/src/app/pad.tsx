@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { BookOpen, HeartHandshake, Settings } from 'lucide-react-native';
+import { HeartHandshake, Settings } from 'lucide-react-native';
 import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,11 +14,12 @@ import { Bo } from '@/ui/Bo';
 import { TvzText } from '@/ui/TvzText';
 
 /**
- * Het keuzescherm (handoff-voorzieningen, scherm 01). Dit is het startpunt
- * van de app voor beheerders en hulpvragers: twee grote gekleurde kaarten,
- * Bo ernaast, en onderaan een kleine knop naar de eigen gegevens.
+ * Het startscherm (handoff-voorzieningen, scherm 01). Dit is het startpunt
+ * van de app voor beheerders en hulpvragers: de grote groene hulp-kaart met
+ * Bo ernaast, en onderaan een kleine knop naar de eigen gegevens. Het
+ * info-pad is verdwenen: weten zit achter het vergrootglas (18-08).
  *
- * De tabbalk bestaat niet meer; vanaf hier ga je een pad in en kom je via
+ * De tabbalk bestaat niet meer; vanaf hier ga je het pad in en kom je via
  * de Bo-knop in de header altijd hier terug.
  */
 export default function PadKeuze() {
@@ -37,10 +38,9 @@ export default function PadKeuze() {
           <Bo width={78} />
         </View>
 
-        <PadKaart
-          pad={PADEN.weten}
-          icoon={<BookOpen color={colors.white} size={20} strokeWidth={2.3} />}
-        />
+        {/* Het info-pad is weg (wens Jelle 18-08): weten zit nu achter het
+            vergrootglas op de hulp-pagina. Hier blijft één duidelijke ingang
+            over. */}
         <PadKaart
           pad={PADEN.regelen}
           icoon={<HeartHandshake color={colors.white} size={20} strokeWidth={2.3} />}

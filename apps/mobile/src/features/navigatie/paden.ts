@@ -16,7 +16,7 @@
  * app een knop om aanbieder te worden.
  */
 
-import { colors } from '@/theme';
+import { colors, gradientGroen } from '@/theme';
 
 export type PadId = 'weten' | 'regelen' | 'vrijwilliger' | 'aanbieder';
 
@@ -48,7 +48,7 @@ export type Pad = {
  * Hulpgroen voor het regel-pad (zoals de screenshots 03 t/m 07), blauw voor
  * het weet-pad. De keuze voor groen volgt het brandbook: groen geeft.
  */
-const HULP_GROEN: [string, string] = ['#5FA22A', '#8DC93F'];
+const HULP_GROEN: [string, string] = [gradientGroen.colors[0], gradientGroen.colors[1]];
 const INFO_BLAUW: [string, string] = [colors.primary, colors.primaryMid];
 const VRIJWILLIGER_NAVY: [string, string] = [colors.primaryDark, colors.primaryMid];
 /** Warm amber voor de werkkant van de app: dit is niemands zorgscherm. */

@@ -16,12 +16,13 @@ import { supabase } from '@/lib/supabase';
  */
 const OUDE_ROUTES: Record<string, string> = {
   rooster: '/regelen/planning',
-  steun: '/weten/wegwijzer',
+  // Het info-pad is weg (18-08): wegwijzer-meldingen openen de zoek-popup.
+  steun: '/regelen/zoek',
   kring: '/regelen/kring',
   voorzien: '/regelen/voorzieningen',
   forum: '/weten/forum',
   hulpmakelaar: '/regelen/makelaar',
-  'wegwijzer-lijst': '/weten/wegwijzer',
+  'wegwijzer-lijst': '/regelen/zoek',
 };
 
 export function deeplinkToPath(deeplink: string | null | undefined): string {

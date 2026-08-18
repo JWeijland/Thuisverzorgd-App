@@ -39,12 +39,8 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       pad: 'regelen',
       route: '/regelen/kring',
     },
-    {
-      titleKey: 'rondleiding.beheerder4Titel',
-      textKey: 'rondleiding.beheerder4Tekst',
-      pad: 'weten',
-      route: '/weten/wegwijzer',
-    },
+    // De wegwijzer-stap is weg: het info-pad bestaat niet meer, weten zit
+    // achter het vergrootglas op de hulp-pagina (18-08).
   ],
   vrijwilliger: [
     {
@@ -87,12 +83,6 @@ export const WALKTHROUGH_STEPS: Record<WalkthroughRole, WalkthroughStep[]> = {
       textKey: 'rondleiding.hulpvrager2Tekst',
       pad: 'regelen',
       route: '/regelen/kring',
-    },
-    {
-      titleKey: 'rondleiding.hulpvragerSteunTitel',
-      textKey: 'rondleiding.hulpvragerSteunTekst',
-      pad: 'weten',
-      route: '/weten/wegwijzer',
     },
   ],
 };

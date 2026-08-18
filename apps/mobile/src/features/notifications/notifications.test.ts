@@ -9,7 +9,7 @@ describe('deeplinkToPath', () => {
   it('vertaalt de oude routenamen naar de nieuwe paden', () => {
     expect(deeplinkToPath('tvz://rooster')).toBe('/regelen/planning');
     expect(deeplinkToPath('tvz://kring')).toBe('/regelen/kring');
-    expect(deeplinkToPath('tvz://steun')).toBe('/weten/wegwijzer');
+    expect(deeplinkToPath('tvz://steun')).toBe('/regelen/zoek');
   });
   it('valt terug op de inbox', () => {
     expect(deeplinkToPath(null)).toBe('/inbox');
