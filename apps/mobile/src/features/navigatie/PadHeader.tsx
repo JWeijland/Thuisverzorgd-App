@@ -3,7 +3,6 @@ import { router, usePathname } from 'expo-router';
 import { ArrowLeft, Search } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ProfileAvatar } from '@/features/avatars/ProfileAvatar';
@@ -22,8 +21,9 @@ import { useWalkthrough } from '@/features/onboarding/walkthrough';
 import { t } from '@/i18n';
 import { haptics } from '@/lib/haptics';
 import { useStatusBalk } from '@/lib/statusbalk';
-import { colors, hitTarget, radius, spacing } from '@/theme';
-import { Bo, BoPeek, type BoRol } from '@/ui/Bo';
+import { colors, hitTarget, paginabalk, radius, spacing } from '@/theme';
+import { BoMono, BoPeek } from '@/ui/Bo';
+import { Golfrand, Kringel } from '@/ui/getekend/Getekend';
 import { TvzText } from '@/ui/TvzText';
 
 type Props = {
@@ -84,20 +84,41 @@ export function PadHeader({
   const { width: breedte } = useWindowDimensions();
   const toonSpoor = toontKruimelspoor(profile.data?.role);
 
+  // De golfrand en het Bo-watermerk volgen de onderkant van het verloop:
+  // Thuisrood voor de gewone balk, Nachtbruin voor de donkere (aanbieder).
+  const donker = pad === 'aanbieder';
+  const golfKleur = padConfig.gradient[padConfig.gradient.length - 1]!;
+
   return (
-    <LinearGradient
-      colors={padConfig.gradient}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.balk}
-      onLayout={(event) => meetHeader(event.nativeEvent.layout.height)}
-    >
-      {/* Bo zit zacht in de achtergrond, zodat de balk niet één vlak groen
-          is (wens Jelle 11-08). Hij is bewust laag in contrast: het gaat om
-          de tekst erboven, niet om Bo. */}
-      <View pointerEvents="none" style={styles.boAchtergrond}>
-        <Bo width={150} rol={boRolVoor(pad)} />
+    <View onLayout={(event) => meetHeader(event.nativeEvent.layout.height)}>
+      <LinearGradient
+        colors={padConfig.gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.balk}
+      >
+      {/* Bo als wit silhouet in de achtergrond (huisstijl v4: het watermerk
+          van de paginabalk), rechts geplaatst en onder en rechts uitgesneden.
+          Bewust laag in contrast: het gaat om de tekst erboven, niet om Bo. */}
+      <View
+        pointerEvents="none"
+        style={[
+          styles.boAchtergrond,
+          { opacity: donker ? paginabalk.boDekkingDonker : paginabalk.boDekking },
+        ]}
+      >
+        <BoMono width={150} />
       </View>
+
+      {/* De kringelstreep linksonder, wit op 50%: het getekende gebaar van
+          de grote paginabalk. */}
+      <Kringel
+        variant="onder"
+        width={96}
+        kleur={colors.white}
+        dekking={paginabalk.kringelDekking}
+        style={styles.kringel}
+      />
 
       <SafeAreaView edges={['top']}>
         <View style={styles.rij1}>
@@ -155,7 +176,7 @@ export function PadHeader({
               }}
               style={styles.zoekKnop}
             >
-              <Search color={colors.primary} size={20} strokeWidth={2.6} />
+              <Search color={colors.primaryMid} size={20} strokeWidth={2.6} />
             </Pressable>
           ) : null}
 
@@ -238,52 +259,38 @@ export function PadHeader({
 
         {children}
       </SafeAreaView>
+      </LinearGradient>
 
-      {/* Kleine golf onderaan: dezelfde getekende rand als in het brandbook,
-          zodat de balk geen hard vierkant blok is. */}
-      <Svg
+      {/* De golfrand uit het brandbook: de vaste onderrand van elke
+          paginabalk, in de kleur van de onderkant van het verloop. */}
+      <Golfrand
         width={breedte}
-        height={GOLF}
-        viewBox={`0 0 ${breedte} ${GOLF}`}
+        height={paginabalk.golfHoogte}
+        kleur={golfKleur}
         style={styles.golf}
-        pointerEvents="none"
-      >
-        <Path
-          d={`M0 ${GOLF * 0.55} C ${breedte * 0.2} -2, ${breedte * 0.35} ${GOLF}, ${breedte * 0.55} ${GOLF * 0.5} C ${breedte * 0.75} 0, ${breedte * 0.9} ${GOLF * 0.9} ${breedte} ${GOLF * 0.35} L ${breedte} ${GOLF} L 0 ${GOLF} Z`}
-          fill={colors.bg}
-        />
-      </Svg>
-    </LinearGradient>
+      />
+    </View>
   );
-}
-
-/** Hoogte van de golvende onderrand. */
-const GOLF = 16;
-
-/** Bo kleurt mee met het pad, zoals overal in de app. */
-function boRolVoor(pad: PadId): BoRol {
-  if (pad === 'vrijwilliger') return 'vrijwilliger';
-  if (pad === 'weten' || pad === 'aanbieder') return 'beheerder';
-  return 'vrijwilliger';
 }
 
 const styles = StyleSheet.create({
   balk: {
     paddingHorizontal: spacing.screen,
-    paddingBottom: spacing.md + GOLF,
+    paddingBottom: spacing.md,
     overflow: 'hidden',
   },
   boAchtergrond: {
     position: 'absolute',
     right: -34,
     bottom: -46,
-    opacity: 0.14,
+  },
+  kringel: {
+    position: 'absolute',
+    left: spacing.screen,
+    bottom: 4,
   },
   golf: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: -1,
+    marginTop: -1,
   },
   rij1: {
     flexDirection: 'row',

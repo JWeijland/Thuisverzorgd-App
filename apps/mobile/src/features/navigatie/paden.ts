@@ -16,7 +16,7 @@
  * app een knop om aanbieder te worden.
  */
 
-import { colors, gradientGroen } from '@/theme';
+import { colors, gradient, gradientDonker } from '@/theme';
 
 export type PadId = 'weten' | 'regelen' | 'vrijwilliger' | 'aanbieder';
 
@@ -33,8 +33,8 @@ export type Pad = {
   subtitelKey: string;
   /** Langere uitleg op de kaart van het keuzescherm. */
   uitlegKey: string;
-  /** Gradient van de headerbalk. */
-  gradient: [string, string];
+  /** Gradient van de paginabalk. */
+  gradient: readonly [string, string, ...string[]];
   /** Achtergrondkleur van de pagina's in dit pad. */
   achtergrond: string;
   /** Kleur van een niet-actief schuifje op de gekleurde balk. */
@@ -45,14 +45,12 @@ export type Pad = {
 };
 
 /**
- * Hulpgroen voor het regel-pad (zoals de screenshots 03 t/m 07), blauw voor
- * het weet-pad. De keuze voor groen volgt het brandbook: groen geeft.
+ * Huisstijl v4: elk scherm begint met dezelfde Thuisrode paginabalk; het
+ * verloop gaat nooit meer naar groen of blauw. Alleen de aanbieder (de
+ * werkkant, een organisatiescherm) krijgt de donkere variant in Nachtbruin.
  */
-const HULP_GROEN: [string, string] = [gradientGroen.colors[0], gradientGroen.colors[1]];
-const INFO_BLAUW: [string, string] = [colors.primary, colors.primaryMid];
-const VRIJWILLIGER_NAVY: [string, string] = [colors.primaryDark, colors.primaryMid];
-/** Warm amber voor de werkkant van de app: dit is niemands zorgscherm. */
-const AANBIEDER_AMBER: [string, string] = ['#8A6009', '#C08F1F'];
+const BALK_ROOD = gradient.colors;
+const BALK_DONKER = gradientDonker.colors;
 
 export const PADEN: Record<PadId, Pad> = {
   weten: {
@@ -60,10 +58,10 @@ export const PADEN: Record<PadId, Pad> = {
     titelKey: 'paden.weten.titel',
     subtitelKey: 'paden.weten.sub',
     uitlegKey: 'paden.weten.uitleg',
-    gradient: INFO_BLAUW,
+    gradient: BALK_ROOD,
     achtergrond: colors.bg,
     schuifjeVlak: 'rgba(255,255,255,0.18)',
-    schuifjeActiefTekst: colors.primary,
+    schuifjeActiefTekst: colors.primaryDark,
     // Zorgmakelaars is hier weg (17-08): de mantelzorgmakelaar is een
     // voorziening in het hulp-pad geworden (/regelen/makelaar).
     schuifjes: [
@@ -76,10 +74,10 @@ export const PADEN: Record<PadId, Pad> = {
     titelKey: 'paden.regelen.titel',
     subtitelKey: 'paden.regelen.sub',
     uitlegKey: 'paden.regelen.uitleg',
-    gradient: HULP_GROEN,
+    gradient: BALK_ROOD,
     achtergrond: colors.bg,
     schuifjeVlak: 'rgba(255,255,255,0.20)',
-    schuifjeActiefTekst: colors.successText,
+    schuifjeActiefTekst: colors.primaryDark,
     schuifjes: [
       { route: '/regelen/voorzieningen', labelKey: 'paden.regelen.voorzieningen' },
       { route: '/regelen/planning', labelKey: 'paden.regelen.planning' },
@@ -91,10 +89,10 @@ export const PADEN: Record<PadId, Pad> = {
     titelKey: 'paden.vrijwilliger.titel',
     subtitelKey: 'paden.vrijwilliger.sub',
     uitlegKey: 'paden.vrijwilliger.uitleg',
-    gradient: VRIJWILLIGER_NAVY,
+    gradient: BALK_ROOD,
     achtergrond: colors.bg,
     schuifjeVlak: 'rgba(255,255,255,0.18)',
-    schuifjeActiefTekst: colors.primary,
+    schuifjeActiefTekst: colors.primaryDark,
     schuifjes: [
       { route: '/vrijwilliger/buurt', labelKey: 'paden.vrijwilliger.buurt' },
       { route: '/vrijwilliger/taken', labelKey: 'paden.vrijwilliger.taken' },
@@ -106,10 +104,10 @@ export const PADEN: Record<PadId, Pad> = {
     titelKey: 'paden.aanbieder.titel',
     subtitelKey: 'paden.aanbieder.sub',
     uitlegKey: 'paden.aanbieder.uitleg',
-    gradient: AANBIEDER_AMBER,
+    gradient: BALK_DONKER,
     achtergrond: colors.bg,
     schuifjeVlak: 'rgba(255,255,255,0.20)',
-    schuifjeActiefTekst: colors.warnText,
+    schuifjeActiefTekst: colors.nachtbruin,
     schuifjes: [
       { route: '/aanbieder/beschikbaarheid', labelKey: 'paden.aanbieder.beschikbaarheid' },
       { route: '/aanbieder/afspraken', labelKey: 'paden.aanbieder.afspraken' },

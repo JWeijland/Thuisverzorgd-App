@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.row,
   },
   vakActief: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMid,
   },
   tekst: {
     color: colors.inkSoft,
