@@ -11,6 +11,7 @@ import { haptics } from '@/lib/haptics';
 import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, radius, shadows, spacing } from '@/theme';
 import { Bo } from '@/ui/Bo';
+import { Kringel } from '@/ui/getekend/Getekend';
 import { TvzText } from '@/ui/TvzText';
 
 /**
@@ -31,6 +32,8 @@ export default function PadKeuze() {
         <View style={styles.kop}>
           <View style={styles.kopTekst}>
             <TvzText preset="screenTitle">{t('paden.keuzeTitel')}</TvzText>
+            {/* Het gebaar van dit scherm: de kringelstreep onder de hoofdkop. */}
+            <Kringel variant="onder" width={110} style={styles.kringel} />
             <TvzText preset="secondary" style={styles.kopSub}>
               {t('paden.keuzeSub')}
             </TvzText>
@@ -133,6 +136,9 @@ const styles = StyleSheet.create({
   },
   kopSub: {
     marginTop: spacing.xs,
+  },
+  kringel: {
+    marginTop: 2,
   },
   kaart: {
     flexDirection: 'row',

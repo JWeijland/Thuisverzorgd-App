@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { colors, radius, spacing } from '@/theme';
 import { Bo } from '@/ui/Bo';
+import { Kringel } from '@/ui/getekend/Getekend';
 import { TvzText } from '@/ui/TvzText';
 
 type Props = {
@@ -32,6 +33,8 @@ export function EmptyState({ title, body, bo }: Props) {
       <TvzText preset="cardTitle" style={styles.title}>
         {title}
       </TvzText>
+      {/* Leeg scherm volgens de huisstijl: kringel plus Bo. */}
+      {bo ? <Kringel variant="kort" width={64} style={styles.kringel} /> : null}
       {body ? (
         <TvzText preset="secondary" style={styles.body}>
           {body}
@@ -61,6 +64,9 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
+  },
+  kringel: {
+    marginTop: spacing.xs,
   },
   body: {
     textAlign: 'center',

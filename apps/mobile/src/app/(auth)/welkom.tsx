@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
 import { colors, gradient, radius, spacing } from '@/theme';
-import { Bo, Button, TvzBounce, TvzText } from '@/ui';
+import { Bo, Button, Kringel, TvzBounce, TvzText } from '@/ui';
 import { useStatusBalk } from '@/lib/statusbalk';
 
 /** Welkom (screen 01): Thuisrood verloop, logo met stuiterende balkjes, twee knoppen. */
@@ -15,9 +15,11 @@ export default function WelkomScreen() {
     <LinearGradient {...gradient} style={styles.fill}>
       <SafeAreaView style={styles.safe}>
         <View style={styles.logoBlock}>
+          {/* Op het rode vlak wordt het logo wit met alleen het Hulpgroen als
+              accent: rood op rood valt weg. */}
           <View style={styles.logoRow}>
             <TvzBounce>
-              <View style={[styles.bar, { backgroundColor: colors.primaryMid }]} />
+              <View style={[styles.bar, { backgroundColor: colors.white }]} />
             </TvzBounce>
             <TvzBounce delay={200}>
               <View style={[styles.bar, { backgroundColor: colors.accent }]} />
@@ -27,6 +29,8 @@ export default function WelkomScreen() {
           <TvzText preset="screenTitle" style={styles.wordmark}>
             Thuisverzorgd
           </TvzText>
+          {/* Het gebaar van dit scherm: de kringelstreep, wit op donker. */}
+          <Kringel variant="streep" width={132} kleur={colors.white} dekking={0.8} />
           <TvzText preset="body" style={styles.tagline}>
             {t('welkom.tagline')}
           </TvzText>
