@@ -72,7 +72,7 @@ export default function RolkeuzeScreen() {
           ]}
         >
           <View style={styles.cardRij}>
-            <Bo width={56} rol="beheerder" />
+            <Bo width={56} />
             <View style={styles.cardTekst}>
               <TvzText preset="cardTitle" style={styles.cardTitle}>
                 {t('rolkeuze.beheerderTitel')}
@@ -97,7 +97,7 @@ export default function RolkeuzeScreen() {
           ]}
         >
           <View style={styles.cardRij}>
-            <Bo width={56} rol="vrijwilliger" />
+            <Bo width={56} />
             <View style={styles.cardTekst}>
               <TvzText preset="cardTitle" style={styles.cardTitle}>
                 {t('rolkeuze.vrijwilligerTitel')}
@@ -122,7 +122,7 @@ export default function RolkeuzeScreen() {
           ]}
         >
           <View style={styles.cardRij}>
-            <Bo width={56} rol="hulpvrager" />
+            <Bo width={56} />
             <View style={styles.cardTekst}>
               <TvzText preset="cardTitle" style={styles.cardTitle}>
                 {t('rolkeuze.hulpvragerTitel')}

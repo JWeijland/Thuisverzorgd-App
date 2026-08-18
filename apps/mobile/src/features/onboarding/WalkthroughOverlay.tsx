@@ -75,7 +75,6 @@ export function WalkthroughOverlay({ uid, role }: Props) {
         step={step + 1}
         totalSteps={steps.length}
         bo
-        boRol={activeRole ?? undefined}
         arrow="up"
         arrowOffset={midden - spacing.screen - 10}
         onNext={() => {

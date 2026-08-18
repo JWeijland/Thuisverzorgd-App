@@ -6,12 +6,15 @@ import { KringMotief } from '@/features/circles/KringMotief';
 import { t } from '@/i18n';
 import { useStatusBalk } from '@/lib/statusbalk';
 import { colors, radius, rolTints, spacing } from '@/theme';
-import { Bo, Button, Card, RolChip, TvzText, type BoRol } from '@/ui';
+import { Bo, Button, Card, RolChip, TvzText } from '@/ui';
 
-const ROLLEN: BoRol[] = ['beheerder', 'vrijwilliger', 'hulpvrager'];
+/** De drie rollen die samen een kring vormen. */
+type KringRol = 'beheerder' | 'vrijwilliger' | 'hulpvrager';
+
+const ROLLEN: KringRol[] = ['beheerder', 'vrijwilliger', 'hulpvrager'];
 
 /** Startscherm van elke rol na de rolkeuze. */
-const START: Record<BoRol, string> = {
+const START: Record<KringRol, string> = {
   beheerder: '/pad',
   vrijwilliger: '/vrijwilliger/buurt',
   hulpvrager: '/pad',
@@ -25,7 +28,7 @@ const START: Record<BoRol, string> = {
 export default function KringuitlegScreen() {
   useStatusBalk('donker');
   const params = useLocalSearchParams<{ rol?: string }>();
-  const rol: BoRol = ROLLEN.includes(params.rol as BoRol) ? (params.rol as BoRol) : 'beheerder';
+  const rol: KringRol = ROLLEN.includes(params.rol as KringRol) ? (params.rol as KringRol) : 'beheerder';
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -64,7 +67,7 @@ export default function KringuitlegScreen() {
 
         <View style={styles.voet}>
           <View style={styles.boWrap}>
-            <Bo width={104} rol={rol} />
+            <Bo width={104} />
           </View>
           <Button
             label={t('kringuitleg.deAppIn')}

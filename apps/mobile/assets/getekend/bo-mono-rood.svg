@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 244" fill="none" role="img" aria-label="Bo, mascotte">
+  <mask id="boFaceR" maskUnits="userSpaceOnUse" x="0" y="0" width="220" height="244">
+    <rect x="0" y="0" width="220" height="244" fill="white"/>
+    <ellipse cx="88" cy="112" rx="9" ry="12.5" fill="black"/>
+    <ellipse cx="132" cy="112" rx="9" ry="12.5" fill="black"/>
+    <path d="M92 140 Q110 156 128 140" stroke="black" stroke-width="7" stroke-linecap="round" fill="none"/>
+  </mask>
+  <g mask="url(#boFaceR)">
+    <g fill="#E55A40">
+      <rect x="146" y="66" width="58" height="26" rx="13" transform="rotate(-38 175 79)"/>
+      <circle cx="196" cy="58" r="14"/>
+      <rect x="18" y="126" width="52" height="25" rx="12.5" transform="rotate(26 44 138)"/>
+      <ellipse cx="85" cy="220" rx="21" ry="12"/>
+      <ellipse cx="136" cy="220" rx="21" ry="12"/>
+      <ellipse cx="110" cy="132" rx="78" ry="92"/>
+      <ellipse cx="131" cy="17" rx="13" ry="7" transform="rotate(-18 131 17)"/>
+      <ellipse cx="113" cy="12" rx="11" ry="6" transform="rotate(22 113 12)"/>
+    </g>
+    <path d="M112 42 q1 -13 11 -19" stroke="#E55A40" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

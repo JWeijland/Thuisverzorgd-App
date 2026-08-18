@@ -44,7 +44,7 @@ export default function BuddyVragenScreen() {
     return (
       <View style={styles.safe}>
         <View style={styles.klaarWrap}>
-          <Bo width={140} rol="hulpvrager" />
+          <Bo width={140} />
           <TvzText preset="screenTitle" style={styles.klaarTitel}>
             {t('buddyVragen.klaarTitel')}
           </TvzText>

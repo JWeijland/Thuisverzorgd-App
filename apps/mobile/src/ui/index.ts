@@ -13,6 +13,15 @@ export { Toggle } from '@/ui/Toggle';
 export { EmptyState } from '@/ui/EmptyState';
 export { BottomSheet } from '@/ui/BottomSheet';
 export { Coachmark } from '@/ui/Coachmark';
-export { Bo, BoPeek, type BoRol } from '@/ui/Bo';
+export { Bo, BoPeek, BoMono } from '@/ui/Bo';
+export {
+  Golfrand,
+  Handcirkel,
+  Handpijl,
+  Kringel,
+  Onderstreping,
+  Vonkje,
+  type KringelVariant,
+} from '@/ui/getekend/Getekend';
 export { RolChip } from '@/ui/RolChip';
 export { tvzIn, TvzBounce, PulseDot } from '@/ui/animations';

@@ -23,7 +23,7 @@ export default function KoppelcodeScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.kop}>
           <TvzBounce>
-            <Bo width={92} rol="hulpvrager" />
+            <Bo width={92} />
           </TvzBounce>
           <TvzText preset="screenTitle" style={styles.titel}>
             {t('mijnCode.onboardingTitel')}
