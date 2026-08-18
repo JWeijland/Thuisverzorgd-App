@@ -2,6 +2,8 @@ export {
   colors,
   gradient,
   gradientGroen,
+  gradientDonker,
+  paginabalk,
   radius,
   spacing,
   dashedBorder,

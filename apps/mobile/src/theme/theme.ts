@@ -1,59 +1,81 @@
 /**
- * Design tokens van Thuisverzorgd.
- * Bron: docs/design/README.md (sectie "Design Tokens") + brandbook v3 "Getekend".
+ * Design tokens van Thuisverzorgd, huisstijl v4.0 (augustus 2026).
+ * Bron: Brand Guidelines v4.0, hoofdstuk 03 + DesignSystem/HUISSTIJL.md.
+ *
+ * Wat er veranderde t.o.v. v3: Thuisrood #E55A40 is de primaire merkkleur,
+ * Linnenwit #FCF8F6 is het fundament, en groen is geen CTA-kleur meer maar
+ * hoort bij Bo, bevestiging en beschikbaarheid. Kringblauw blijft, voor de
+ * kring, de kaart en uitleg.
+ *
+ * Alle sleutels uit v3 bestaan nog, zodat schermen blijven werken.
  * Nooit losse hexwaarden in schermen gebruiken: alles via deze tokens.
  */
 
 export const colors = {
-  /** donkerste navy: gradients, videocall, directe-hulp-marker */
-  primaryDark: '#112F50',
-  /** primaire knoppen, actieve tabs, koppen */
-  primary: '#1A4878',
-  /** accent-navy, avatars, links, gradient-eind */
-  primaryMid: '#2A6CB0',
-  /** Hulpgroen: primaire CTA, actief/positief, pulserende status */
+  /** Diepbaksteen: rode tekst op licht, ingedrukte knop, donker merkvlak */
+  primaryDark: '#9F2F21',
+  /** Thuisrood: merk, paginabalk, actieve staat, primaire knoppen */
+  primary: '#E55A40',
+  /** Gloedrood: knop met witte tekst (4,9 : 1), links, iconen */
+  primaryMid: '#CE3B24',
+  /** Zachte merk-achtergrond (rood 50) */
+  primarySoft: '#FEF4F1',
+  /** Merk-tint voor chips, badges en avatars (rood 100) */
+  primaryTint: '#FCE7E1',
+  /** Nachtbruin: donkere vlakken, covers, schaduwkleur */
+  nachtbruin: '#3A1D16',
+
+  /** Hulpgroen: Bo, bevestiging, beschikbaar. Geen CTA meer. */
   accent: '#8DC93F',
   /** hover/donkere variant hulpgroen */
   accentDark: '#73B02B',
-  /** hover op groene knoppen */
+  /** hover op groene vlakken */
   accentHover: '#9AD44E',
-  successBg: '#F1F8E4',
+  /** tekst of icoon bovenop accent of oker: nooit wit */
+  onAccent: '#3A1D16',
+
+  successBg: '#EEF7E0',
   successText: '#4C7A16',
-  warnBg: '#FBF3E0',
-  warnText: '#9A6E0B',
-  /** semantisch oranje (brandbook "warning"): open plekken in de week */
-  warnDot: '#E19E11',
-  errorBg: '#FDEDEC',
-  error: '#D9413A',
-  /** bodytekst */
-  ink: '#112640',
-  /** secundaire tekst */
-  inkSoft: '#5A687A',
-  /** tertiaire tekst, placeholders */
-  inkFaint: '#8F9AAA',
-  /** randen */
-  line: '#E3E8F1',
+  warnBg: '#FBF0D8',
+  warnText: '#8A5E06',
+  /** Okergeel (brandbook "warning"): open plekken in de week */
+  warnDot: '#C98A0F',
+  errorBg: '#F6E2E6',
+  /** Alarmrood: donkerder en koeler dan het merk, altijd met icoon en woord */
+  error: '#9B1B30',
+
+  /** bodytekst (15,8 : 1 op linnen) */
+  ink: '#2B1A16',
+  /** secundaire tekst (6,3 : 1) */
+  inkSoft: '#6E574F',
+  /** tertiaire tekst, placeholders (3,3 : 1, alleen labels) */
+  inkFaint: '#9C857C',
+  /** randen, hairlines */
+  line: '#EDE2DD',
   /** lichte vlakken, iconentegels */
-  surfaceAlt: '#EEF2F8',
-  /** blauwe pill-achtergrond */
+  surfaceAlt: '#F6EEEA',
+
+  /** Kringblauw-tint: pill-achtergrond voor kring en uitleg */
   tintBlue: '#EAF1F9',
+  /** Kringblauw: kaart, kring, informatie */
+  blue: '#2A6CB0',
   /** lichtblauw hero-vlak van het dienst-detail (handoff voorzieningen) */
   heroBlue: '#E9F1FA',
-  /** app-achtergrond */
-  bg: '#F5F8FC',
+
+  /** app-achtergrond: Linnenwit, bijna wit met warme ondertoon */
+  bg: '#FCF8F6',
   white: '#FFFFFF',
   /** chatbubbel eigen bericht */
-  chatOwn: '#DEE8F4',
+  chatOwn: '#FCE7E1',
   /** chatbubbel ander */
   chatOther: '#EAF5D8',
 } as const;
 
 /**
  * Zachte bubbeltinten voor kringgenoten in de chat: iedere afzender krijgt
- * (op basis van zijn id) een vaste eigen tint, zodat je berichten van
- * verschillende mensen in één oogopslag uit elkaar houdt.
+ * (op basis van zijn id) een vaste eigen tint.
  */
-export const chatTints = ['#EAF5D8', '#FDF0DC', '#EFE6F7', '#DFF2F0', '#FBE8E8'] as const;
+export const chatTints = ['#EAF5D8', '#FDF0DC', '#EFE6F7', '#DFF2F0', '#FCE7E1'] as const;
 
 /** Deterministische tint voor een afzender (zelfde id → altijd dezelfde kleur). */
 export function chatTintFor(senderId: string): string {
@@ -64,12 +86,12 @@ export function chatTintFor(senderId: string): string {
 
 /**
  * Themakleuren van de Wegwijzer: elk kennisthema krijgt een eigen tint voor de
- * iconentegel, zodat je thema's uit elkaar houdt zonder ze te hoeven lezen.
- * Blauw, groen en oranje komen uit het merkpalet; paars is de enige extra tint
- * (dezelfde als de lila chatbubbel) en wordt nergens anders voor gebruikt.
+ * iconentegel. Rood, groen en blauw komen uit het merkpalet, paars is de enige
+ * extra tint en wordt nergens anders voor gebruikt.
  */
 export const themaTints = {
-  blauw: { vlak: colors.tintBlue, icoon: colors.primaryMid },
+  rood: { vlak: colors.primarySoft, icoon: colors.primaryDark },
+  blauw: { vlak: colors.tintBlue, icoon: colors.blue },
   groen: { vlak: colors.successBg, icoon: colors.successText },
   oranje: { vlak: colors.warnBg, icoon: colors.warnText },
   paars: { vlak: '#EFE6F7', icoon: '#6B4E93' },
@@ -78,46 +100,65 @@ export const themaTints = {
 export type ThemaTint = keyof typeof themaTints;
 
 /**
- * Rolkleuren uit het logo-verhaal (brandbook 2.1/2.2): blauw vraagt
- * (hulpvrager), groen geeft (buddy), navy draagt (beheerder, "de steun").
- * De makelaar leent het wegwijzer-paars. Gebruikt door RolChip en Bo.
+ * Rolkleuren: het merk (rood) draagt de beheerder, groen geeft (buddy),
+ * blauw vraagt (hulpvrager). De makelaar leent het wegwijzer-paars.
  */
 export const rolTints = {
-  beheerder: { vlak: '#E4EBF4', tekst: colors.primary, stip: colors.primary },
+  beheerder: { vlak: colors.primarySoft, tekst: colors.primaryDark, stip: colors.primary },
   vrijwilliger: { vlak: colors.successBg, tekst: colors.successText, stip: colors.accentDark },
-  hulpvrager: { vlak: colors.tintBlue, tekst: colors.primaryMid, stip: colors.primaryMid },
+  hulpvrager: { vlak: colors.tintBlue, tekst: colors.blue, stip: colors.blue },
   makelaar: { vlak: '#EFE6F7', tekst: '#6B4E93', stip: '#6B4E93' },
 } as const;
 
 export type RolTint = keyof typeof rolTints;
 
-/** Standaard-gradient (headers, welkom, videocall): 115deg primaryDark → primaryMid. */
+/**
+ * De paginabalk boven elk scherm: verloop van rood 400 naar rood 500 naar een
+ * dieper rood, diagonaal. Nooit rood naar groen verlopen.
+ */
 export const gradient = {
-  colors: [colors.primaryDark, colors.primaryMid] as [string, string],
+  colors: ['#EE6E52', colors.primary, '#D0492F'] as [string, string, string],
   start: { x: 0, y: 0 },
   end: { x: 1, y: 1 },
 } as const;
 
-/** Hulpgroene gradient van het regel-pad; ook voor de profielkop. */
+/** Donkere variant van de paginabalk: alleen beheer- en organisatieschermen. */
+export const gradientDonker = {
+  colors: ['#4A2A22', colors.nachtbruin] as [string, string],
+  start: { x: 0, y: 0 },
+  end: { x: 1, y: 1 },
+} as const;
+
+/** Groene gradient: bevestigingen en het profiel van een buddy. */
 export const gradientGroen = {
   colors: ['#5FA22A', colors.accent] as [string, string],
   start: { x: 0, y: 0 },
   end: { x: 1, y: 1 },
 } as const;
 
+/**
+ * Maten van de paginabalk (brandbook 7.2). Kies een variant, niet iets ertussenin.
+ */
+export const paginabalk = {
+  hoogteGroot: 180,
+  hoogteCompact: 120,
+  hoogteKlein: 96,
+  /** hoogte van de golfrand onderaan */
+  golfHoogte: 8,
+  /** Bo als wit silhouet op de achtergrond */
+  boDekking: 0.12,
+  boDekkingDonker: 0.08,
+  /** kringelstreep linksonder, alleen bij de grote variant */
+  kringelDekking: 0.5,
+} as const;
+
 /** Vlakken bijna vierkant; alles wat een actie of status is, is een pill. */
 export const radius = {
-  /** invoervelden */
   input: 8,
-  /** kleine rijen */
   row: 10,
-  /** kaarten */
   card: 12,
-  /** iconentegels (15–17) */
   tile: 16,
-  /** knoppen, chips, tabs, statuspillen */
   pill: 999,
-  /** chatbubbels: 18 18 6 18 (eigen) / 18 18 18 6 (ander) */
   bubble: 18,
   bubbleTail: 6,
 } as const;
@@ -129,11 +170,8 @@ export const spacing = {
   lg: 16,
   xl: 20,
   xxl: 24,
-  /** schermpadding 20–24 */
   screen: 20,
-  /** verticale gap tussen kaarten */
   cardGap: 10,
-  /** kaartpadding 16–22 */
   cardPadding: 18,
   chipGap: 8,
 } as const;
