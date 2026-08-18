@@ -22,7 +22,8 @@ module.exports = ({ config }) => ({
   android: {
     package: 'nl.thuisverzorgd.app',
     adaptiveIcon: {
-      backgroundColor: '#112F50',
+      // Linnenwit (huisstijl v4): dezelfde warme achtergrond als het icoon.
+      backgroundColor: '#FCF8F6',
       foregroundImage: './assets/images/android-icon-foreground.png',
       backgroundImage: './assets/images/android-icon-background.png',
       monochromeImage: './assets/images/android-icon-monochrome.png',
@@ -39,7 +40,7 @@ module.exports = ({ config }) => ({
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#112F50',
+        backgroundColor: '#FCF8F6',
         image: './assets/images/splash-icon.png',
         imageWidth: 76,
       },
