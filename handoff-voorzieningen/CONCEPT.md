@@ -1,4 +1,6 @@
 # Thuisverzorgd — twee paden, mascotte Bo & voorzieningen
+
+> **Let op (18-08-2026):** de kleuren in deze handoff (hulpgroen/blauw/amber voor de padbalken) zijn vervangen door huisstijl v4: elke paginabalk is Thuisrood, de aanbieder Nachtbruin. Zie `apps/mobile/src/theme/HUISSTIJL.md`. Flows en lay-out blijven gelden.
 Handoff voor Claude Code · augustus 2026 · bron: `TVZ App v3.dc.html` (Claude Design)
 
 ## 1. Het idee

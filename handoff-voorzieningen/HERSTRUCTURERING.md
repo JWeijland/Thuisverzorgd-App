@@ -1,5 +1,7 @@
 # Thuisverzorgd — herstructurering (voor Claude Code)
 
+> **Let op (18-08-2026):** de kleuren in deze handoff (hulpgroen/blauw/amber voor de padbalken) zijn vervangen door huisstijl v4: elke paginabalk is Thuisrood, de aanbieder Nachtbruin. Zie `apps/mobile/src/theme/HUISSTIJL.md`. Flows en lay-out blijven gelden.
+
 Dit document beschrijft **wat er in de app-structuur is veranderd** ten opzichte van de eerdere versie met een tabbalk onderaan. Het gaat over opbouw, navigatie, knoppen en flows — **niet** over kleuren, typografie of styling; die staan al vast in de designrichtlijnen (o.a. de groene ringel-streep boven pagina's, Baloo 2 + Comic Neue, mascotte Bo).
 
 Referentie-ontwerp: `TVZ App v3.dc.html`. Screenshots in `screens/`.
