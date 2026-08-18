@@ -78,7 +78,10 @@ export default function ZoekPopup() {
           accessibilityLabel={t('algemeen.sluiten')}
           onPress={() => {
             void haptics.tik();
-            router.back();
+            // Via een melding kun je hier direct binnenkomen; dan is er geen
+            // terugstapel en val je terug op de hulp-pagina.
+            if (router.canGoBack()) router.back();
+            else router.replace('/regelen/voorzieningen');
           }}
           style={styles.sluiten}
         >
@@ -86,7 +89,9 @@ export default function ZoekPopup() {
         </Pressable>
       </View>
 
-      <WegwijzerLijst kop={kop} />
+      {/* De zoekbalk groot en bovenaan, toetsenbord meteen open: je komt
+          hier om je vraag te typen (wens Jelle 18-08). */}
+      <WegwijzerLijst kop={kop} prominent />
     </SafeAreaView>
   );
 }

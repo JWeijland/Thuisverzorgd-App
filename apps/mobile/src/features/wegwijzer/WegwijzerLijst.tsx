@@ -54,7 +54,18 @@ export function vraagAanMakelaar(vraag?: string) {
  * "mantelwoning" en krijgt het onderwerp dat daarover gaat. Vind je het
  * antwoord niet, dan stap je onderaan door naar een hulpmakelaar.
  */
-export function WegwijzerLijst({ kop }: { kop?: ReactNode }) {
+export function WegwijzerLijst({
+  kop,
+  prominent = false,
+}: {
+  kop?: ReactNode;
+  /**
+   * Zet de zoekbalk groot en bovenaan, met het toetsenbord meteen open. Voor
+   * de zoek-popup achter het vergrootglas: daar kom je om te typen (wens
+   * Jelle 18-08).
+   */
+  prominent?: boolean;
+}) {
   const [term, setTerm] = useState('');
   const [thema, setThema] = useState<string | null>(null);
   const zoekterm = useDebounced(term);
@@ -97,10 +108,15 @@ export function WegwijzerLijst({ kop }: { kop?: ReactNode }) {
     <View style={styles.fill}>
       <ScrollView contentContainerStyle={styles.list} keyboardShouldPersistTaps="handled">
         {/* Alles boven de kennisbank (vandaag-strip, makelaar-blok) scrolt mee,
-            zodat de pagina één doorlopend geheel blijft. */}
-        {!zoekt && kop ? kop : null}
-        <View style={styles.zoekbalk}>
-          <Search color={colors.inkFaint} size={19} strokeWidth={2.2} />
+            zodat de pagina één doorlopend geheel blijft. In de prominente
+            variant staat de zoekbalk juist bovenaan: eerst typen, dan lezen. */}
+        {!prominent && !zoekt && kop ? kop : null}
+        <View style={[styles.zoekbalk, prominent && styles.zoekbalkGroot]}>
+          <Search
+            color={prominent ? colors.primary : colors.inkFaint}
+            size={prominent ? 22 : 19}
+            strokeWidth={2.2}
+          />
           <TextInput
             textContentType="none"
             autoComplete="off"
@@ -108,8 +124,9 @@ export function WegwijzerLijst({ kop }: { kop?: ReactNode }) {
             onChangeText={setTerm}
             placeholder={t('wegwijzer.zoekPlaceholder')}
             placeholderTextColor={colors.inkFaint}
-            style={styles.zoekveld}
+            style={[styles.zoekveld, prominent && styles.zoekveldGroot]}
             autoCorrect={false}
+            autoFocus={prominent}
             returnKeyType="search"
             accessibilityLabel={t('wegwijzer.zoekPlaceholder')}
           />
@@ -124,6 +141,7 @@ export function WegwijzerLijst({ kop }: { kop?: ReactNode }) {
             </Pressable>
           ) : null}
         </View>
+        {prominent && !zoekt && kop ? kop : null}
         {zoekt ? (
           <>
             {(suggesties.data ?? []).length > 0 ? (
@@ -460,12 +478,23 @@ const styles = StyleSheet.create({
     minHeight: 48,
     marginBottom: spacing.md,
   },
+  // De grote variant voor de zoek-popup: dit is waar het scherm om draait,
+  // dus de balk mag niet wegvallen tussen de kaarten.
+  zoekbalkGroot: {
+    minHeight: 58,
+    borderWidth: 2,
+    borderColor: colors.primaryMid,
+    paddingHorizontal: 18,
+  },
   zoekveld: {
     flex: 1,
     fontFamily: 'ComicNeue_400Regular',
     fontSize: 15.5,
     color: colors.ink,
     paddingVertical: 12,
+  },
+  zoekveldGroot: {
+    fontSize: 17,
   },
   list: {
     padding: spacing.screen,

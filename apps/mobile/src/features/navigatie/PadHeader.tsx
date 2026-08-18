@@ -153,9 +153,9 @@ export function PadHeader({
                 void haptics.tik();
                 router.push('/regelen/zoek');
               }}
-              style={styles.rond}
+              style={styles.zoekKnop}
             >
-              <Search color={colors.white} size={19} strokeWidth={2.4} />
+              <Search color={colors.primary} size={20} strokeWidth={2.6} />
             </Pressable>
           ) : null}
 
@@ -299,6 +299,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  // Het vergrootglas als witte knop, even zwaar als de Bo-knop: de zoekbalk
+  // erachter moet je kunnen vinden (wens Jelle 18-08).
+  zoekKnop: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
   },
   boKnop: {
     width: 38,
