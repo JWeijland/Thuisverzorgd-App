@@ -281,7 +281,8 @@
     "startTitel": "Nog geen hulpkring",
     "startTekst": "In zes korte stappen zet je samen met Bo een kring op rond de persoon voor wie je zorgt.",
     "startKnop": "Begin met Bo",
-    "startVerder": "Ga verder waar je gebleven was"
+    "startVerder": "Ga verder waar je gebleven was",
+    "middelpunt": "Middelpunt van de kring"
   },
   "aanvraag": {
     "titelAanvraag": "Aanvraag voor de kring",
@@ -705,7 +706,7 @@
     "buddyTegelTitel": "Buddy op bezoek",
     "buddyTegelTekst": "Een vrijwilliger uit de buurt komt gratis langs.",
     "dienstenTitel": "Diensten aan huis",
-    "dienstenSub": "Aanbieders uit de buurt. Je betaalt pas na het bezoek.",
+    "dienstenSub": "Aanbieders uit de buurt.",
     "perBezoek": "per bezoek",
     "perUur": "per uur",
     "uurKort": "/u",
@@ -717,7 +718,7 @@
     "verwachtRegelUur": "per uur · bij jou thuis · gelieerd aan Thuisverzorgd",
     "wanneerTitel": "Wanneer komt {naam}?",
     "snelst": "snelst",
-    "betaalNa": "Betaal na het bezoek · gratis annuleren tot 24 uur vooraf",
+    "betaalNa": "Gratis annuleren tot 24 uur vooraf",
     "boekSlot": "Boek {moment}",
     "afrekenenTitel": "Afrekenen",
     "overzichtDienst": "Dienst",
@@ -879,7 +880,7 @@
   },
   "paden": {
     "keuzeTitel": "Waar kan Bo je mee helpen?",
-    "keuzeSub": "Kies een kant. Je kunt altijd wisselen via Bo bovenin.",
+    "keuzeSub": "Regel hulp voor je naaste. Via Bo bovenin kom je hier altijd terug.",
     "gegevens": "Mijn gegevens en instellingen",
     "naarKeuze": "Terug naar de keuze",
     "naarProfiel": "Mijn gegevens",
