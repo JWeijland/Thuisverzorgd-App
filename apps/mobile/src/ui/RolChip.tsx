@@ -12,7 +12,7 @@ type Props = {
 
 /**
  * Rolchip: klein pilletje met stip en rolnaam in de vaste rolkleur
- * (logo-verhaal: navy draagt, groen geeft, blauw vraagt; makelaar paars).
+ * (logo-verhaal v4: rood draagt, groen geeft, blauw vraagt; makelaar paars).
  * Staat overal waar een persoon genoemd wordt, zodat rollen herkenbaar zijn.
  */
 export function RolChip({ rol, meervoud = false }: Props) {

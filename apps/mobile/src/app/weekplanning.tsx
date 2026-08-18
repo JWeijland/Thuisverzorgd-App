@@ -302,8 +302,8 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryMid,
   },
   periodChipActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.primaryMid,
+    borderColor: colors.primaryMid,
   },
   periodTextActive: {
     color: colors.white,

@@ -8,7 +8,7 @@ import { colors, gradient, radius, spacing } from '@/theme';
 import { Bo, Button, TvzBounce, TvzText } from '@/ui';
 import { useStatusBalk } from '@/lib/statusbalk';
 
-/** Welkom (screen 01): navy gradient, logo met stuiterende balkjes, twee knoppen. */
+/** Welkom (screen 01): Thuisrood verloop, logo met stuiterende balkjes, twee knoppen. */
 export default function WelkomScreen() {
   useStatusBalk('licht');
   return (

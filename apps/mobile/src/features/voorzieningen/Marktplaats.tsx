@@ -48,7 +48,7 @@ export function Marktplaats() {
               onPress={() => router.push('/dienst/buddy')}
             >
               {/* De vage stockfoto is weg (wens Jelle 18-08): een rustige
-                  navy banner in de merkstijl, met een duidelijk icoon en de
+                  donkere banner in de merkstijl, met een duidelijk icoon en de
                   gratis-pil. Zo springt de belangrijkste voorziening eruit
                   zonder dat je iets hoeft te ontcijferen. */}
               <LinearGradient
@@ -144,7 +144,7 @@ function MakelaarTegel() {
             ))}
           </View>
         ) : (
-          <MessagesSquare color={colors.primary} size={20} strokeWidth={2.2} />
+          <MessagesSquare color={colors.primaryMid} size={20} strokeWidth={2.2} />
         )}
       </View>
       <View style={styles.makelaarTekst}>
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
     gap: spacing.cardGap,
   },
-  // Buddy is de belangrijkste voorziening van de app: een brede navy banner
+  // Buddy is de belangrijkste voorziening van de app: een brede donkere banner
   // die duidelijk boven het raster van betaalde diensten staat.
   buddyTegel: {
     flexDirection: 'row',

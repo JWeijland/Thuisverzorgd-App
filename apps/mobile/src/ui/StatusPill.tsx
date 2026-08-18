@@ -21,5 +21,5 @@ const kinds: Record<StatusKind, { bg: string; color: string }> = {
   success: { bg: colors.successBg, color: colors.successText },
   warn: { bg: colors.warnBg, color: colors.warnText },
   error: { bg: colors.errorBg, color: colors.error },
-  info: { bg: colors.tintBlue, color: colors.primary },
+  info: { bg: colors.tintBlue, color: colors.blue },
 };

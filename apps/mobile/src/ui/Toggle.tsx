@@ -19,7 +19,7 @@ type Props = {
 const TRACK_WIDTH = 52;
 const TRACK_HEIGHT = 32;
 const THUMB = 26;
-const OFF_TRACK = '#E0E5EE';
+const OFF_TRACK = colors.line;
 
 /** Schakelaar in merkstijl: aan = Hulpgroen, uit = grijs (brandbook 5.2). */
 export function Toggle({ value, onValueChange, accessibilityLabel }: Props) {

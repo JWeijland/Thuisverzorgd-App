@@ -141,7 +141,7 @@ export function Marker({ coordinate, anchor, onPress, children }: MarkerProps) {
 /**
  * Druppelmarkers naar het handoff-ontwerp 1d ("druppel met labelpill", zonder
  * de labelpill): kleinere druppels; hulpkring wit met twee stipjes, directe
- * hulp navy met groene bliksem. ViewBox 52x66, punt van de druppel op y≈53.
+ * hulp Thuisrood met groene bliksem. ViewBox 52x66, punt van de druppel op y≈53.
  * De blur-filters uit de SVG's rendert react-native-svg niet; de grondschaduw
  * is daarom een vlakke ellips.
  */
@@ -161,7 +161,7 @@ const PIN_ANCHOR_Y = 52.84 / 66;
 const HIT_PAD = 12;
 
 /**
- * Hulpkring: witte druppel met navy rand en twee stipjes (blauw + groen), met
+ * Hulpkring: witte druppel met rode rand en twee stipjes (rood + groen), met
  * de kringnaam als labelpil eronder (ontwerp 1d).
  */
 export function KringMarker({
@@ -191,7 +191,7 @@ export function KringMarker({
     >
       <View style={styles.kringWrap}>
         <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
-          <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill="#112F50" opacity={0.15} />
+          <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill={colors.nachtbruin} opacity={0.15} />
           <Path d={PIN_PATH} fill={colors.white} stroke={colors.primary} strokeWidth={4} />
           <Rect x={13} y={20.5} width={11} height={8} rx={4} fill={colors.primaryMid} />
           <Rect x={28} y={20.5} width={11} height={8} rx={4} fill={colors.accent} />
@@ -201,7 +201,7 @@ export function KringMarker({
                 width={22}
                 height={22}
                 rx={11}
-                fill="#8DC93F"
+                fill={colors.accent}
                 stroke={colors.white}
                 strokeWidth={2.5}
               />
@@ -210,7 +210,7 @@ export function KringMarker({
                 y={15.7}
                 fontSize={12.5}
                 fontWeight="700"
-                fill="#112F50"
+                fill={colors.primary}
                 textAnchor="middle"
               >
                 {`+${plekkenVrij}`}
@@ -274,7 +274,7 @@ export function BuddyMarker({
   );
 }
 
-/** Directe hulp: navy druppel met groene bliksem en een zachte gloed eromheen. */
+/** Directe hulp: Thuisrode druppel met groene bliksem en een zachte gloed eromheen. */
 export function RequestMarker({
   lat,
   lon,
@@ -298,9 +298,9 @@ export function RequestMarker({
     >
       <View style={styles.kringWrap}>
         <Svg width={PIN_W} height={PIN_H} viewBox="0 0 52 66">
-          <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill="#112F50" opacity={0.15} />
-          <SvgCircle cx={26} cy={24} r={22} fill="#8DC93F" opacity={0.18} />
-          <Path d={PIN_PATH} fill="#112F50" stroke={colors.white} strokeWidth={3.5} />
+          <Ellipse cx={26} cy={61} rx={10} ry={3.5} fill={colors.nachtbruin} opacity={0.15} />
+          <SvgCircle cx={26} cy={24} r={22} fill={colors.accent} opacity={0.18} />
+          <Path d={PIN_PATH} fill={colors.primary} stroke={colors.white} strokeWidth={3.5} />
           <Path d="M29.5 10.5 L17.5 27.5 h6.5 L22.5 39 L34.5 22.5 h-6.5 Z" fill={colors.accent} />
         </Svg>
         {label ? (
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   labelText: {
-    color: colors.primary,
+    color: colors.primaryDark,
     fontSize: 11,
   },
   buddyWrap: {

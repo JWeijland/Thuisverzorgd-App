@@ -28,7 +28,7 @@ const useDismissed = create<{ ids: string[]; dismiss: (id: string) => void }>((s
 }));
 
 /**
- * Persistente taakbanner: dunne navy pill met de eerstvolgende geclaimde taak.
+ * Persistente taakbanner: dunne Diepbaksteen-pill met de eerstvolgende geclaimde taak.
  * Tik = uitklappen naar een detailkaart met afronden (pas vanaf de afgesproken
  * tijd) en terugdraaien zolang de banner open staat.
  */

@@ -69,7 +69,7 @@ export default function AfrekenenScreen() {
           onPress={() => router.back()}
           style={styles.terug}
         >
-          <ChevronLeft color={colors.primary} size={26} strokeWidth={2.4} />
+          <ChevronLeft color={colors.primaryMid} size={26} strokeWidth={2.4} />
         </Pressable>
         <TvzText preset="screenTitle" style={styles.titel}>
           {t('voorzien.afrekenenTitel')}
@@ -115,7 +115,7 @@ export default function AfrekenenScreen() {
               onPress={() => setMethode(key)}
               style={[styles.betaalRij, index > 0 && styles.betaalRijLijn]}
             >
-              <Icon color={colors.primary} size={22} strokeWidth={2.2} />
+              <Icon color={colors.primaryMid} size={22} strokeWidth={2.2} />
               <TvzText preset="body" style={styles.betaalLabel}>
                 {label}
               </TvzText>

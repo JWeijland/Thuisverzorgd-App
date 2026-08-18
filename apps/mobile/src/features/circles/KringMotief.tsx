@@ -15,7 +15,7 @@ import { colors, shadows } from '@/theme';
 
 /**
  * "De kring als beeld" uit het brandbook: buddy's (blauw en groen) rondom één
- * hulpvrager (navy). Dit motief keert terug in illustraties en decoratie, dus
+ * hulpvrager (dieprood). Dit motief keert terug in illustraties en decoratie, dus
  * gebruiken we het hier als het beeld bij het aanmaken van een hulpkring.
  *
  * De buddy's komen één voor één binnenvliegen. Zodra de kring echt is

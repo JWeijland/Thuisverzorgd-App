@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     width: 44,
   },
   dayName: {
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   dayDate: {
     fontSize: 11.5,

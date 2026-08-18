@@ -16,7 +16,7 @@ export function InboxBell() {
       onPress={() => router.push('/inbox')}
       style={styles.button}
     >
-      <Bell color={colors.primary} size={20} strokeWidth={2.2} />
+      <Bell color={colors.primaryMid} size={20} strokeWidth={2.2} />
       {unread > 0 ? <View style={styles.dot} /> : null}
     </Pressable>
   );

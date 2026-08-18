@@ -399,7 +399,7 @@ function KringKaart({
     <View style={[styles.kringKaart, shadows.card]}>
       <View style={styles.kringKop}>
         <View style={styles.kringIcon}>
-          <MapPin color={colors.primary} size={17} strokeWidth={2.4} />
+          <MapPin color={colors.primaryMid} size={17} strokeWidth={2.4} />
         </View>
         <View style={styles.kringKopText}>
           <TvzText preset="cardTitle">{circle.name}</TvzText>
@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
   topLayer: {
     paddingHorizontal: spacing.screen,
   },
-  // Tellerkaart (ontwerp 1a): navy vlak met groene pin, kringen dik, aanvragen eronder.
+  // Tellerkaart (ontwerp 1a): donker merkvlak met groene pin, kringen dik, aanvragen eronder.
   // Zacht wit vlak dat over de kaart zweeft in plaats van een donkerblauw
   // blok: de kaart blijft het beeld, de teller is een notitie erover
   // (feedback Jelle 11-08).

@@ -10,7 +10,7 @@ type Props = {
   onPress?: () => void;
 };
 
-/** Selecteerbare filter-/keuzechip: gekozen wordt navy, de rest blijft licht. */
+/** Selecteerbare filter-/keuzechip: gekozen wordt Gloedrood, de rest blijft licht. */
 export function Chip({ label, selected = false, onPress }: Props) {
   const { factor } = useTextScale();
   return (
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   selected: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMid,
   },
   unselected: {
     backgroundColor: colors.white,

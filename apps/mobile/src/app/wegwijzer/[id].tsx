@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   stapNrTekst: {
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   stapTekst: {
     flex: 1,
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
   linkTekst: {
     flex: 1,
     fontSize: 15,
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   bijgewerkt: {
     color: colors.inkFaint,

@@ -16,7 +16,7 @@ type Props = {
   haptic?: HapticSoort | 'geen';
 };
 
-/** Standaard voelt een groene CTA steviger dan een gewone knop. */
+/** Standaard voelt de grote CTA steviger dan een gewone knop. */
 const hapticPerVariant: Record<Variant, HapticSoort> = {
   primary: 'tik',
   cta: 'stevig',
@@ -26,8 +26,10 @@ const hapticPerVariant: Record<Variant, HapticSoort> = {
 };
 
 /**
- * Alles wat een actie is, is een pill (radius 999).
- * `cta` (Hulpgroen) maximaal één per scherm; nooit witte tekst op groen.
+ * Alles wat een actie is, is een pill (radius 999). Knoppen met witte tekst
+ * zijn Gloedrood (huisstijl v4, 4,9:1): kleine witte tekst mag niet op
+ * Thuisrood, en groen is geen knopkleur meer. `cta` is de zwaarste knop,
+ * maximaal een per scherm.
  */
 export function Button({
   label,
@@ -74,11 +76,11 @@ export function Button({
 }
 
 const variants: Record<Variant, { container: ViewStyle; color: string }> = {
-  primary: { container: { backgroundColor: colors.primary }, color: colors.white },
-  cta: { container: { backgroundColor: colors.accent }, color: colors.primaryDark },
+  primary: { container: { backgroundColor: colors.primaryMid }, color: colors.white },
+  cta: { container: { backgroundColor: colors.primaryMid }, color: colors.white },
   outline: {
     container: { backgroundColor: colors.white, borderWidth: 1.5, borderColor: colors.line },
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   outlineOnDark: {
     container: {
@@ -104,10 +106,10 @@ const styles = StyleSheet.create({
     minHeight: hitTarget.cta,
   },
   disabled: {
-    backgroundColor: '#C7D2E2',
+    backgroundColor: colors.line,
     borderWidth: 0,
   },
   disabledText: {
-    color: colors.white,
+    color: colors.inkFaint,
   },
 });

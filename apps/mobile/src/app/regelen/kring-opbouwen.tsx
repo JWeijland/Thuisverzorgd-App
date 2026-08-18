@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceAlt,
   },
   pilAan: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMid,
   },
   pilTekstAan: {
     color: colors.white,

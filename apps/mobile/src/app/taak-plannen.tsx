@@ -446,8 +446,8 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   dagAan: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.primaryMid,
+    borderColor: colors.primaryMid,
   },
   dagTekst: {
     color: colors.inkFaint,

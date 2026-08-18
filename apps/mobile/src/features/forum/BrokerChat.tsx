@@ -387,7 +387,7 @@ function MakelaarProfiel({
             <View style={styles.profielMetaRow}>
               <Pill
                 label={t('steun.makelaarBadge')}
-                color={colors.primary}
+                color={colors.primaryMid}
                 backgroundColor={colors.white}
               />
               {makelaar.city ? (
@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     flex: 1,
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   wisselPill: {
     borderRadius: radius.pill,
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   bubbleNaam: {
-    color: colors.primary,
+    color: colors.primaryDark,
     fontSize: 11,
     marginBottom: 1,
   },
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMid,
     alignItems: 'center',
     justifyContent: 'center',
   },

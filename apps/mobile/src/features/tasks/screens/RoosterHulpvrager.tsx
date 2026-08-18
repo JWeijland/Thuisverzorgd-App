@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   callButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMid,
     color: colors.white,
     borderRadius: radius.pill,
     textAlign: 'center',

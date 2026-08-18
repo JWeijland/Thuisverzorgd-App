@@ -675,7 +675,7 @@ export default function ProfielScreen() {
         ) : (
           <>
             <Pressable accessibilityRole="button" onPress={photoFromCamera} style={styles.photoRow}>
-              <Camera color={colors.primary} size={22} strokeWidth={2.2} />
+              <Camera color={colors.primaryMid} size={22} strokeWidth={2.2} />
               <TvzText preset="cardTitle" style={styles.photoLabel}>
                 {t('idFoto.maakFoto')}
               </TvzText>
@@ -685,7 +685,7 @@ export default function ProfielScreen() {
               onPress={photoFromLibrary}
               style={styles.photoRow}
             >
-              <Images color={colors.primary} size={22} strokeWidth={2.2} />
+              <Images color={colors.primaryMid} size={22} strokeWidth={2.2} />
               <TvzText preset="cardTitle" style={styles.photoLabel}>
                 {t('idFoto.uitBibliotheek')}
               </TvzText>
@@ -773,8 +773,8 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
   },
   dagAan: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.primaryMid,
+    borderColor: colors.primaryMid,
   },
   dagTekstAan: {
     color: colors.white,
@@ -789,7 +789,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMid,
     borderWidth: 2,
     borderColor: colors.white,
     alignItems: 'center',

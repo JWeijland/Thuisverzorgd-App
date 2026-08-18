@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
     color: colors.inkSoft,
   },
   schuifTekstActief: {
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   motiefKlein: {
     marginBottom: spacing.sm,

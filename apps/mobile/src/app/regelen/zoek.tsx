@@ -29,7 +29,7 @@ export default function ZoekPopup() {
       {/* Kleine beschrijving: wat dit is en waarom je het kunt vertrouwen. */}
       <View style={styles.uitlegRij}>
         <View style={styles.uitlegIcoon}>
-          <BookOpenCheck color={colors.primary} size={20} strokeWidth={2.2} />
+          <BookOpenCheck color={colors.primaryMid} size={20} strokeWidth={2.2} />
         </View>
         <TvzText preset="secondary" style={styles.uitlegTekst}>
           {t('zoekPopup.uitleg')}
@@ -47,7 +47,7 @@ export default function ZoekPopup() {
       >
         <Card style={styles.makelaarKaart}>
           <View style={styles.makelaarIcoon}>
-            <MessagesSquare color={colors.primary} size={18} strokeWidth={2.2} />
+            <MessagesSquare color={colors.primaryMid} size={18} strokeWidth={2.2} />
           </View>
           <View style={styles.makelaarTekst}>
             <TvzText preset="bodyBold">{t('zoekPopup.makelaarTitel')}</TvzText>
@@ -65,7 +65,7 @@ export default function ZoekPopup() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.titelRij}>
         <View style={styles.titelIcoon}>
-          <Search color={colors.primary} size={20} strokeWidth={2.4} />
+          <Search color={colors.primaryMid} size={20} strokeWidth={2.4} />
         </View>
         <View style={styles.titelTekst}>
           <TvzText preset="screenTitle" style={styles.titel}>

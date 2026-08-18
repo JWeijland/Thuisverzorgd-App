@@ -193,7 +193,7 @@ export default function IdEnFotoScreen() {
           onPress={() => choosing && pickFromCamera(choosing)}
           style={styles.sourceRow}
         >
-          <Camera color={colors.primary} size={22} strokeWidth={2.2} />
+          <Camera color={colors.primaryMid} size={22} strokeWidth={2.2} />
           <TvzText preset="cardTitle" style={styles.sourceLabel}>
             {t('idFoto.maakFoto')}
           </TvzText>
@@ -203,7 +203,7 @@ export default function IdEnFotoScreen() {
           onPress={() => choosing && pickFromLibrary(choosing)}
           style={styles.sourceRow}
         >
-          <Images color={colors.primary} size={22} strokeWidth={2.2} />
+          <Images color={colors.primaryMid} size={22} strokeWidth={2.2} />
           <TvzText preset="cardTitle" style={styles.sourceLabel}>
             {t('idFoto.uitBibliotheek')}
           </TvzText>

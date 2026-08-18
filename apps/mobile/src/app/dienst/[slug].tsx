@@ -53,7 +53,7 @@ export default function DienstDetail() {
               onPress={() => router.back()}
               style={styles.terug}
             >
-              <ChevronLeft color={colors.primary} size={26} strokeWidth={2.4} />
+              <ChevronLeft color={colors.primaryMid} size={26} strokeWidth={2.4} />
             </Pressable>
             <View style={styles.heroInhoud}>
               <View style={styles.avatarRing}>

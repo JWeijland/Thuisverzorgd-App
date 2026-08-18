@@ -5,7 +5,7 @@ import { colors } from '@/theme';
 /**
  * Eigen icoonset voor de Wegwijzer, getekend volgens het brandbook (5.3
  * Iconografie): lijndikte 2,2 op een 24-raster, ronde uiteinden en hoeken,
- * navy als basis, en de handtekening van het merk: elk icoon heeft precies
+ * het merkrood als basis, en de handtekening van het merk: elk icoon heeft precies
  * één ronde vorm die Hulpgroen vult. Nooit twee groene stippen in één icoon.
  *
  * Ze staan op de themategels in een squircle met de themakleur eronder, zoals
@@ -115,7 +115,7 @@ const STANDAARD: Tekening = TEKENINGEN.basis!;
 export function ThemaIcoon({
   thema,
   size = 22,
-  kleur = colors.primary,
+  kleur = colors.primaryMid,
 }: {
   /** De slug van het thema, bijv. "wonen". */
   thema: string;

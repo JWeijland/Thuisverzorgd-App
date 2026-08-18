@@ -14,8 +14,8 @@ type Props = {
 /** Kleine informatieve pill (badge), bijv. rolpill of "± 1 uur". */
 export function Pill({
   label,
-  color = colors.primary,
-  backgroundColor = colors.tintBlue,
+  color = colors.primaryDark,
+  backgroundColor = colors.primaryTint,
   style,
 }: Props) {
   const { factor } = useTextScale();

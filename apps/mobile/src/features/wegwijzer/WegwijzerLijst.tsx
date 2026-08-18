@@ -450,7 +450,7 @@ export function MakelaarKaart({ vraag }: { vraag?: string }) {
     >
       <Card style={styles.makelaar}>
         <View style={styles.makelaarIcoon}>
-          <MessagesSquare color={colors.primary} size={20} strokeWidth={2.2} />
+          <MessagesSquare color={colors.primaryMid} size={20} strokeWidth={2.2} />
         </View>
         <View style={styles.fill}>
           <TvzText preset="cardTitle">{t('wegwijzer.makelaarTitel')}</TvzText>
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
     minHeight: 32,
   },
   antwoordBronTekst: {
-    color: colors.primary,
+    color: colors.primaryDark,
     flexShrink: 1,
   },
   antwoordOverige: {
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     color: colors.inkFaint,
   },
   raak: {
-    color: colors.primary,
+    color: colors.primaryDark,
     fontSize: 13.5,
     lineHeight: 20,
   },
@@ -646,7 +646,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   terugText: {
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   makelaarWrap: {
     marginTop: spacing.md,

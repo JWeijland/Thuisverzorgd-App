@@ -60,7 +60,7 @@ export default function BuddyZoeken() {
           style={styles.kaartKnop}
         >
           <View style={styles.kaartIcoon}>
-            <Map color={colors.primary} size={24} strokeWidth={2.2} />
+            <Map color={colors.primaryMid} size={24} strokeWidth={2.2} />
           </View>
           <View style={styles.kaartTekst}>
             <TvzText preset="cardTitle">{t('buddyZoeken.opDeKaart')}</TvzText>

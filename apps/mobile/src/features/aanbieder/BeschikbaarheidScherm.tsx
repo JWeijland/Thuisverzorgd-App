@@ -272,7 +272,7 @@ function DatumStepper({
           }}
           style={[styles.stepperKnop, !kanTerug && styles.stepperKnopUit]}
         >
-          <ChevronLeft color={kanTerug ? colors.primary : colors.inkFaint} size={22} strokeWidth={2.4} />
+          <ChevronLeft color={kanTerug ? colors.primaryMid : colors.inkFaint} size={22} strokeWidth={2.4} />
         </Pressable>
         <TvzText preset="cardTitle" style={styles.stepperDatum}>
           {dagLabel(waarde)}
@@ -286,7 +286,7 @@ function DatumStepper({
           }}
           style={styles.stepperKnop}
         >
-          <ChevronRight color={colors.primary} size={22} strokeWidth={2.4} />
+          <ChevronRight color={colors.primaryMid} size={22} strokeWidth={2.4} />
         </Pressable>
       </View>
     </View>
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceAlt,
   },
   tijdTekst: {
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   geslotenTekst: {
     paddingHorizontal: spacing.sm,

@@ -5,7 +5,7 @@ import { TvzBounce } from '@/ui/animations';
 
 /**
  * Laad-animatie volgens het brandbook ("bij laden valt het logo uiteen in
- * drie stuiterende stippen: blauw, groen, navy") — geen systeem-spinner.
+ * drie stuiterende stippen: rood, groen, dieprood") — geen systeem-spinner.
  */
 export function TvzLoader({ onDark = false }: { onDark?: boolean }) {
   const dotColors = [colors.primaryMid, colors.accent, onDark ? colors.white : colors.primaryDark];

@@ -130,7 +130,7 @@ export default function OpleidingScreen() {
                       onPress={() => WebBrowser.openBrowserAsync(module.video_url!)}
                       style={styles.videoKnop}
                     >
-                      <PlayCircle color={colors.primary} size={22} strokeWidth={2.2} />
+                      <PlayCircle color={colors.primaryMid} size={22} strokeWidth={2.2} />
                       <TvzText preset="cardTitle" style={styles.videoLabel}>
                         {module.video_label ?? t('opleiding.bekijkVideo')}
                       </TvzText>
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accentDark,
   },
   moduleNrText: {
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   moduleTitel: {
     flex: 1,
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   videoLabel: {
     flex: 1,
     fontSize: 15,
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   slot: {
     alignItems: 'center',

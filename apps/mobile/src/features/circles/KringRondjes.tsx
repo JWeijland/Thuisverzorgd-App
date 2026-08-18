@@ -51,7 +51,7 @@ function Rondje({ circleId, naam }: { circleId: string; naam: string }) {
         name={hulpvrager?.profile?.name ?? naam}
         avatarPath={hulpvrager?.profile?.avatar_path}
         size={48}
-        backgroundColor={colors.primary}
+        backgroundColor={colors.primaryMid}
       />
     </Pressable>
   );

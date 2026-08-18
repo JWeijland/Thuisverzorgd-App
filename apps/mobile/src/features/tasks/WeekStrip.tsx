@@ -146,13 +146,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.tintBlue,
   },
   dayName: {
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   dayNum: {
     fontSize: 12,
   },
   todayText: {
-    color: colors.primary,
+    color: colors.primaryDark,
   },
   dots: {
     flexDirection: 'row',
